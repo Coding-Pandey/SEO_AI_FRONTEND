@@ -158,7 +158,7 @@ const KeywordTool = () => {
                     </h2>
                     <ul className="previous_post p-0">
                   
-                      {seoClusterData.map((item: any, index) => {
+                      {seoClusterData.map((item: any) => {
                         const expirationDate = new Date(item.last_reset);
                         const currentDate = new Date();
 

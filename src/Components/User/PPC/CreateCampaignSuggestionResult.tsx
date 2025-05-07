@@ -133,17 +133,17 @@ const CreateCampaignSuggestionResult = () => {
     type,
     groupId,
   }) => {
+    const initialText = type === 'headline' ? item.text.Ad_Headline : item.text.Description;
     const [isEditing, setIsEditing] = useState(false);
-    const [editedText, setEditedText] = useState(item.text);
-    const [charCount, setCharCount] = useState(item.text.length);
+    const [editedText, setEditedText] = useState(initialText);
+    const [charCount, setCharCount] = useState(initialText.length);
   
     const handleEditClick = () => {
       setIsEditing(true);
     };
   
-    // Dynamic max length based on type
     const getMaxLength = () => {
-      return type === 'headline' ? 50 : 100; // Headline max 50, Description max 100
+      return type === 'headline' ? 50 : 100;
     };
   
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -155,38 +155,58 @@ const CreateCampaignSuggestionResult = () => {
       }
     };
   
+ 
     const handleSave = () => {
-      if (editedText === "") {
+      if (editedText.trim() === "") {
         alert(`Please enter a ${type === 'headline' ? 'headline' : 'description'} name.`);
         return;
       }
-  
+    
       const updatedData = JSON.parse(localStorage.getItem("ClusterData") || "[]");
-  
+    
       const updatedDataWithText = updatedData.map((group: any) => {
         if (group.Page_title_id === groupId) {
           return {
             ...group,
-            [type === 'headline' ? 'Ad_Headlines' : 'Descriptions']: group[type === 'headline' ? 'Ad_Headlines' : 'Descriptions'].map(
-              (text: string) => (text === item.text ? editedText : text)
-            ),
+            [type === 'headline' ? 'Ad_Headlines' : 'Descriptions']: group[
+              type === 'headline' ? 'Ad_Headlines' : 'Descriptions'
+            ].map((textObj: any) => {
+              const matchId = type === 'headline' ? item.text.Headlines_id : item.text.Description_id;
+    
+              if (
+                (type === 'headline' && textObj.Headlines_id === matchId) ||
+                (type === 'description' && textObj.Description_id === matchId)
+              ) {
+                return type === 'headline'
+                  ? { ...textObj, Ad_Headline: editedText }
+                  : { ...textObj, Description: editedText };
+              }
+              return textObj;
+            }),
           };
         }
         return group;
       });
-  
+    
       localStorage.setItem("ClusterData", JSON.stringify(updatedDataWithText));
-      item.text = editedText;
+    
+      // Update UI immediately
+      if (type === 'headline') {
+        item.text.Ad_Headline = editedText;
+      } else {
+        item.text.Description = editedText;
+      }
+    
       setIsEditing(false);
-      toast.success(` ${type === 'headline' ? 'headline' : 'description'} uploaded successfully`, {
+      toast.success(`${type === 'headline' ? 'Headline' : 'Description'} updated successfully`, {
         position: "top-right",
         autoClose: 2000,
       });
     };
-  
+    
     const handleCancel = () => {
-      setEditedText(item.text);
-      setCharCount(item.text.length); 
+      setEditedText(type === 'headline' ? item.text.Ad_Headline : item.text.Description);
+      setCharCount((type === 'headline' ? item.text.Ad_Headline : item.text.Description).length);
       setIsEditing(false);
     };
   
@@ -198,22 +218,24 @@ const CreateCampaignSuggestionResult = () => {
               <textarea
                 value={editedText}
                 onChange={handleChange}
-                maxLength={getMaxLength()} // Set maxLength dynamically based on type
+                maxLength={getMaxLength()}
                 className="edit-input"
               />
               <p className="font_12 mb-0">{charCount}/{getMaxLength()}</p>
               <div className="button-container">
                 <span onClick={handleSave} className="icon-save">
-                  <i className="bi bi-check-circle-fill"></i> {/* Save Icon */}
+                  <i className="bi bi-check-circle-fill"></i>
                 </span>
                 <span onClick={handleCancel} className="icon-cancel">
-                  <i className="bi bi-x-circle-fill"></i> {/* Cancel Icon */}
+                  <i className="bi bi-x-circle-fill"></i>
                 </span>
               </div>
             </div>
           ) : (
             <>
-              <p className="font_16 mb-0 item_heading">{item.text}</p>
+              <p className="font_16 mb-0 item_heading">
+                {type === 'headline' ? item.text.Ad_Headline : item.text.Description}
+              </p>
               <div className="edit_item">
                 <span className="edit_icon" onClick={handleEditClick}>
                   <i className="bi bi-pencil-fill"></i>

@@ -156,7 +156,7 @@ const CreateCampaign = () => {
     Previously Created ({ppcClusterData.length}/10)
   </h2>
   <ul className="previous_post p-0">
-    {ppcClusterData.map((item:any, index) => {
+    {ppcClusterData.map((item:any) => {
   const expirationDate = new Date(item.last_reset);
   const currentDate = new Date();
 

@@ -1,11 +1,13 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {useNavigate, useParams } from "react-router-dom";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
+  deleteKeywordData,
+  deletePageData,
   GetSeoClusterDataById,
-  SEOClusterUploadFile,
+  UpdateSEOtitle,
 } from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
 
@@ -35,8 +37,8 @@ const SuggestionsResultById = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [SuggestionKeywordDetails, setSuggestionKeywordDetails] =
     useState<SuggestionKeywordDetailsType | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [modalTitleId, setModalTitleId] = useState<number | null>(null);
+  const [showModal, setShowModal] = useState(false);  
+  const [modalTitleId, setModalTitleId] = useState<string | null>(null);
   const [modalTitleValue, setModalTitleValue] = useState<string>("");
   const [modalURLValue, setModalURLValue] = useState<string>("");
 
@@ -71,46 +73,116 @@ const SuggestionsResultById = () => {
     }
   };
 
-  const removeKeyword = (keywordId: number, pageTitleId: number) => {
-    // setSuggestionKeywordDetails((prevDetails) => {
-    //   const updatedDetails = prevDetails.map((item) => {
-    //     if (item.Page_title_id === pageTitleId) {
-    //       const updatedKeywords = item.Keywords.filter(
-    //         (keyword: any) => keyword.Keyword_id !== keywordId
-    //       );
-    //       return { ...item, Keywords: updatedKeywords };
-    //     }
-    //     return item;
-    //   });
-    //   localStorage.setItem("ClusterData", JSON.stringify(updatedDetails));
-    //   return updatedDetails;
-    // });
-  };
+ 
 
-  const removePageTitle = (pageTitleId: number) => {
-    // setSuggestionKeywordDetails((prevDetails) => {
-    //   const updatedDetails = prevDetails.filter(
-    //     (item) => item.Page_title_id !== pageTitleId
-    //   );
-    //   localStorage.setItem("ClusterData", JSON.stringify(updatedDetails));
-    //   return updatedDetails;
-    // });
+  const removeKeyword = async (uuid: string, keywordId: string) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this keyword?");
+    if (!isConfirmed) return;
+    try {
+      const response = await deleteKeywordData(uuid, keywordId);
+      if (response.status === 200 || response.status === 204) {
+        toast.success("Keyword deleted successfully");
+        setSuggestionKeywordDetails((prevDetails: any) => {
+          if (!prevDetails) return prevDetails;
+          const updatedDetails = prevDetails.data.map((item: any) => {
+            const updatedKeywords = item.Keywords.filter(
+              (keyword: any) => keyword.Keyword_id !== keywordId
+            );
+            return { ...item, Keywords: updatedKeywords };
+          });
+        
+          return { ...prevDetails, data: updatedDetails };
+        });
+      }
+    } catch (error:any) {
+      console.error("Error deleting keyword:", error);
+      const status = error.response?.status;
+      const message = (error.response?.data as any)?.detail;
+      if (status === 401) {
+        toast.error(message, { position: "top-right", autoClose: 3000 });
+        navigate("/Logout");
+      }
+    }
   };
+  
 
-  const handleSaveTitle = () => {
-    // if (!modalTitleValue.trim() ||!modalURLValue.trim()) {
-    //   toast.warn("Title & Suggested URL cannot be empty");
-    //   return;
-    // }
-    // const updatedData = SuggestionKeywordDetails.map((item) =>
-    //   item.Page_title_id === modalTitleId
-    //     ? { ...item, Page_Title: modalTitleValue,Suggested_URL_Structure: modalURLValue }
-    //     : item
-    // );
-    // setSuggestionKeywordDetails(updatedData);
-    // localStorage.setItem("ClusterData", JSON.stringify(updatedData));
-    // setShowModal(false);
+  const removePageTitle = async (uuid: string, pageTitleId: string) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete?");
+    if (!isConfirmed) return;
+    try {
+      const response = await deletePageData(uuid, pageTitleId);
+      if (response.status === 200 || response.status === 204) {
+        toast.success("Deleted successfully");
+        setSuggestionKeywordDetails((prev: any) => {
+          if (!prev || !Array.isArray(prev.data)) return prev;
+  
+          const updatedData = prev.data.filter(
+            (item: any) => item.Page_title_id !== pageTitleId
+          );
+  
+          return { ...prev, data: updatedData };
+        });
+      }
+    } catch (error: any) {
+      console.error("Error deleting page title:", error);
+      const status = error.response?.status;
+      const message = (error.response?.data as any)?.detail;
+      if (status === 401) {
+        toast.error(message, { position: "top-right", autoClose: 3000 });
+        navigate("/Logout");
+      }
+    }
   };
+  
+ 
+  const handleSaveTitle = async () => {
+    if (!modalTitleValue.trim() || !modalURLValue.trim()) {
+      toast.warn("Title & Suggested URL cannot be empty");
+      return;
+    }
+    const uuid=SuggestionKeywordDetails?.id
+      // Prevent saving if modalTitleId is null
+    if (modalTitleId === null || !uuid) {
+      console.log("Missing title ID or cluster ID");
+      return;
+    } 
+    try {
+      const formData = { 
+        Page_Title: modalTitleValue,
+        Suggested_URL_Structure: modalURLValue,
+       };
+  
+      const response = await UpdateSEOtitle(uuid, modalTitleId, formData);
+  
+      if (response.status === 200) {
+        setSuggestionKeywordDetails((prev) => {
+          if (!prev) return prev;
+          const updatedData = prev.data.map((item:any) =>
+            item.Page_title_id === modalTitleId
+              ? {
+                  ...item,
+                  Page_Title: modalTitleValue,
+                  Suggested_URL_Structure: modalURLValue,
+                }
+              : item
+          );
+          const updatedDetails = { ...prev, data: updatedData };
+          return updatedDetails;
+        });
+        toast.success("Title updated successfully");
+        setShowModal(false);
+      }
+    } catch (error:any) {
+      console.error("Update error:", error);
+      const status = error.response?.status;
+      const message = (error.response?.data as any)?.detail;
+      if (status === 401) {
+        toast.error(message, { position: "top-right", autoClose: 3000 });
+        navigate("/Logout");
+      }
+    }
+  };
+  
 
   return (
     <>
@@ -149,7 +221,7 @@ const SuggestionsResultById = () => {
             <div className="suggest_page_wrapper">
               <div className="row">
                 <div className={`col-12 col-lg-12 suggest_card_outer`}>
-                  {SuggestionKeywordDetails?.data.length === 0 ? (
+                  {SuggestionKeywordDetails?.data?.length === 0 ? (
                     <div className="no-suggestions">
                       <p>No suggestions found</p>
                     </div>
@@ -163,9 +235,9 @@ const SuggestionsResultById = () => {
                           <button className="btn">
                             <i
                               className="bi bi-x"
-                              // onClick={() =>
-                              //   removePageTitle(item.Page_title_id)
-                              // }
+                              onClick={() =>
+                                removePageTitle(SuggestionKeywordDetails?.id,item.Page_title_id)
+                              }
                             ></i>
                           </button>
                         </div>
@@ -174,12 +246,12 @@ const SuggestionsResultById = () => {
                           <span>
                             <i
                               className="bi bi-pencil me-1 text-primary"
-                              // onClick={() => {
-                              //   setShowModal(true);
-                              //   setModalTitleId(item.Page_title_id);
-                              //   setModalTitleValue(item.Page_Title);
-                              //   setModalURLValue(item.Suggested_URL_Structure);
-                              // }}
+                              onClick={() => {
+                                setShowModal(true);
+                                setModalTitleId(item.Page_title_id);
+                                setModalTitleValue(item.Page_Title);
+                                setModalURLValue(item.Suggested_URL_Structure);
+                              }}
                               style={{
                                 paddingLeft: "10px",
                                 cursor: "pointer",
@@ -209,12 +281,12 @@ const SuggestionsResultById = () => {
                                       cursor: "pointer",
                                       paddingLeft: "5px",
                                     }}
-                                    // onClick={() =>
-                                    //   removeKeyword(
-                                    //     keyword.Keyword_id,
-                                    //     item.Page_title_id
-                                    //   )
-                                    // }
+                                    onClick={() =>
+                                      removeKeyword(
+                                        SuggestionKeywordDetails?.id,
+                                        keyword.Keyword_id
+                                      )
+                                    }
                                   ></i>
                                 </div>
                               </div>

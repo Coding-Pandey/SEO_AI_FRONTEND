@@ -19,8 +19,6 @@ export const SEOGenerateKeyword = async (formData: SEOGenerateKeywordDetails) =>
     }
   };
 
-  
-
  
 
   export const SEOClusterUploadFile = async (filteredData: SEOPPCClusterUploadPaylaod) => {
@@ -60,6 +58,34 @@ export const SEOGenerateKeyword = async (formData: SEOGenerateKeywordDetails) =>
       throw error;
     }
   };
+
+  export const deleteKeywordData = async (uuid:string,id:string) => {
+    try {
+      const response = await axiosInstance.delete(`/api/seo-files/${uuid}/keywords/${id}`);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const deletePageData = async (uuid:string,id:string) => {
+    try {
+      const response = await axiosInstance.delete(`/api/seo-files/${uuid}/pages/${id}`);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  export const UpdateSEOtitle = async (uuid:string,id:string,formData: { Page_Title: string }) => {
+    try {
+      const response = await axiosInstance.patch(`/api/seo-files/${uuid}/pages/${id}`,formData);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
 
   
 //ppc
@@ -121,6 +147,34 @@ export const PPclusterUploadFile = async (filteredData:any) => {
   try {
     const response = await axiosInstance.post('/api/ppc_cluster_uploadfile', filteredData);
     return response; 
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const deleteKeywordDataPpc = async (uuid:string,id:string) => {
+  try {
+    const response = await axiosInstance.delete(`/api/ppc-files/${uuid}/keywords/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deletePageDataPpc = async (uuid:string,id:string) => {
+  try {
+    const response = await axiosInstance.delete(`/api/ppc-files/${uuid}/pages/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const UpdatetitlePpc = async (uuid:string , id:string, formData: { Ad_Group: string }) => {
+  try {
+    const response = await axiosInstance.patch(`/api/ppc-files/${uuid}/pages/${id}`,formData);
+    return response;
   } catch (error) {
     throw error;
   }

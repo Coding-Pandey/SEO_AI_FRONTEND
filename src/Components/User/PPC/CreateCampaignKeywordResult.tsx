@@ -1,5 +1,4 @@
-import React from 'react'
-import { useLocation, useNavigate } from "react-router-dom";
+ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { KeyboardEvent, useEffect, useState } from "react";

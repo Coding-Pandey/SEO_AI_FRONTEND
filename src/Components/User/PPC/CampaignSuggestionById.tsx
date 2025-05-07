@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Header from "../Header/Header"
 import SideBar from "../SideBar/SideBar"
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { GetPpcClusterDataById, PPclusterUploadFile } from "../Services/Services";
+import { deleteKeywordDataPpc, deletePageDataPpc, GetPpcClusterDataById, UpdatetitlePpc } from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
 
 
@@ -18,6 +18,7 @@ const CampaignSuggestionById = () => {
     const [modalTitleValue, setModalTitleValue] = useState<string>("");
 
     console.log(SuggestionKeywordDetails, "SuggestionKeywordDetails")
+
     useEffect(() => {
         if (id) {
             fetchPpcClusterData(id);
@@ -49,62 +50,133 @@ const CampaignSuggestionById = () => {
     };
 
 
+    const handleDeleteGroup = async (uuid: string, pageId: string) => {
+        const isConfirmed = window.confirm("Are you sure you want to delete this?");
+        if (!isConfirmed) return;
+      
+        try {
+          const response = await deletePageDataPpc(uuid, pageId);
+          if (response.status === 200 || response.status === 204) {
+            toast.success("Ad Group deleted successfully");
+      
+            // Update local state by removing the deleted Ad Group
+            setSuggestionKeywordDetails((prev: any) => {
+              if (!prev || !Array.isArray(prev.data)) return prev;
+      
+              const updatedData = prev.data.filter(
+                (group: any) => group.Page_title_id !== pageId
+              );
+      
+              return { ...prev, data: updatedData };
+            });
+          }
+        } catch (error:any) {
+          console.error("Error deleting Ad Group:", error);
+          const status = error.response?.status;
+          const message = (error.response?.data as any)?.detail;
+          if (status === 401) {
+            toast.error(message, { position: "top-right", autoClose: 3000 });
+            navigate("/Logout");
+          }
+        }
+      };
+      
+
+      const handleDeleteKeyword = async (uuid: string, keywordId: string) => {
+        const isConfirmed = window.confirm("Are you sure you want to delete this keyword?");
+        if (!isConfirmed) return;
+      
+        try {
+          const response = await deleteKeywordDataPpc(uuid, keywordId);
+          if (response.status === 200 || response.status === 204) {
+            toast.success("Keyword deleted successfully");
+      
+            setSuggestionKeywordDetails((prev: any) => {
+              if (!prev || !Array.isArray(prev.data)) return prev;
+      
+              const updatedData = prev.data.map((group: any) => {
+                const updatedKeywords = group.Keywords.filter(
+                  (keyword: any) => keyword.Keyword_id !== keywordId
+                );
+                return { ...group, Keywords: updatedKeywords };
+              });
+      
+              return { ...prev, data: updatedData };
+            });
+          }
+        } catch (error:any) {
+          console.error("Error deleting keyword:", error);
+          const status = error.response?.status;
+          const message = (error.response?.data as any)?.detail;
+          if (status === 401) {
+            toast.error(message, { position: "top-right", autoClose: 3000 });
+            navigate("/Logout");
+          }
+        }
+      };
+      
+
+      const handleSaveTitle = async () => {
+        if (!modalTitleValue.trim()) {
+          toast.warning("Please enter a valid title");
+          return;
+        }
+        const uuid=SuggestionKeywordDetails?.id
+        if (!uuid || modalTitleId === null) {
+          toast.error("Missing UUID or Page Title ID");
+          return;
+        }
+     
+      
+        try {
+        //   const formData = { Ad_Group: modalTitleValue };
+          const formData =  {
+            Ad_Group: modalTitleValue
+          }
+          const response = await UpdatetitlePpc(uuid, modalTitleId.toString(), formData);
+      
+          if (response.status === 200 || response.status === 201) {
+            toast.success("Title updated successfully");
+      
+            setSuggestionKeywordDetails((prev: any) => {
+              if (!prev || !Array.isArray(prev.data)) return prev;
+      
+              const updatedData = prev.data.map((item: any) => {
+                if (item.Page_title_id === modalTitleId.toString()) {
+                  return { ...item, Ad_Group: modalTitleValue };
+                }
+                return item;
+              });
+      
+              return { ...prev, data: updatedData };
+            });
+      
+            setShowModal(false);  
+            setModalTitleValue("");  
+            setModalTitleId(null); 
+          }
+        } catch (error:any) {
+          console.error("Error updating title:", error);
+          const status = error.response?.status;
+          const message = (error.response?.data as any)?.detail;
+          if (status === 401) {
+            toast.error(message, { position: "top-right", autoClose: 3000 });
+            navigate("/Logout");
+          }
+        }
+      };
+      
 
 
-    const handleDeleteGroup = (pageId: string) => {
-        // const updatedData = SuggestionKeywordDetails.filter(item => item.Page_title_id !== pageId);
-        // setSuggestionKeywordDetails(updatedData);
-        // localStorage.setItem("ClusterData", JSON.stringify(updatedData));
-    };
 
-    const handleDeleteKeyword = (pageId: string, keywordId: string) => {
-        // const updatedData = SuggestionKeywordDetails.map(item => {
-        //   if (item.Page_title_id === pageId) {
-        //     const filteredKeywords = item.Keywords.filter(
-        //       (keyword: { Keyword_id: string }) => keyword.Keyword_id !== keywordId
-        //     );
-        //     return { ...item, Keywords: filteredKeywords };
-        //   }
-        //   return item;
-        // });
-
-        // setSuggestionKeywordDetails(updatedData);
-        // localStorage.setItem("ClusterData", JSON.stringify(updatedData));
-    };
-
-    const handleSaveTitle = () => {
-        // if (!modalTitleValue.trim()) {
-        //   toast.warning("Please enter a valid title");
-        //   return;
-        // }
-
-        // const updatedData = SuggestionKeywordDetails.map(item => {
-        //   if (item.Page_title_id === modalTitleId) {
-        //     return { ...item, Ad_Group: modalTitleValue };
-        //   }
-        //   return item;
-        // });
-
-        // setSuggestionKeywordDetails(updatedData);
-        // localStorage.setItem("ClusterData", JSON.stringify(updatedData));
-        // setShowModal(false);
-        // toast.success("Title updated successfully", {
-        //   position: "top-right",
-        //   autoClose: 3000,
-        // });
-    };
-
-
-
-
-    const KeywordItem: React.FC<{ keyword: any; pageId: string }> = ({ keyword, pageId }) => (
+    const KeywordItem: React.FC<{ keyword: any; pageId: string }> = ({ keyword }) => (
         <div className="col-12 col-md-6">
             <div className="keyword_item">
                 <p className="font_16 mb-0">{keyword.Keyword}</p>
                 <div className="font_16">
                     <span>{keyword.Avg_Monthly_Searches}</span>
                     <i className="bi bi-x" style={{ cursor: "pointer" }}
-                    //   onClick={() => handleDeleteKeyword(pageId, keyword.Keyword_id)}
+                      onClick={() => handleDeleteKeyword(SuggestionKeywordDetails?.id, keyword.Keyword_id)}
                     ></i>
                 </div>
             </div>
@@ -114,104 +186,151 @@ const CampaignSuggestionById = () => {
 
 
 
-    const SearchItemComponent: React.FC<{ item: any; type: 'headline' | 'description'; groupId: string }> = ({
-        item,
-        type,
-        groupId,
-    }) => {
-        const [isEditing, setIsEditing] = useState(false);
-        const [editedText, setEditedText] = useState(item.text);
-        const [charCount, setCharCount] = useState(item.text.length);
-
-        const handleEditClick = () => {
-            // setIsEditing(true);
-        };
-
+   
+  const SearchItemComponent: React.FC<{ item: any; type: 'headline' | 'description'; groupId: string }> = ({
+    item,
+    type,
+    groupId,
+  }) => {
+    const initialText = type === 'headline' ? item.text.Ad_Headline : item.text.Description;
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedText, setEditedText] = useState(initialText);
+    const [charCount, setCharCount] = useState(initialText.length);
+  
+    const handleEditClick = () => {
+      setIsEditing(true);
+    };
+  
+    const getMaxLength = () => {
+      return type === 'headline' ? 50 : 100;
+    };
+  
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const newText = e.target.value;
+      const maxLength = getMaxLength();
+      if (newText.length <= maxLength) {
+        setEditedText(newText);
+        setCharCount(newText.length);
+      }
+    };
+  
  
-        const getMaxLength = () => {
-            return type === 'headline' ? 50 : 100;  
+    const handleSave = async () => {
+        if (editedText.trim() === "") {
+          alert(`Please enter a ${type === 'headline' ? 'headline' : 'description'} name.`);
+          return;
+        }
+        const uuid=SuggestionKeywordDetails?.id
+        if (!uuid ) {
+          toast.error("Missing UUID or Page Title ID");
+          return;
+        }
+      
+        const isHeadline = type === 'headline';
+        const itemId = isHeadline ? item.text.Headlines_id : item.text.Description_id;
+        const fieldKey = isHeadline ? 'Ad_Headlines' : 'Descriptions';
+      
+        const formData: any = {
+          [fieldKey]: [
+            {
+              [isHeadline ? 'Headlines_id' : 'Description_id']: itemId,
+              [isHeadline ? 'Ad_Headline' : 'Description']: editedText,
+            },
+          ],
         };
-
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            const newText = e.target.value;
-            const maxLength = getMaxLength();
-            if (newText.length <= maxLength) {
-                setEditedText(newText);
-                setCharCount(newText.length);
-            }
-        };
-
-        const handleSave = () => {
-            if (editedText === "") {
-                alert(`Please enter a ${type === 'headline' ? 'headline' : 'description'} name.`);
-                return;
-            }
-
-            const updatedData = JSON.parse(localStorage.getItem("ClusterData") || "[]");
-
-            const updatedDataWithText = updatedData.map((group: any) => {
+      
+        try {
+          const response = await UpdatetitlePpc(uuid, groupId, formData);
+      
+          if (response.status === 200 || response.status === 204) {
+            setSuggestionKeywordDetails((prev: any) => {
+              const updatedData = prev.data.map((group: any) => {
                 if (group.Page_title_id === groupId) {
-                    return {
-                        ...group,
-                        [type === 'headline' ? 'Ad_Headlines' : 'Descriptions']: group[type === 'headline' ? 'Ad_Headlines' : 'Descriptions'].map(
-                            (text: string) => (text === item.text ? editedText : text)
-                        ),
-                    };
+                  const updatedGroup = { ...group };
+                  updatedGroup[fieldKey] = group[fieldKey].map((entry: any) => {
+                    if (
+                      (isHeadline && entry.Headlines_id === itemId) ||
+                      (!isHeadline && entry.Description_id === itemId)
+                    ) {
+                      return isHeadline
+                        ? { ...entry, Ad_Headline: editedText }
+                        : { ...entry, Description: editedText };
+                    }
+                    return entry;
+                  });
+                  return updatedGroup;
                 }
                 return group;
+              });
+      
+              return { ...prev, data: updatedData };
             });
-
-            localStorage.setItem("ClusterData", JSON.stringify(updatedDataWithText));
-            item.text = editedText;
+      
             setIsEditing(false);
-            toast.success(` ${type === 'headline' ? 'headline' : 'description'} uploaded successfully`, {
-                position: "top-right",
-                autoClose: 2000,
+            toast.success(`${isHeadline ? 'Headline' : 'Description'} updated successfully`, {
+              position: "top-right",
+              autoClose: 2000,
             });
-        };
-
-        const handleCancel = () => {
-            setEditedText(item.text);
-            setCharCount(item.text.length);
-            setIsEditing(false);
-        };
-
-        return (
-            <div className="col-12 col-md-12">
-                <div className="search_headlines_item">
-                    {isEditing ? (
-                        <div className="edit-container">
-                            <textarea
-                                value={editedText}
-                                onChange={handleChange}
-                                maxLength={getMaxLength()} // Set maxLength dynamically based on type
-                                className="edit-input"
-                            />
-                            <p className="font_12 mb-0">{charCount}/{getMaxLength()}</p>
-                            <div className="button-container">
-                                <span onClick={handleSave} className="icon-save">
-                                    <i className="bi bi-check-circle-fill"></i> {/* Save Icon */}
-                                </span>
-                                <span onClick={handleCancel} className="icon-cancel">
-                                    <i className="bi bi-x-circle-fill"></i> {/* Cancel Icon */}
-                                </span>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <p className="font_16 mb-0 item_heading">{item.text}</p>
-                            <div className="edit_item">
-                                <span className="edit_icon" onClick={handleEditClick}>
-                                    <i className="bi bi-pencil-fill"></i>
-                                </span>
-                                <p className="font_12 mb-0">{charCount}/{getMaxLength()}</p>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        );
+          }
+        } catch (error:any) {
+          console.error("Error updating:", error);
+          const status = error.response?.status;
+          const message = (error.response?.data as any)?.detail;
+          if (status === 401) {
+            toast.error(message, { position: "top-right", autoClose: 3000 });
+            navigate("/Logout");
+          }else{
+            toast.error(`Failed to update ${isHeadline ? 'headline' : 'description'}`);
+          }
+        }
+      };
+      
+    const handleCancel = () => {
+      setEditedText(type === 'headline' ? item.text.Ad_Headline : item.text.Description);
+      setCharCount((type === 'headline' ? item.text.Ad_Headline : item.text.Description).length);
+      setIsEditing(false);
     };
+  
+    return (
+      <div className="col-12 col-md-12">
+        <div className="search_headlines_item">
+          {isEditing ? (
+            <div className="edit-container">
+              <textarea
+                value={editedText}
+                onChange={handleChange}
+                maxLength={getMaxLength()}
+                className="edit-input"
+              />
+              <p className="font_12 mb-0">{charCount}/{getMaxLength()}</p>
+              <div className="button-container">
+                <span onClick={handleSave} className="icon-save">
+                  <i className="bi bi-check-circle-fill"></i>
+                </span>
+                <span onClick={handleCancel} className="icon-cancel">
+                  <i className="bi bi-x-circle-fill"></i>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="font_16 mb-0 item_heading">
+                {type === 'headline' ? item.text.Ad_Headline : item.text.Description}
+              </p>
+              <div className="edit_item">
+                <span className="edit_icon" 
+                onClick={handleEditClick}
+                >
+                  <i className="bi bi-pencil-fill"></i>
+                </span>
+                <p className="font_12 mb-0">{charCount}/{getMaxLength()}</p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
 
 
 
@@ -219,18 +338,18 @@ const CampaignSuggestionById = () => {
         <div className="col-12 card_left">
             <div className="suggest_card box-shadow bg-white">
                 <div className="remove_card">
-                    <button className="btn" onClick={() => handleDeleteGroup(group.Page_title_id)}>
+                    <button className="btn" onClick={() => handleDeleteGroup(SuggestionKeywordDetails?.id,group.Page_title_id)}>
                         <i className="bi bi-x"></i>
                     </button>
                 </div>
                 <h3 className="font_20 font_500">
                     {group.Ad_Group}
                     <span className="heading_edit"
-                    //   onClick={() => {
-                    //                         setShowModal(true);
-                    //                         setModalTitleId(group.Page_title_id);
-                    //                         setModalTitleValue(group.Ad_Group);
-                    //                       }}
+                      onClick={() => {
+                                            setShowModal(true);
+                                            setModalTitleId(group.Page_title_id);
+                                            setModalTitleValue(group.Ad_Group);
+                                          }}
                     >
                         <i className="bi bi-pencil-fill" style={{ cursor: "pointer" }}></i>
                     </span>
@@ -340,7 +459,7 @@ const CampaignSuggestionById = () => {
                                                 &times;
                                             </button>
 
-                                            <h4>Edit Page Title & Suggested URL</h4>
+                                            <h4>Edit Page Title.</h4>
 
                                             <label className="pb-2">Page Title :</label>
                                             <textarea
