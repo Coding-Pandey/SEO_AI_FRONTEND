@@ -118,12 +118,7 @@ const KeywordsSuggestionsResult = () => {
         <div className="inner_content ">
           <div className="keyword_tool_content">
             <div
-              className="content_header mb-4"
-              style={{
-                justifyContent: "space-between",
-                alignItems: "center",
-                display: "flex",
-              }}
+              className="content_header mb-4 heading_btn"
             >
               <div>
                 <h2 className="font_25 font_600 mb-2">
@@ -152,9 +147,8 @@ const KeywordsSuggestionsResult = () => {
                   onChange={(e) => setFileName(e.target.value)}
                 />
                 <button
+                className="btn primary_btn"
                   style={{
-                    backgroundColor: "#3b82f6",
-                    color: "white",
                     fontWeight: "600",
                     padding: "8px 20px",
                     borderRadius: "6px",

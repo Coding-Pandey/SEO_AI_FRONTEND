@@ -4,7 +4,10 @@ import SideBar from "../SideBar/SideBar";
 import { KeyboardEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { language_options, location_options } from "../../Page/store";
-import { SEOClusterKeywordService, SEOGenerateKeyword } from "../Services/Services";
+import {
+  SEOClusterKeywordService,
+  SEOGenerateKeyword,
+} from "../Services/Services";
 import { toast } from "react-toastify";
 import Loading from "../../Page/Loading/Loading";
 
@@ -24,13 +27,30 @@ const KeywordToolResult = () => {
   const [language, setLanguage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [brandedWords, setBrandedWords] = useState<boolean>(false);
+  const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
+  const [includeInput, setIncludeInput] = useState<string>("");
+
+  const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const trimmed = includeInput.trim();
+      if (trimmed && !includeKeywords.includes(trimmed)) {
+        setIncludeKeywords([...includeKeywords, trimmed]);
+      }
+      setIncludeInput("");
+    }
+  };
+
+  const removeIncludeKeyword = (index: number) => {
+    setIncludeKeywords(includeKeywords.filter((_, i) => i !== index));
+  };
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("keywordToolResult");
       if (storedData) {
         setGenerateKeywordDetails(JSON.parse(storedData));
       }
-    } 
+    }
   }, [location.state]);
 
   const handleDeleteKeyword = (index: number) => {
@@ -38,9 +58,11 @@ const KeywordToolResult = () => {
     updatedKeywords.splice(index, 1);
     setGenerateKeywordDetails(updatedKeywords);
     localStorage.setItem("keywordToolResult", JSON.stringify(updatedKeywords));
-    toast.success("Keyword deleted successfully!", { position: "top-right", autoClose: 1000 });
+    toast.success("Keyword deleted successfully!", {
+      position: "top-right",
+      autoClose: 1000,
+    });
   };
-
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
@@ -74,7 +96,6 @@ const KeywordToolResult = () => {
     setCountry([]);
     setLanguage(null);
   };
- 
 
   const handleSubmit = async () => {
     const selectedLocationIds = country.map((c: any) => c.value);
@@ -124,26 +145,24 @@ const KeywordToolResult = () => {
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setBrandedWords(e.target.value === "Branding Keywords");
   };
-  
 
- 
-  const handleSuggestPages = async() => {
+  const handleSuggestPages = async () => {
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
     const limitedData = filteredData.slice(0, 10);
-    
-    setLoadingSuggestion(true);
 
-        const newData={
-        keywords: limitedData,
-        delete_word: {
-          branded_words: brandedWords,
-          branded_keyword: []
-        }
-      }
-   
- 
+    setLoadingSuggestion(true);
+    console.log(brandedWords)
+    const newData = {
+      keywords: limitedData,
+      delete_word: {
+        // branded_words: brandedWords,
+        branded_words: false,
+        branded_keyword: [],
+      },
+    };
+
     try {
       const SEOClusterResponse = await SEOClusterKeywordService(newData);
       if (
@@ -151,8 +170,8 @@ const KeywordToolResult = () => {
         SEOClusterResponse.status === 200
       ) {
         const ClusterData = SEOClusterResponse.data;
-       console.log(ClusterData,"ClusterData")
-       localStorage.setItem("ClusterData", JSON.stringify(ClusterData));
+        console.log(ClusterData, "ClusterData");
+        localStorage.setItem("ClusterData", JSON.stringify(ClusterData));
         navigate("/seo/KeywordsSuggestionsResult", { state: ClusterData });
         setLoadingSuggestion(false);
       }
@@ -170,7 +189,7 @@ const KeywordToolResult = () => {
 
   return (
     <>
-    {loadingSuggestion && <Loading/>}
+      {loadingSuggestion && <Loading />}
       <Header />
       <main className="main_wrapper">
         <SideBar />
@@ -179,51 +198,53 @@ const KeywordToolResult = () => {
             <div className="content_header mb-4">
               <h2 className="font_25 font_600 mb-2">
                 <i className="bi bi-search me-1 font_20 text-primary"></i>{" "}
-                  Keyword Manager -{" "}
+                Keyword Manager -{" "}
                 <span style={{ fontSize: "18px", fontWeight: 600 }}>
                   Search Results
                 </span>
               </h2>
             </div>
-              <div className="keyword_search_results">
-                <div className="search_filter">
-                  <div className="row align-items-center gy-3">
-                    <div className="col-12 col-md-6 col-xl-4">
-                      <div className="form-input search_volume">
-                        <label
-                          htmlFor="keyword_volume"
-                          className="form-label font_14 mb-0"
-                        >
-                          Search Volume:
-                        </label>
-                        <input
-                          type="range"
-                          className="form-range"
-                          id="keyword_volume"
-                          min={0}
-                          max={500}
-                          value={volume}
-                          onChange={(e) => setVolume(Number(e.target.value))}
-                        />
-                        <span>{volume}</span>
-                      </div>
+            <div className="keyword_search_results">
+              <div className="search_filter">
+                <div className="row align-items-center gy-3">
+                  <div className="col-12 col-md-6 col-xl-4">
+                    <div className="form-input search_volume">
+                      <label
+                        htmlFor="keyword_volume"
+                        className="form-label font_14 mb-0"
+                      >
+                        Search Volume:
+                      </label>
+                      <input
+                        type="range"
+                        className="form-range"
+                        id="keyword_volume"
+                        min={0}
+                        max={500}
+                        value={volume}
+                        onChange={(e) => setVolume(Number(e.target.value))}
+                      />
+                      <span>{volume}</span>
                     </div>
+                  </div>
 
-                    <div className="col-12 col-md-6 col-xl-3">
-                      <div className="exclue_include_wrapper">
-                        <select
-                          className="form-select"
-                          id="excludeKeyword"
-                          aria-label="Exclude Keyword"
-                          onChange={handleSelectChange}
-                        >
-                          <option value="">Exclude</option>
-                          <option value="Branding Keywords">Branding Keywords</option>
-                          {/* <option value="2">Option 2</option>
+                  <div className="col-12 col-md-8 col-xl-4">
+                    <div className="exclue_include_wrapper">
+                      <select
+                        className="form-select"
+                        id="excludeKeyword"
+                        aria-label="Exclude Keyword"
+                        onChange={handleSelectChange}
+                      >
+                        <option value="">Exclude</option>
+                        <option value="Branding Keywords">
+                          Branding Keywords
+                        </option>
+                        {/* <option value="2">Option 2</option>
                           <option value="3">Option 3</option> */}
-                        </select>
+                      </select>
 
-                        {/* <select
+                      {/* <select
                           className="form-select"
                           id="includeKeyword"
                           aria-label="Include Keyword"
@@ -233,35 +254,69 @@ const KeywordToolResult = () => {
                           <option value="2">Option 2</option>
                           <option value="3">Option 3</option>
                         </select> */}
-                      </div>
-                    </div>
 
-                    <div className="col-12 col-md-12 col-xl-5">
-                      <div className="result_btn_wrapper">
-                        <button
-                          type="button"
-                          className="btn primary_btn add_more"
-                          data-bs-toggle="modal"
-                          data-bs-target="#exampleModal"
-                          onClick={() => setIsModalOpen(true)}
-                        >
-                          Add More Keywords
-                        </button>
-                        <button className="btn primary_btn suggest_page" onClick={() => handleSuggestPages()} >
-                             Suggest Pages
-                        </button>
-                      </div>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Include"
+                        style={{ color: "black" }}
+                        value={includeInput}
+                        onChange={(e) => setIncludeInput(e.target.value)}
+                        onKeyDown={handleIncludeKeyDown}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-md-12 col-xl-4">
+                    <div className="result_btn_wrapper">
+                      <button
+                        type="button"
+                        className="btn primary_btn add_more"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        Add More Keywords
+                      </button>
+                      <button
+                        className="btn primary_btn suggest_page"
+                        onClick={() => handleSuggestPages()}
+                      >
+                        Suggest Pages
+                      </button>
                     </div>
                   </div>
                 </div>
+                {includeKeywords.length > 0 && (
+                <div
+                  className="mb-2 p-2 form-control mt-3"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    border: "2px solid #e7e7e7",
+                    borderRadius: "5px",
+                  }}
+                >
+                  {includeKeywords.map((keyword, index) => (
+                    <span key={index} className="primary_btn  badge mx-1 px-2 py-1 ">
+                      {keyword}{" "}
+                      <i
+                        className="bi bi-x ms-1 "
+                        style={{ cursor: "pointer" }}
+                        onClick={() => removeIncludeKeyword(index)}
+                      ></i>
+                    </span>
+                  ))}
+                </div>
+                 )}
+              </div>
 
-                <div className="result_keyword box-shadow">
-  <div className="row">
-    {generateKeywordDetails.length > 0 ? (
-      generateKeywordDetails.map((item: any, index: any) => (
-        <div className="col-12 col-md-6 col-lg-4" key={index}>
-          <div
-            className={`keyword_item
+              <div className="result_keyword box-shadow">
+                <div className="row">
+                  {generateKeywordDetails.length > 0 ? (
+                    generateKeywordDetails.map((item: any, index: any) => (
+                      <div className="col-12 col-md-6 col-lg-4" key={index}>
+                        <div
+                          className={`keyword_item
               ${
                 item.Avg_Monthly_Searches < volume
                   ? "red-border"
@@ -270,198 +325,195 @@ const KeywordToolResult = () => {
                   : ""
               }
             `}
-          >
-            <p className="font_16 mb-0">{item.Keyword}</p>
-            <div className="font_16">
-              <span>{item.Avg_Monthly_Searches}</span>
-              <i
-                className="bi bi-x"
-                onClick={() => handleDeleteKeyword(index)}
-                style={{ cursor: "pointer" }}
-              ></i>
-            </div>
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="col-12">
-        <p>No keywords found</p>
-      </div>
-    )}
-  </div>
-</div>
-
-
-                {isModalOpen && (
-                  <div
-                    className="modal d-block"
-                    role="dialog"
-                    style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-                  >
-                    <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                      <div className="modal-content">
-                        <div className="modal-header">
-                          <h2 className="font_25 font_600 mb-2">
-                            <i className="bi bi-search me-1 font_20"></i>{" "}
-                            Keyword Manager
-                          </h2>
-                          <button
-                            type="button"
-                            className="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                            onClick={closeModal}
-                          ></button>
+                        >
+                          <p className="font_16 mb-0">{item.Keyword}</p>
+                          <div className="font_16">
+                            <span>{item.Avg_Monthly_Searches}</span>
+                            <i
+                              className="bi bi-x"
+                              onClick={() => handleDeleteKeyword(index)}
+                              style={{ cursor: "pointer" }}
+                            ></i>
+                          </div>
                         </div>
-                        <div className="modal-body">
-                          <div className="row mx-0 gy-3">
-                            <div className="col-12">
-                              <div className="keyword_tool_right">
-                                <p className="font_16 mb-0">
-                                  Enter up to 10 keywords in the field. Separate
-                                  each keyword with a comma or press Enter after
-                                  each one. After entering your keywords, click{" "}
-                                  <span className="font_500">
-                                    "Start Research"
-                                  </span>{" "}
-                                  to proceed with your search.
-                                </p>
-                              </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-12">
+                      <p>No keywords found</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {isModalOpen && (
+                <div
+                  className="modal d-block"
+                  role="dialog"
+                  style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+                >
+                  <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h2 className="font_25 font_600 mb-2">
+                          <i className="bi bi-search me-1 font_20"></i> Keyword
+                          Manager
+                        </h2>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                          onClick={closeModal}
+                        ></button>
+                      </div>
+                      <div className="modal-body">
+                        <div className="row mx-0 gy-3">
+                          <div className="col-12">
+                            <div className="keyword_tool_right">
+                              <p className="font_16 mb-0">
+                                Enter up to 10 keywords in the field. Separate
+                                each keyword with a comma or press Enter after
+                                each one. After entering your keywords, click{" "}
+                                <span className="font_500">
+                                  "Start Research"
+                                </span>{" "}
+                                to proceed with your search.
+                              </p>
                             </div>
+                          </div>
 
-                            <div className="col-12">
-                              <form>
-                                {keywords.length > 10 && (
-                                  <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
-                                    Error: Limit Reached. Please enter no more
-                                    than 10 keywords.
-                                  </p>
-                                )}
-                                {keywords.length > 0 && (
-                                  <div
-                                    className="mb-2 p-2 form-control mb-2"
-                                    style={{
-                                      backgroundColor: "#ffffff",
-                                      border: "2px solid #e7e7e7",
-                                      borderRadius: "8px",
-                                    }}
-                                  >
-                                    <div className="d-flex flex-wrap gap-2">
-                                      {keywords.map((keyword, index) => (
-                                        <span
-                                          key={index}
-                                          className={`badge d-flex align-items-center p-2 ${
-                                            index < 10
-                                              ? "bg-light-green"
-                                              : "bg-danger text-white"
-                                          }`}
-                                          style={{
-                                            borderRadius: "5px",
-                                          }}
-                                        >
-                                          {keyword}
-                                          <button
-                                            type="button"
-                                            onClick={() => removeKeyword(index)}
-                                            className={`btn-close btn-sm ms-2  ${
-                                              index < 10
-                                                ? "text-green"
-                                                : "text-white"
-                                            }`}
-                                            aria-label="Remove"
-                                          ></button>
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                                <div className="row">
-                                  <div className="col-12">
-                                    <input
-                                      type="text"
-                                      className="form-control mb-2"
-                                      placeholder="Enter keywords (press Enter or comma to add)"
-                                      value={input}
-                                      onChange={(e) => setInput(e.target.value)}
-                                      onKeyDown={handleKeyDown}
-                                    />
-                                  </div>
-                                  <div className="col-12">
-                                    <textarea
-                                      className="form-control"
-                                      placeholder="Product/Service Description"
-                                      id="key_tool_description"
-                                      style={{ height: "100px" }}
-                                      value={description}
-                                      onChange={(e) =>
-                                        setDescription(e.target.value)
-                                      }
-                                    ></textarea>
-                                  </div>
-
-                                  <div className="col-6">
-                                    <div className="form_input">
-                                      <Select
-                                        options={locationOptions}
-                                        value={country}
-                                        onChange={setCountry}
-                                        isMulti
-                                        placeholder="Select Target Country"
-                                      />
-                                    </div>
-                                  </div>
-
-                                  <div className="col-6">
-                                    <div className="form_input">
-                                      <select
-                                        className="form-select"
-                                        id="targetLanguage"
-                                        aria-label="target_language"
-                                        onChange={(e) =>
-                                          setLanguage(e.target.value)
-                                        }
+                          <div className="col-12">
+                            <form>
+                              {keywords.length > 10 && (
+                                <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
+                                  Error: Limit Reached. Please enter no more
+                                  than 10 keywords.
+                                </p>
+                              )}
+                              {keywords.length > 0 && (
+                                <div
+                                  className="mb-2 p-2 form-control mb-2"
+                                  style={{
+                                    backgroundColor: "#ffffff",
+                                    border: "2px solid #e7e7e7",
+                                    borderRadius: "8px",
+                                  }}
+                                >
+                                  <div className="d-flex flex-wrap gap-2">
+                                    {keywords.map((keyword, index) => (
+                                      <span
+                                        key={index}
+                                        className={`badge d-flex align-items-center p-2 ${
+                                          index < 10
+                                            ? "bg-light-green"
+                                            : "bg-danger text-white"
+                                        }`}
+                                        style={{
+                                          borderRadius: "5px",
+                                        }}
                                       >
-                                        <option value="">Language</option>
-                                        {language_options.map((language) => (
-                                          <option
-                                            key={language.ID}
-                                            value={language.ID}
-                                          >
-                                            {language.Name}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-6">
-                                    <button
-                                      type="button"
-                                      className="btn primary_btn mt-2"
-                                      onClick={handleSubmit}
-                                      disabled={
-                                        (keywords.length === 0 && input.trim() === "") ||
-                                        keywords.length > 10 ||
-                                        country.length === 0 ||
-                                        !language 
-                                      }
-                                    >
-                                      {loading ? "Please wait..." : "Start"}
-                                    </button>
+                                        {keyword}
+                                        <button
+                                          type="button"
+                                          onClick={() => removeKeyword(index)}
+                                          className={`btn-close btn-sm ms-2  ${
+                                            index < 10
+                                              ? "text-green"
+                                              : "text-white"
+                                          }`}
+                                          aria-label="Remove"
+                                        ></button>
+                                      </span>
+                                    ))}
                                   </div>
                                 </div>
-                              </form>
-                            </div>
+                              )}
+                              <div className="row">
+                                <div className="col-12">
+                                  <input
+                                    type="text"
+                                    className="form-control mb-2"
+                                    placeholder="Enter keywords (press Enter or comma to add)"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                  />
+                                </div>
+                                <div className="col-12">
+                                  <textarea
+                                    className="form-control"
+                                    placeholder="Product/Service Description"
+                                    id="key_tool_description"
+                                    style={{ height: "100px" }}
+                                    value={description}
+                                    onChange={(e) =>
+                                      setDescription(e.target.value)
+                                    }
+                                  ></textarea>
+                                </div>
+
+                                <div className="col-6">
+                                  <div className="form_input">
+                                    <Select
+                                      options={locationOptions}
+                                      value={country}
+                                      onChange={setCountry}
+                                      isMulti
+                                      placeholder="Select Target Country"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="col-6">
+                                  <div className="form_input">
+                                    <select
+                                      className="form-select"
+                                      id="targetLanguage"
+                                      aria-label="target_language"
+                                      onChange={(e) =>
+                                        setLanguage(e.target.value)
+                                      }
+                                    >
+                                      <option value="">Language</option>
+                                      {language_options.map((language) => (
+                                        <option
+                                          key={language.ID}
+                                          value={language.ID}
+                                        >
+                                          {language.Name}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
+
+                                <div className="col-6">
+                                  <button
+                                    type="button"
+                                    className="btn primary_btn mt-2"
+                                    onClick={handleSubmit}
+                                    disabled={
+                                      (keywords.length === 0 &&
+                                        input.trim() === "") ||
+                                      keywords.length > 10 ||
+                                      country.length === 0 ||
+                                      !language
+                                    }
+                                  >
+                                    {loading ? "Please wait..." : "Start"}
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-     
-            
-    
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>

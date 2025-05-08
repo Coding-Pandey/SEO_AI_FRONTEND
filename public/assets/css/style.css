@@ -987,6 +987,7 @@ form .row {
 .search_headlines_item .edit_icon {
     font-size: 12px;
     line-height: 16px;
+    cursor: pointer;
 }
 
 .edit_item {
@@ -1730,12 +1731,21 @@ form .row {
     border-radius: 8px;
   }
   
+.heading_btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    row-gap: 10px;
+    flex-wrap: wrap;
+}
+
   /* Responsive styles */
   @media (max-width: 768px) {
-    .edit-container {
-      flex-direction: column; /* Stack elements vertically for small screens */
+    /* .edit-container {
+      flex-direction: column;
       gap: 5px;
-    }
+    } 
+      */
   
     .edit-input {
       width: 100%; /* Make the input take full width on small screens */
@@ -1754,4 +1764,5 @@ form .row {
       font-size: 18px; /* Adjust icon size for smaller screens */
     }
   }
+  
   

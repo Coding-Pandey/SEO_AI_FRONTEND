@@ -24,6 +24,23 @@ const CreateCampaignKeywordResult = () => {
   const [language, setLanguage] = useState<string | null>(null);
   const [brandedWords, setBrandedWords] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
+  const [includeInput, setIncludeInput] = useState<string>("");
+
+  const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const trimmed = includeInput.trim();
+      if (trimmed && !includeKeywords.includes(trimmed)) {
+        setIncludeKeywords([...includeKeywords, trimmed]);
+      }
+      setIncludeInput("");
+    }
+  };
+
+  const removeIncludeKeyword = (index: number) => {
+    setIncludeKeywords(includeKeywords.filter((_, i) => i !== index));
+  };
  
   useEffect(() => {
     if (location.state) {
@@ -130,10 +147,12 @@ const CreateCampaignKeywordResult = () => {
     const limitedData = filteredData.slice(0, 10);
  
     const cleanedData = limitedData.map(({ isNew, ...rest }) => rest);
+    console.log(brandedWords)
     const newData={
       keywords: cleanedData,
       delete_word: {
-        branded_words: brandedWords,
+        // branded_words: brandedWords,
+        branded_words: false,
         branded_keyword: []
       }
     }
@@ -204,7 +223,7 @@ const CreateCampaignKeywordResult = () => {
                         <span>{volume}</span>
                       </div>
                     </div>
-                  <div className="col-12 col-md-6 col-xl-3">
+                  <div className="col-12 col-md-6 col-xl-4">
                     <div className="exclue_include_wrapper">
                     <select
                           className="form-select"
@@ -218,19 +237,18 @@ const CreateCampaignKeywordResult = () => {
                           <option value="3">Option 3</option> */}
                         </select>
 
-                      {/* <select
-                        className="form-select"
-                        id="includeKeyword"
-                        aria-label="Include keyword"
-                      >
-                        <option defaultValue="">Include</option>
-                        <option value="1">Option 1</option>
-                        <option value="2">Option 2</option>
-                        <option value="3">Option 3</option>
-                      </select> */}
+                        <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Include"
+                        style={{ color: "black" }}
+                        value={includeInput}
+                        onChange={(e) => setIncludeInput(e.target.value)}
+                        onKeyDown={handleIncludeKeyDown}
+                      />
                     </div>
                   </div>
-                  <div className="col-12 col-md-12 col-xl-5">
+                  <div className="col-12 col-md-12 col-xl-4">
                       <div className="result_btn_wrapper">
                         <button
                           type="button"
@@ -247,6 +265,27 @@ const CreateCampaignKeywordResult = () => {
                       </div>
                     </div>
                 </div>
+                {includeKeywords.length > 0 && (
+                <div
+                  className="mb-2 p-2 form-control mt-3"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    border: "2px solid #e7e7e7",
+                    borderRadius: "5px",
+                  }}
+                >
+                  {includeKeywords.map((keyword, index) => (
+                    <span key={index} className="primary_btn  badge mx-1 px-2 py-1 ">
+                      {keyword}{" "}
+                      <i
+                        className="bi bi-x ms-1 "
+                        style={{ cursor: "pointer" }}
+                        onClick={() => removeIncludeKeyword(index)}
+                      ></i>
+                    </span>
+                  ))}
+                </div>
+                 )}
               </div>
               <div className="result_keyword box-shadow">
                 <div className="result_table_wrapper table-responsive">

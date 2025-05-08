@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import logo from "../../../assets/images/logo.svg";
-import profilePic from "../../../assets/images/profile-pic1.jpg";
 import { useAuth } from "../../../ContextApi/AuthContext/AuthContext";
 
 const Header = () => {
@@ -10,7 +8,7 @@ const Header = () => {
       <nav className="navbar navbar-expand-md">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/dashboard">
-            <img src={logo} className="img-fluid main-logo" alt="logo" />
+            <img  src="/assets/images/logo.svg" className="img-fluid main-logo" alt="logo" />
           </Link>
 
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -45,7 +43,7 @@ const Header = () => {
                 aria-expanded="false"
               >
                 <img
-                  src={profilePic}
+                  src="/assets/images/profile-pic1.jpg"
                   className="img-fluid profile-icon"
                   alt="profile-icon"
                 />
@@ -75,7 +73,7 @@ const Header = () => {
             aria-labelledby="offcanvasExampleLabel"
           >
             <div className="offcanvas-header">
-              <img src={logo} className="img-fluid main-logo" alt="logo" />
+              <img src="/assets/images/logo.svg" className="img-fluid main-logo" alt="logo" />
               <button
                 type="button"
                 className="btn-close"
