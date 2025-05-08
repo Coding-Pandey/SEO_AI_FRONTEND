@@ -144,15 +144,14 @@ const CreateCampaignKeywordResult = () => {
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
-    const limitedData = filteredData.slice(0, 10);
+    const limitedData = filteredData.slice(0, 50);
  
     const cleanedData = limitedData.map(({ isNew, ...rest }) => rest);
-    console.log(brandedWords)
+    // console.log(brandedWords)
     const newData={
       keywords: cleanedData,
       delete_word: {
-        // branded_words: brandedWords,
-        branded_words: false,
+        branded_words: brandedWords,
         branded_keyword: []
       }
     }

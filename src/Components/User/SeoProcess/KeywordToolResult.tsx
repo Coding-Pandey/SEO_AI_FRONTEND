@@ -150,15 +150,14 @@ const KeywordToolResult = () => {
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
-    const limitedData = filteredData.slice(0, 10);
+    const limitedData = filteredData.slice(0, 50);
 
     setLoadingSuggestion(true);
-    console.log(brandedWords)
+
     const newData = {
       keywords: limitedData,
       delete_word: {
-        // branded_words: brandedWords,
-        branded_words: false,
+        branded_words: brandedWords,
         branded_keyword: [],
       },
     };

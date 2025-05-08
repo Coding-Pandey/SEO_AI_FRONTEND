@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import logoWhite from "../assets/images/logo-white.svg";
 import {
   LoginFormData,
   validateLoginForm,
@@ -107,7 +106,7 @@ const Login = () => {
         <div className="col-12 col-sm-4 col-lg-3 bg_blue">
           <div className="sign_sidebar">
             <div className="sign_logo_wrapper">
-              <img src={logoWhite} className="img-fluid sign-logo" alt="logo" />
+              <img src="/assets/images/logo-white.svg" className="img-fluid sign-logo" alt="logo" />
             </div>
             <div className="sign_plan">
               <h3 className="font_25 font_600 mb-3">Plan includes</h3>
