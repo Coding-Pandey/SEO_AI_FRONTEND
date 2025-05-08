@@ -2,7 +2,7 @@
 const Planner = () => {
   return (
     <div>
-      
+         
     </div>
   )
 }
