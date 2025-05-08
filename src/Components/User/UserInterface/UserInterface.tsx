@@ -6,24 +6,17 @@ export interface SEOGenerateKeywordDetails {
   }
   
 
-   interface SEOClusterKeywordData {
-    Keyword: string;
-    Avg_Monthly_Searches: number;
+  interface SEOClusterKeywordData {
+    keywords: any[];  
+    delete_word: {
+      branded_words: boolean;  
+      branded_keyword: string[]; 
+    };
   }
   
-  export type SEOClusterKeywordDataPayload = SEOClusterKeywordData[];
+  export type SEOClusterKeywordDataPayload = SEOClusterKeywordData;
 
 
-  export interface SEOPPCClusterKeywordData {
-      Keyword: string,
-      Avg_Monthly_Searches: number,
-      Competition: string,
-      LowTopOfPageBid: number,
-      HighTopOfPageBid: number,
-  }
-
-  
-  export type SEOPPCClusterKeywordDataPayload = SEOPPCClusterKeywordData[];
 
 
   export interface SEOPPCClusterUploadPaylaod {

@@ -22,8 +22,8 @@ const KeywordToolResult = () => {
   const [description, setDescription] = useState<string>("");
   const [country, setCountry] = useState<any>([]);
   const [language, setLanguage] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [brandedWords, setBrandedWords] = useState<boolean>(false);
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("keywordToolResult");
@@ -121,16 +121,31 @@ const KeywordToolResult = () => {
     }
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setBrandedWords(e.target.value === "Branding Keywords");
+  };
+  
 
+ 
   const handleSuggestPages = async() => {
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
     const limitedData = filteredData.slice(0, 10);
+    
     setLoadingSuggestion(true);
+
+        const newData={
+        keywords: limitedData,
+        delete_word: {
+          branded_words: brandedWords,
+          branded_keyword: []
+        }
+      }
+   
  
     try {
-      const SEOClusterResponse = await SEOClusterKeywordService(limitedData);
+      const SEOClusterResponse = await SEOClusterKeywordService(newData);
       if (
         SEOClusterResponse.status === 201 ||
         SEOClusterResponse.status === 200
@@ -200,14 +215,15 @@ const KeywordToolResult = () => {
                           className="form-select"
                           id="excludeKeyword"
                           aria-label="Exclude Keyword"
+                          onChange={handleSelectChange}
                         >
                           <option value="">Exclude</option>
-                          <option value="1">Option 1</option>
-                          <option value="2">Option 2</option>
-                          <option value="3">Option 3</option>
+                          <option value="Branding Keywords">Branding Keywords</option>
+                          {/* <option value="2">Option 2</option>
+                          <option value="3">Option 3</option> */}
                         </select>
 
-                        <select
+                        {/* <select
                           className="form-select"
                           id="includeKeyword"
                           aria-label="Include Keyword"
@@ -216,7 +232,7 @@ const KeywordToolResult = () => {
                           <option value="1">Option 1</option>
                           <option value="2">Option 2</option>
                           <option value="3">Option 3</option>
-                        </select>
+                        </select> */}
                       </div>
                     </div>
 

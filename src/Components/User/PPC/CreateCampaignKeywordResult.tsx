@@ -22,8 +22,9 @@ const CreateCampaignKeywordResult = () => {
   const [description, setDescription] = useState<string>("");
   const [country, setCountry] = useState<any>([]);
   const [language, setLanguage] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-console.log(generateKeywordDetails)
+  const [brandedWords, setBrandedWords] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+ 
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("keywordToolResult");
@@ -117,6 +118,10 @@ console.log(generateKeywordDetails)
     localStorage.setItem('keywordToolResult', JSON.stringify(updatedKeywords));
     toast.success("Keyword deleted successfully!", { position: "top-right", autoClose: 1000 });
   };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setBrandedWords(e.target.value === "Branding Keywords");
+  };
   
   const handleSuggestPages = async() => {
     const filteredData = generateKeywordDetails.filter(
@@ -125,10 +130,17 @@ console.log(generateKeywordDetails)
     const limitedData = filteredData.slice(0, 10);
  
     const cleanedData = limitedData.map(({ isNew, ...rest }) => rest);
+    const newData={
+      keywords: cleanedData,
+      delete_word: {
+        branded_words: brandedWords,
+        branded_keyword: []
+      }
+    }
  
     setLoadingSuggestion(true);
     try {
-      const SEOClusterResponse = await SEOPPCClusterKeywordService(cleanedData);
+      const SEOClusterResponse = await SEOPPCClusterKeywordService(newData);
       if (
         SEOClusterResponse.status === 201 ||
         SEOClusterResponse.status === 200
@@ -194,18 +206,19 @@ console.log(generateKeywordDetails)
                     </div>
                   <div className="col-12 col-md-6 col-xl-3">
                     <div className="exclue_include_wrapper">
-                      <select
-                        className="form-select"
-                        id="excludeKeyword"
-                        aria-label="Exclude Keyword"
-                      >
-                        <option defaultValue="">Exclude</option>
-                        <option value="1">Option 1</option>
-                        <option value="2">Option 2</option>
-                        <option value="3">Option 3</option>
-                      </select>
+                    <select
+                          className="form-select"
+                          id="excludeKeyword"
+                          aria-label="Exclude Keyword"
+                          onChange={handleSelectChange}
+                        >
+                          <option value="">Exclude</option>
+                          <option value="Branding Keywords">Branding Keywords</option>
+                          {/* <option value="2">Option 2</option>
+                          <option value="3">Option 3</option> */}
+                        </select>
 
-                      <select
+                      {/* <select
                         className="form-select"
                         id="includeKeyword"
                         aria-label="Include keyword"
@@ -214,7 +227,7 @@ console.log(generateKeywordDetails)
                         <option value="1">Option 1</option>
                         <option value="2">Option 2</option>
                         <option value="3">Option 3</option>
-                      </select>
+                      </select> */}
                     </div>
                   </div>
                   <div className="col-12 col-md-12 col-xl-5">

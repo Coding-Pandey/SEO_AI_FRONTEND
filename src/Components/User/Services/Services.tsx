@@ -1,5 +1,5 @@
 import axiosInstance from "../../../Interceptor/Interceptor";
-import { SEOClusterKeywordDataPayload, SEOGenerateKeywordDetails, SEOPPCClusterKeywordDataPayload, SEOPPCClusterUploadPaylaod } from "../UserInterface/UserInterface";
+import { SEOClusterKeywordDataPayload, SEOGenerateKeywordDetails, SEOPPCClusterUploadPaylaod } from "../UserInterface/UserInterface";
 
 export const SEOGenerateKeyword = async (formData: SEOGenerateKeywordDetails) => {
     try {
@@ -132,7 +132,7 @@ export const SEOPPCGenerateKeyword = async (formData: SEOGenerateKeywordDetails)
 };
 
 
-export const SEOPPCClusterKeywordService = async (filteredData: SEOPPCClusterKeywordDataPayload) => {
+export const SEOPPCClusterKeywordService = async (filteredData: SEOClusterKeywordDataPayload) => {
   try {
     const response = await axiosInstance.post('/api/ppc_keyword_clustering', filteredData);
     return response; 
