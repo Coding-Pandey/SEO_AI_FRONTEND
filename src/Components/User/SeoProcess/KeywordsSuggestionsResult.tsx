@@ -17,6 +17,7 @@ const KeywordsSuggestionsResult = () => {
   const [modalTitleId, setModalTitleId] = useState<number | null>(null);
   const [modalTitleValue, setModalTitleValue] = useState<string>("");
   const [modalURLValue, setModalURLValue] = useState<string>("");
+  
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("ClusterData");

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../ContextApi/AuthContext/AuthContext";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { msalInstance } from "./msalConfig";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -100,6 +101,49 @@ const Login = () => {
     onError: (error) => console.log("Google Login Failed:", error),
   });
 
+  const handleMicrosoftLogin = async () => {
+    try {
+      const loginResponse = await msalInstance.loginPopup({
+        scopes: ["user.read"],
+      });
+
+      const account = loginResponse.account;
+
+      const tokenResponse = await msalInstance.acquireTokenSilent({
+        scopes: ["user.read"],
+        account,
+      });
+
+      const userInfoResponse = await axios.get("https://graph.microsoft.com/v1.0/me", {
+        headers: {
+          Authorization: `Bearer ${tokenResponse.accessToken}`,
+        },
+      });
+
+      const profile = userInfoResponse.data;
+      const userDetails = {
+        username: profile.displayName,
+        email: profile.userPrincipalName,
+        oAuthId: profile.id,
+        role: "user",
+      };
+
+      const response = await googleLoginService(userDetails);
+      const { access_token, user } = response.data;
+
+      if (response.status === 200 || response.status === 201) {
+        const combinedData = { access_token, user };
+        localStorage.setItem("user_Data", JSON.stringify(combinedData));
+        setUsers(combinedData);
+        setTimeout(() => {
+          navigate("/dashBoard");
+        }, 100);
+      }
+    } catch (err) {
+      console.error("Microsoft login failed", err);
+    }
+  };
+
   return (
     <div className="sign_wrapper">
       <div className="row mx-0">
@@ -155,7 +199,7 @@ const Login = () => {
                     <i className="bi bi-google"></i>
                     <span>Google</span>
                   </button>
-                  <button type="button" className="btn primary_btn_outline">
+                  <button type="button"  onClick={handleMicrosoftLogin} className="btn primary_btn_outline">
                     <i className="bi bi-windows"></i>
                     <span>Microsoft</span>
                   </button>

@@ -153,12 +153,18 @@ const KeywordToolResult = () => {
     const limitedData = filteredData.slice(0, 50);
 
     setLoadingSuggestion(true);
-
+    const finalKeywords =
+      includeKeywords.length > 0
+        ? includeKeywords
+        : includeInput.trim() !== ""
+        ? [includeInput.trim()]
+        : [];
+ 
     const newData = {
       keywords: limitedData,
       delete_word: {
         branded_words: brandedWords,
-        branded_keyword: [],
+        branded_keyword: finalKeywords,
       },
     };
 
@@ -287,26 +293,29 @@ const KeywordToolResult = () => {
                   </div>
                 </div>
                 {includeKeywords.length > 0 && (
-                <div
-                  className="mb-2 p-2 form-control mt-3"
-                  style={{
-                    backgroundColor: "#ffffff",
-                    border: "2px solid #e7e7e7",
-                    borderRadius: "5px",
-                  }}
-                >
-                  {includeKeywords.map((keyword, index) => (
-                    <span key={index} className="primary_btn  badge mx-1 px-2 py-1 ">
-                      {keyword}{" "}
-                      <i
-                        className="bi bi-x ms-1 "
-                        style={{ cursor: "pointer" }}
-                        onClick={() => removeIncludeKeyword(index)}
-                      ></i>
-                    </span>
-                  ))}
-                </div>
-                 )}
+                  <div
+                    className="mb-2 p-2 form-control mt-3"
+                    style={{
+                      backgroundColor: "#ffffff",
+                      border: "2px solid #e7e7e7",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    {includeKeywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="primary_btn  badge mx-1 px-2 py-1 "
+                      >
+                        {keyword}{" "}
+                        <i
+                          className="bi bi-x ms-1 "
+                          style={{ cursor: "pointer" }}
+                          onClick={() => removeIncludeKeyword(index)}
+                        ></i>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="result_keyword box-shadow">
