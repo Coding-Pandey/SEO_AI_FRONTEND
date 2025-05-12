@@ -79,6 +79,7 @@ const GeneratePost = () => {
       setLoading(true);
       const response = await GeneratePostService(formData);
       if (response.status === 200 || response.status === 201) {
+        setLoading(false);
         console.log(response.data, "response.data");
       }
     } catch (error: any) {
