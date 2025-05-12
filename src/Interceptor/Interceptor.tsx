@@ -43,7 +43,10 @@ axiosInstance.interceptors.response.use(
     const status = error.response?.status;
     const message = (error.response?.data as any)?.detail;
     if (status === 401) {
-      throw error;
+         toast.error(message, { position: "top-right", autoClose: 3000 });
+         setTimeout(() => {
+          window.location.href = '/Logout';
+        }, 1000);   
     } else if ([400, 403, 404, 409, 429 ].includes(status || 0)) {
       let errorMessage = 'An error occurred. Please try again.';
       switch (status) {

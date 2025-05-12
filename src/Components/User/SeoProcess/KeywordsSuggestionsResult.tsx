@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
@@ -7,7 +7,7 @@ import { SEOClusterUploadFile } from "../Services/Services";
 
 const KeywordsSuggestionsResult = () => {
   const location = useLocation();
-  const navigate = useNavigate();
+ 
   const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [SuggestionKeywordDetails, setSuggestionKeywordDetails] = useState<
@@ -80,13 +80,7 @@ const KeywordsSuggestionsResult = () => {
       }
     } catch (error: any) {
       setLoading(false);
-      console.error("Error:", error);
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
+      console.error("Error handleSave:", error);
     }
   };
 

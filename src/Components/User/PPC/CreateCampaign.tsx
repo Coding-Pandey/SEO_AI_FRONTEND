@@ -38,16 +38,7 @@ const CreateCampaign = () => {
         }
       } catch (error: any) {
         setLoadingData(false);
-        console.error("Error:", error);
-        const status = error.response?.status;
-        const message = error.response?.data?.detail;
-        if (status === 401) {
-          navigate("/Logout");
-          toast.error(message || "Unauthorized access", {
-            position: "top-right",
-            autoClose: 3000,
-          });
-        }
+        console.error("Error fetchPPCClusterData:", error);
       } finally {
         setLoadingData(false);
       }
@@ -98,13 +89,8 @@ const CreateCampaign = () => {
       }
     } catch (error: any) {
       setLoading(false);
-      console.error("Error:", error);
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
+      console.error("Error handleSubmit:", error);
+     
     }
   };
 

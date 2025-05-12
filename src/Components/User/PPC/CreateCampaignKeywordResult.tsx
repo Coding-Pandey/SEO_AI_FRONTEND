@@ -121,12 +121,7 @@ const CreateCampaignKeywordResult = () => {
         closeModal();
       }
     } catch (error: any) {
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
+     console.log("Error handleSubmit:",error)
     } finally {
       setLoading(false);
     }
@@ -185,12 +180,7 @@ const CreateCampaignKeywordResult = () => {
         setLoadingSuggestion(false);
       }
     } catch (error: any) {
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
+      console.log("Error handleSuggestPages:",error)
     } finally {
       setLoadingSuggestion(false);
     }

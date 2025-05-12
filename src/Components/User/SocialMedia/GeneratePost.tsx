@@ -1,9 +1,95 @@
+import { useState, ChangeEvent } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
+import { GeneratePostService } from "../Services/Services";
+import Loading from "../../Page/Loading/Loading";
 
 const GeneratePost = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [input, setInput] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+  const [platforms, setPlatforms] = useState<string[]>([]);
+  const [objectives, setObjectives] = useState<string[]>([]);
+  const [audience, setAudience] = useState<string[]>([]);
+  const [additional, setAdditional] = useState<string[]>([]);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleCheckbox = (
+    value: string,
+    selectedList: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    if (selectedList.includes(value)) {
+      setter(selectedList.filter((item) => item !== value));
+    } else {
+      setter([...selectedList, value]);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file || !description) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      const platformsToCheck: string[] = [
+        "facebook",
+        "instagram",
+        "twitter",
+        "linkedIn",
+        "tiktok",
+      ];
+
+      const posts: { [key: string]: boolean | null } = platformsToCheck.reduce(
+        (acc: any, platform) => {
+          // If the platform is in the array, set it to true, otherwise set it to null.
+          acc[`${platform}_post`] = platforms.includes(platform) ? true : false;
+          return acc;
+        },
+        {}
+      );
+
+      const hash_tag: boolean | null = additional.includes("hastag")
+        ? true
+        : false;
+      const emoji: boolean | null = additional.includes("emojis")
+        ? true
+        : false;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("description", description);
+      formData.append("fileName", input);
+      platformsToCheck.forEach((platform) => {
+        formData.append(`${platform}_post`, String(posts[`${platform}_post`]));
+      });
+
+      formData.append("objectives", JSON.stringify(objectives));
+      formData.append("audience", JSON.stringify(audience));
+      formData.append("hash_tag", String(hash_tag));
+      formData.append("emoji", String(emoji));
+
+      setLoading(true);
+      const response = await GeneratePostService(formData);
+      if (response.status === 200 || response.status === 201) {
+        console.log(response.data, "response.data");
+      }
+    } catch (error: any) {
+      setLoading(false);
+      console.log("Error handleUpload:", error);
+    }
+  };
+
   return (
     <>
+      {loading && <Loading />}
       <Header />
       <main className="main_wrapper">
         <SideBar />
@@ -17,7 +103,7 @@ const GeneratePost = () => {
               </h2>
             </div>
             <div className="generate_post_form keyword_search_form">
-              <div className="row gy-3">
+              <div className="row gy-3 ">
                 {/* Previously Created */}
                 <div className="col-12 col-xl-5">
                   <div className="previously_created_warpper">
@@ -62,198 +148,230 @@ const GeneratePost = () => {
                     <h2 className="font_25 font_500 mb-3">
                       Generate New Posts
                     </h2>
-                    <p className="keyword_error font_16">
-                      Error: Limit Reached: Please enter no more than 10
-                      keywords
-                    </p>
-
-                    {/* Post Name */}
-                    <div className="col-12">
-                      <label
-                        htmlFor="generate_post_name"
-                        className="font_20 font_500 mb-2"
-                      >
-                        Name your post set*
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="generate_post_name"
-                      />
-                    </div>
-
-                    {/* Description */}
-                    <div className="col-12">
-                      <label
-                        htmlFor="post_msg"
-                        className="font_20 font_500 mb-2"
-                      >
-                        Describe Your Message or campaign*
-                      </label>
-                      <textarea
-                        className="form-control"
-                        placeholder="Describe your message"
-                        id="post_msg"
-                        style={{ height: "120px" }}
-                      ></textarea>
-                    </div>
-
-                    {/* File Upload */}
-                    <div className="col-12">
-                      <label
-                        htmlFor="post_upload"
-                        className="font_20 font_500 mb-2"
-                      >
-                        Upload Campaign Files
-                      </label>
-                      <div className="doc_file_wrapper">
+                    <div className="row">
+                      {/* Post Name */}
+                      <div className="col-12">
+                        <label
+                          htmlFor="generate_post_name"
+                          className="font_20 font_500 mb-2"
+                        >
+                          Name your post set*
+                        </label>
                         <input
-                          className="form-control upload_input"
-                          type="file"
-                          id="post_upload"
+                          type="text"
+                          className="form-control"
+                          id="generate_post_name"
+                          placeholder="Enter fileName"
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
                         />
-                        <div className="doc_left">
-                          <p className="font_16 mb-1">
-                            Drag and drop files here or{" "}
-                            <span className="text_blue">browse</span> to upload
-                          </p>
-                        </div>
                       </div>
-                    </div>
 
-                    {/* Select Platforms */}
-                    <div className="form_input">
-                      <h3 className="font_20 font_500 mb-3">
-                        Select Platforms
-                      </h3>
-                      <div className="row mb-2">
-                        {[
-                          "Facebook",
-                          "Instagram",
-                          "Twitter",
-                          "LinkedIn",
-                          "Tiktok",
-                          "...",
-                        ].map((platform, i) => (
-                          <div className="col-12 col-lg-6 col-xxl-4" key={i}>
-                            <input
-                              type="checkbox"
-                              id={`platform_${i}`}
-                              name={`platform_${i}`}
-                              value={platform.toLowerCase()}
-                            />
-                            <label
-                              htmlFor={`platform_${i}`}
-                              className="font_16 ms-1"
-                            >
-                              {platform}
-                            </label>
-                          </div>
-                        ))}
+                      {/* Description */}
+                      <div className="col-12">
+                        <label
+                          htmlFor="post_msg"
+                          className="font_20 font_500 mb-2"
+                        >
+                          Describe Your Message or campaign*
+                        </label>
+                        <textarea
+                          className="form-control"
+                          placeholder="Describe your message"
+                          id="post_msg"
+                          style={{ height: "120px" }}
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                        ></textarea>
                       </div>
-                    </div>
 
-                    {/* Define Post Objective */}
-                    <div className="form_input">
-                      <h3 className="font_20 font_500 mb-3">
-                        Define Post Objective
-                      </h3>
-                      <div className="row mb-2">
-                        {[
-                          "Drive Traffic",
-                          "Boost Engagement",
-                          "Announce Product",
-                          "Brand Awareness",
-                          "Personal Post",
-                          "Promote Event",
-                        ].map((objective, i) => (
-                          <div
-                            className={`col-12 col-lg-6 col-xxl-${
-                              i % 2 === 0 ? "4" : "8"
-                            }`}
-                            key={i}
-                          >
-                            <input
-                              type="checkbox"
-                              id={`objective_${i}`}
-                              name={`objective_${i}`}
-                              value={objective.toLowerCase().replace(/\s/g, "")}
-                            />
-                            <label
-                              htmlFor={`objective_${i}`}
-                              className="font_16 ms-1"
-                            >
-                              {objective}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Audience */}
-                    <div className="form_input">
-                      <h3 className="font_20 font_500 mb-3">Audience</h3>
-                      <div className="row mb-2">
-                        {[
-                          "Buyer Persona 1 - First Last Name",
-                          "Buyer Persona 2 - First Last Name",
-                          "Buyer Persona 3 - First Last Name",
-                          "General Industry Audience",
-                        ].map((persona, i) => (
-                          <div className="col-12" key={i}>
-                            <input
-                              type="checkbox"
-                              id={`persona_${i}`}
-                              name={`persona_${i}`}
-                              value="persona"
-                            />
-                            <label
-                              htmlFor={`persona_${i}`}
-                              className="font_16 ms-1"
-                            >
-                              {persona}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="form_input">
-                      <h3 className="font_20 font_500 mb-3">Additional</h3>
-                      <div className="row mb-2">
-                        <div className="col-12 col-lg-6 col-xxl-4">
+                      {/* File Upload */}
+                      <div className="col-12">
+                        <label
+                          htmlFor="post_upload"
+                          className="font_20 font_500 mb-2"
+                        >
+                          Upload Campaign Files
+                        </label>
+                       
+                        <div className="doc_file_wrapper">
                           <input
-                            type="checkbox"
-                            id="hastag1"
-                            name="hastag1"
-                            value="hastag"
+                            className="form-control upload_input"
+                            type="file"
+                            id="post_upload"
+                            onChange={handleFileChange}
                           />
-                          <label htmlFor="hastag1" className="font_16 ms-1">
-                            Include Hashtags
-                          </label>
+                          <div className="doc_left">
+                            <p className="font_16 mb-1">
+                              Drag and drop files here or{" "}
+                              <span className="text_blue">browse</span> to
+                              upload
+                            </p>
+                          </div>
                         </div>
-                        <div className="col-12 col-lg-6 col-xxl-8">
-                          <input
-                            type="checkbox"
-                            id="emojis1"
-                            name="emojis1"
-                            value="emojis"
-                          />
-                          <label htmlFor="emojis1" className="font_16 ms-1">
-                            Use Emojis
-                          </label>
+                         {file && (
+                          <div className="mt-2 mb-2 text-center">
+                            <p className="font_16 mb-0">
+                              <strong style={{color:"rgb(250, 122, 78)"}}>Uploaded file:</strong> {file.name}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Select Platforms */}
+                      <div className="form_input mt-3">
+                        <h3 className="font_20 font_500 mb-3">
+                          Select Platforms
+                        </h3>
+                        <div className="row mb-2">
+                          {[
+                            "Facebook",
+                            "Instagram",
+                            "Twitter",
+                            "LinkedIn",
+                            "Tiktok",
+                          ].map((platform, i) => (
+                            <div className="col-12 col-lg-6 col-xxl-4" key={i}>
+                              <input
+                                type="checkbox"
+                                id={`platform_${i}`}
+                                value={platform.toLowerCase()}
+                                onChange={() =>
+                                  handleCheckbox(
+                                    platform.toLowerCase(),
+                                    platforms,
+                                    setPlatforms
+                                  )
+                                }
+                              />
+                              <label
+                                htmlFor={`platform_${i}`}
+                                className="font_16 ms-1"
+                              >
+                                {platform}
+                              </label>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                    <div className="col-12 mt-4">
-                      <button className="btn primary_btn">Generate</button>
+
+                      {/* Define Post Objective */}
+                      <div className="form_input">
+                        <h3 className="font_20 font_500 mb-3">
+                          Define Post Objective
+                        </h3>
+                        <div className="row mb-2">
+                          {[
+                            "Drive Traffic",
+                            "Boost Engagement",
+                            "Announce Product",
+                            "Brand Awareness",
+                            "Personal Post",
+                            "Promote Event",
+                          ].map((objective, i) => (
+                            <div className="col-12 col-lg-6 col-xxl-6" key={i}>
+                              <input
+                                type="checkbox"
+                                id={`objective_${i}`}
+                                value={objective
+                                  .toLowerCase()
+                                  .replace(/\s/g, "")}
+                                onChange={() =>
+                                  handleCheckbox(
+                                    objective.toLowerCase().replace(/\s/g, ""),
+                                    objectives,
+                                    setObjectives
+                                  )
+                                }
+                              />
+                              <label
+                                htmlFor={`objective_${i}`}
+                                className="font_16 ms-1"
+                              >
+                                {objective}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Audience */}
+                      <div className="form_input">
+                        <h3 className="font_20 font_500 mb-3">Audience</h3>
+                        <div className="row mb-2">
+                          {[
+                            "Buyer Persona 1 - First Last Name",
+                            "Buyer Persona 2 - First Last Name",
+                            "Buyer Persona 3 - First Last Name",
+                            "General Industry Audience",
+                          ].map((persona, i) => (
+                            <div className="col-12" key={i}>
+                              <input
+                                type="checkbox"
+                                id={`persona_${i}`}
+                                value={persona}
+                                onChange={() =>
+                                  handleCheckbox(persona, audience, setAudience)
+                                }
+                              />
+                              <label
+                                htmlFor={`persona_${i}`}
+                                className="font_16 ms-1"
+                              >
+                                {persona}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Additional */}
+                      <div className="form_input">
+                        <h3 className="font_20 font_500 mb-3">Additional</h3>
+                        <div className="row mb-2">
+                          {["hastag", "emojis"].map((item, i) => (
+                            <div
+                              className={`col-12 col-lg-6 col-xxl-${
+                                i === 0 ? "4" : "8"
+                              }`}
+                              key={i}
+                            >
+                              <input
+                                type="checkbox"
+                                id={item}
+                                value={item}
+                                onChange={() =>
+                                  handleCheckbox(
+                                    item,
+                                    additional,
+                                    setAdditional
+                                  )
+                                }
+                              />
+                              <label htmlFor={item} className="font_16 ms-1">
+                                {item === "hastag"
+                                  ? "Include Hashtags"
+                                  : "Use Emojis"}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="col-12 mt-4">
+                        <button
+                          className="btn primary_btn"
+                          type="button"
+                          onClick={handleUpload}
+                        >
+                          Generate
+                        </button>
+                      </div>
                     </div>
                   </form>
                 </div>
               </div>
             </div>
-            <hr></hr>
-            <div className="multi_post_wrapper">
+
+            {/* <div className="multi_post_wrapper">
               <div className="download_media mb-3">
                 <button className="btn primary_btn">Delete the set</button>
                 <button className="btn primary_btn ms-2">
@@ -651,7 +769,7 @@ discovery call today.`}
                   <button className="btn primary_btn">Save</button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </main>

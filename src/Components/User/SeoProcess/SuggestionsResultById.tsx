@@ -1,4 +1,4 @@
-import {useNavigate, useParams } from "react-router-dom";
+import {useParams } from "react-router-dom";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ interface SuggestionKeywordDetailsType {
 
 const SuggestionsResultById = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [SuggestionKeywordDetails, setSuggestionKeywordDetails] =
     useState<SuggestionKeywordDetailsType | null>(null);
@@ -58,16 +58,7 @@ const SuggestionsResultById = () => {
       }
     } catch (error: any) {
       setLoading(false);
-      console.error("Error:", error);
-      const status = error.response?.status;
-      const message = error.response?.data?.detail;
-      if (status === 401) {
-        navigate("/Logout");
-        toast.error(message || "Unauthorized access", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
+      console.error("Error fetchSeoClusterData:", error);
     } finally {
       setLoading(false);
     }
@@ -96,12 +87,6 @@ const SuggestionsResultById = () => {
       }
     } catch (error:any) {
       console.error("Error deleting keyword:", error);
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
     }
   };
   
@@ -125,12 +110,6 @@ const SuggestionsResultById = () => {
       }
     } catch (error: any) {
       console.error("Error deleting page title:", error);
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
     }
   };
   
@@ -173,13 +152,7 @@ const SuggestionsResultById = () => {
         setShowModal(false);
       }
     } catch (error:any) {
-      console.error("Update error:", error);
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
+      console.error("error handleSaveTitle:", error);
     }
   };
   

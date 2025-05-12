@@ -179,3 +179,14 @@ export const UpdatetitlePpc = async (uuid:string , id:string, formData: { Ad_Gro
     throw error;
   }
 };
+
+//Social Media
+
+export const  GeneratePostService = async (formdata:any) => {
+  try {
+    const response = await axiosInstance.post('/api/social_media_post', formdata);
+    return response; 
+  } catch (error) {
+    throw error;
+  }
+};

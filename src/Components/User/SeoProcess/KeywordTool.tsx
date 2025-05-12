@@ -41,15 +41,6 @@ const KeywordTool = () => {
     } catch (error: any) {
       setLoadingData(false);
       console.error("Error:", error);
-      const status = error.response?.status;
-      const message = error.response?.data?.detail;
-      if (status === 401) {
-        navigate("/Logout");
-        toast.error(message || "Unauthorized access", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
     } finally {
       setLoadingData(false);
     }
@@ -102,12 +93,6 @@ const KeywordTool = () => {
     } catch (error: any) {
       setLoading(false);
       console.error("Error:", error);
-      const status = error.response?.status;
-      const message = (error.response?.data as any)?.detail;
-      if (status === 401) {
-        toast.error(message, { position: "top-right", autoClose: 3000 });
-        navigate("/Logout");
-      }
     }
   };
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../Header/Header"
 import SideBar from "../SideBar/SideBar"
-import { useNavigate, useParams } from "react-router-dom";
+import {useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { deleteKeywordDataPpc, deletePageDataPpc, GetPpcClusterDataById, UpdatetitlePpc } from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
@@ -9,7 +9,6 @@ import Loading from "../../Page/Loading/Loading";
 
 const CampaignSuggestionById = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [SuggestionKeywordDetails, setSuggestionKeywordDetails] =
         useState<any | null>(null);
@@ -17,7 +16,7 @@ const CampaignSuggestionById = () => {
     const [modalTitleId, setModalTitleId] = useState<number | null>(null);
     const [modalTitleValue, setModalTitleValue] = useState<string>("");
 
-    console.log(SuggestionKeywordDetails, "SuggestionKeywordDetails")
+ 
 
     useEffect(() => {
         if (id) {
@@ -34,16 +33,7 @@ const CampaignSuggestionById = () => {
             }
         } catch (error: any) {
             setLoading(false);
-            console.error("Error:", error);
-            const status = error.response?.status;
-            const message = error.response?.data?.detail;
-            if (status === 401) {
-                navigate("/Logout");
-                toast.error(message || "Unauthorized access", {
-                    position: "top-right",
-                    autoClose: 3000,
-                });
-            }
+            console.error("Error fetchPpcClusterData:", error);
         } finally {
             setLoading(false);
         }
@@ -72,12 +62,6 @@ const CampaignSuggestionById = () => {
           }
         } catch (error:any) {
           console.error("Error deleting Ad Group:", error);
-          const status = error.response?.status;
-          const message = (error.response?.data as any)?.detail;
-          if (status === 401) {
-            toast.error(message, { position: "top-right", autoClose: 3000 });
-            navigate("/Logout");
-          }
         }
       };
       
@@ -106,12 +90,6 @@ const CampaignSuggestionById = () => {
           }
         } catch (error:any) {
           console.error("Error deleting keyword:", error);
-          const status = error.response?.status;
-          const message = (error.response?.data as any)?.detail;
-          if (status === 401) {
-            toast.error(message, { position: "top-right", autoClose: 3000 });
-            navigate("/Logout");
-          }
         }
       };
       
@@ -157,12 +135,6 @@ const CampaignSuggestionById = () => {
           }
         } catch (error:any) {
           console.error("Error updating title:", error);
-          const status = error.response?.status;
-          const message = (error.response?.data as any)?.detail;
-          if (status === 401) {
-            toast.error(message, { position: "top-right", autoClose: 3000 });
-            navigate("/Logout");
-          }
         }
       };
       
@@ -274,14 +246,7 @@ const CampaignSuggestionById = () => {
           }
         } catch (error:any) {
           console.error("Error updating:", error);
-          const status = error.response?.status;
-          const message = (error.response?.data as any)?.detail;
-          if (status === 401) {
-            toast.error(message, { position: "top-right", autoClose: 3000 });
-            navigate("/Logout");
-          }else{
             toast.error(`Failed to update ${isHeadline ? 'headline' : 'description'}`);
-          }
         }
       };
       

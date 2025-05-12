@@ -10,10 +10,7 @@ import Logout from "./Components/Page/Logout";
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
-const SocialMediaPost = lazy(() => import("./Components/User/SocialMedia/SocialMediaPost"));
 const ContentGeneration = lazy(() => import("./Components/User/Content/ContentGeneration"));
-const KeywordsSuggestions = lazy(() => import("./Components/User/SeoProcess/KeywordsSuggestions"));
-const UploadDocument = lazy(() => import("./Components/User/SeoProcess/UploadDocument"));
 const CreateCampaign = lazy(() => import("./Components/User/PPC/CreateCampaign"));
 const GeneratePost = lazy(() => import("./Components/User/SocialMedia/GeneratePost"));
 const KeywordToolResult = lazy(() => import("./Components/User/SeoProcess/KeywordToolResult")); 
@@ -50,13 +47,12 @@ function App() {
             <Route path="/ppc/CampaignSuggestionById/:id" element={<CampaignSuggestionById />} />
 
             <Route path="/social/GeneratePost" element={<GeneratePost />} />
-            <Route path="/SocialMediaPost" element={<SocialMediaPost />} />
+ 
             <Route path="/social/Planner" element={<Planner />} />
             
             <Route path="/content/ContentGeneration" element={<ContentGeneration />} />
             
-            <Route path="/KeywordsSuggestions" element={<KeywordsSuggestions />} />
-            <Route path="/UploadDocument" element={<UploadDocument />} />
+      
             
           </Route>
 
