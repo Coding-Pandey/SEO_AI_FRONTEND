@@ -5,21 +5,21 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import AuthContextComponent from "./ContextApi/AuthContext/AuthContext.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
- import { MsalProvider } from "@azure/msal-react";
-import { msalInstance } from "./auth/msalConfig.tsx";
+//  import { MsalProvider } from "@azure/msal-react";
+// import { msalInstance } from "./auth/msalConfig.tsx";
 
  
 
 createRoot(document.getElementById("root")!).render(
+  <StrictMode>
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-    <MsalProvider instance={msalInstance}>
+    {/* <MsalProvider instance={msalInstance}> */}
     <AuthContextComponent>
       <BrowserRouter>
-        <StrictMode>
           <App />
-        </StrictMode>
       </BrowserRouter>
     </AuthContextComponent>
-    </MsalProvider>
+    {/* </MsalProvider> */}
   </GoogleOAuthProvider>
+  </StrictMode>
 );
