@@ -116,7 +116,7 @@ const CreateCampaign = () => {
         } catch (error: any) {
           toast.error("Failed to delete file.", { position: "top-right", autoClose: 3000 });
         }
-      };
+    };
    
 
   return (
@@ -174,7 +174,7 @@ const CreateCampaign = () => {
       );
     })}
   </ul>
-</div>
+                </div>
                 </div>
                 <div className="col-12 col-xl-7">
                   <form>

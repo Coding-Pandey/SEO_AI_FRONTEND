@@ -6,13 +6,13 @@ import PageNotFound from "./Components/Page/PageNotFound";
 import ProtectedRoutes from "./ProtectedRoutes/ProtectedRoutes";
 import Logout from "./Components/Page/Logout";
  
-
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
 const ContentGeneration = lazy(() => import("./Components/User/Content/ContentGeneration"));
 const CreateCampaign = lazy(() => import("./Components/User/PPC/CreateCampaign"));
 const GeneratePost = lazy(() => import("./Components/User/SocialMedia/GeneratePost"));
+const GeneratedPostResult = lazy(() => import("./Components/User/SocialMedia/GeneratedPostResult")); 
 const KeywordToolResult = lazy(() => import("./Components/User/SeoProcess/KeywordToolResult")); 
 const KeywordsSuggestionsResult = lazy(() => import("./Components/User/SeoProcess/KeywordsSuggestionsResult")); 
 const CreateCampaignKeywordResult = lazy(() => import("./Components/User/PPC/CreateCampaignKeywordResult")); 
@@ -47,6 +47,7 @@ function App() {
             <Route path="/ppc/CampaignSuggestionById/:id" element={<CampaignSuggestionById />} />
 
             <Route path="/social/GeneratePost" element={<GeneratePost />} />
+            <Route path="/social/GeneratedPostResult/:id" element={<GeneratedPostResult />} />
  
             <Route path="/social/Planner" element={<Planner />} />
             

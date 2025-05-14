@@ -1249,6 +1249,36 @@ form .row {
 }
 
 
+.add_media {
+    width: 100%;
+    border: 1px solid gray;
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: gray;
+    margin: 10px 0px;
+    column-gap: 6px;
+    position: relative;
+}
+.add_media .media_input {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0px;
+    bottom: 0px;
+    opacity: 0;
+    z-index: 9;
+    cursor: pointer;
+}
+.add_media .media_text {
+    display: flex;
+    column-gap: 6px;
+    align-items: center;
+}
+
+
 @media only screen and (max-width:1599px) {
     .post_list_content table th {
         width: 300px;
