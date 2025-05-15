@@ -289,11 +289,11 @@ export const deleteSocialMediaPost = async (uuid: string,id: string,platform: st
   }
 };
 
-//   export const UpdateImageSocialMedia = async (uuid:string,id:string,platform: string,formData:any) => {
-//   try {
-//     const response = await axiosInstance.patch(`/api/socialmedia_${platform}/${uuid}/post/${id}`,{formData});
-//     return response;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+  export const UpdateImageSocialMedia = async (uuid:string,id:string,platform: string,formData:any) => {
+  try { 
+    const response = await axiosInstance.patch(`/api/socialmedia_${platform}/${uuid}/post/${id}`,formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

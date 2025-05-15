@@ -1,7 +1,11 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
-import { deleteSocialMediaData, GeneratePostService, GetSocialMediaData } from "../Services/Services";
+import {
+  deleteSocialMediaData,
+  GeneratePostService,
+  GetSocialMediaData,
+} from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +21,7 @@ const GeneratePost = () => {
   const [additional, setAdditional] = useState<string[]>([]);
   const [generatedPostData, setGeneratedPostData] = useState<any[]>([]);
   const navigate = useNavigate();
-
+ 
   useEffect(() => {
     fetchPPCClusterData();
   }, []);
@@ -72,7 +76,7 @@ const GeneratePost = () => {
         "facebook",
         "instagram",
         "twitter",
-        "linkedIn",
+        "linkedin",
         "tiktok",
       ];
 
@@ -118,7 +122,7 @@ const GeneratePost = () => {
         setPlatforms([]);
         setObjectives([]);
         setAudience([]);
-        const id=response.data.uuid
+        const id = response.data.uuid;
         navigate(`/social/GeneratedPostResult/${id}`);
         setLoading(false);
       }

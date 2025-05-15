@@ -1,8 +1,27 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../ContextApi/AuthContext/AuthContext";
+import { useEffect } from "react";
+import { GetSocialMediaData } from "../Services/Services";
 
 const Header = () => {
   const { users } = useAuth();
+
+  useEffect(() => {
+    fetchPPCClusterData();
+  }, []);
+
+  const fetchPPCClusterData = async () => {
+    try {
+      const response = await GetSocialMediaData();
+      if (response.status === 200 || response.status === 201) {
+        //  console.log(response.data);
+      }
+    } catch (error: any) {
+      
+      console.error("Error fetchPPCClusterData:", error);
+    }  
+  };
+
   return (
     <header>
       <nav className="navbar navbar-expand-md">

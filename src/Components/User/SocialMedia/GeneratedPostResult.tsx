@@ -6,6 +6,7 @@ import Loading from "../../Page/Loading/Loading";
 import {
   deleteSocialMediaPost,
   GetGeneratedPostById,
+  UpdateImageSocialMedia,
 } from "../Services/Services";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
@@ -19,6 +20,11 @@ const GeneratedPostResult = () => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [fileData, setFileData] = useState<any>(null);
+  const [CollectPlatform, setCollectPlatform] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [UUIDS, setUUIDS] = useState<string>("");
+  const [localImage, setLocalImage] = useState<string | null>(null);
   console.log(generatedPostDetails);
   useEffect(() => {
     if (id) {
@@ -49,40 +55,36 @@ const GeneratedPostResult = () => {
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
     postId: string,
-    platform: string
+    platform: string,
+    uuid: string
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const localImageUrl = URL.createObjectURL(file);
     const formData = new FormData();
     formData.append("image", file);
-    formData.append("postId", postId);
-    formData.append("platform", platform);
-
     try {
-      // const response = await fetch("/api/upload-post-image", {
-      //   method: "POST",
-      //   body: formData,
-      // });
+      const response = await UpdateImageSocialMedia(
+        uuid,
+        postId,
+        platform,
+        formData
+      );
+      console.log(response.data, "response.data");
 
-      // const data = await response.json();
-
-      // if (response.ok && data.imageUrl) {
-      // update image in local UI
-      setGeneratedPostDetails((prev: any) => {
-        const updatedPosts = { ...prev };
-        const posts = updatedPosts.data[`${platform}_posts`];
-        const updated = posts.map((post: any) =>
-          (platform === "linkedin" ? post.linkedIn_id : post.twitter_id) ===
-          postId
-            ? //  { ...post, image: data.imageUrl }
-              { ...post, image: localImageUrl }
-            : post
-        );
-        updatedPosts.data[`${platform}_posts`] = updated;
-        return updatedPosts;
-      });
-      // }
+      if (response.status === 201 || response.status === 200) {
+        setGeneratedPostDetails((prev: any) => {
+          const updatedPosts = { ...prev };
+          const posts = updatedPosts.data[`${platform}_posts`];
+          const updated = posts.map((post: any) =>
+             post[`${platform}_id`] ===
+            postId
+              ?   { ...post, image: response.data.image }
+              : post
+          );
+          updatedPosts.data[`${platform}_posts`] = updated;
+          return updatedPosts;
+        });
+      }
     } catch (error) {
       console.error("Image upload failed", error);
     }
@@ -122,6 +124,57 @@ const GeneratedPostResult = () => {
     }
   };
 
+  const handleEditFunction =  (post:any,platform:string,uuid:string) => {
+    setSelectedPost(post);
+    setCollectPlatform(platform);
+    setIsModalOpen(true);
+    setContent(post?.discription?.join('\n') || '');
+    setUUIDS(uuid)
+    setFileData(null);
+  };
+
+
+  const handleSaveAndEditPost=async()=>{
+    try{
+      let formData
+      if(fileData){
+          formData=new FormData()
+      }
+      console.log(content,"content")
+      formData?.append("image",fileData)
+      formData?.append("content", JSON.stringify([content]));
+      const postId = selectedPost[`${CollectPlatform}_id`];
+
+        const response = await UpdateImageSocialMedia(
+        UUIDS,
+        postId,
+        CollectPlatform,
+        formData
+      );
+      console.log(response.data, "response.data"); 
+      if (response.status === 201 || response.status === 200) {
+          setLocalImage(null)
+          setIsModalOpen(false);
+         setGeneratedPostDetails((prev: any) => {
+          const updatedPosts = { ...prev };
+          const posts = updatedPosts.data[`${CollectPlatform}_posts`];
+          const updated = posts.map((post: any) =>
+             post[`${CollectPlatform}_id`] ===
+            postId
+              ?   { ...post, image: response.data.image ,discription:[content] }
+              : post
+          );
+          updatedPosts.data[`${CollectPlatform}_posts`] = updated;
+          return updatedPosts;
+        });
+      }
+
+    } catch (error: any) {
+      console.log("Failed to handleSaveAndEditPost.", error);
+    }
+
+  }
+
   return (
     <>
       {loading && <Loading />}
@@ -144,17 +197,23 @@ const GeneratedPostResult = () => {
                   </h2>
                 </div>
                 <div className="edit_post_body">
-                  {selectedPost.image ? (
+                  {(selectedPost.image ||localImage) ? (
                     <div className="social_post_img my-3">
                       <img
-                        src="https://img.freepik.com/free-photo/modern-equipped-computer-lab_23-2149241213.jpg?t=st=1745327949~exp=1745331549~hmac=eb72dc233e5bbacd949f3c5860f88e02215575f5ec3f16f974e9df500dd70a97&w=996"
+                          src={localImage || selectedPost.image}
                         className="img-fluid"
                         alt="image"
                       />
                     </div>
                   ) : (
                     <div className="add_media">
-                      <input type="file" className="media_input" />
+                      <input type="file" className="media_input"   accept="image/*" onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFileData(file);
+      setLocalImage(URL.createObjectURL(file)); // ⬅️ Preview the selected image
+    }
+  }} />
                       <div className="media_text">
                         <i className="bi bi-plus-circle"></i>
                         <span>Add media</span>
@@ -166,12 +225,13 @@ const GeneratedPostResult = () => {
                     <textarea
                       id="post_content"
                       aria-label="post_content"
-                      defaultValue={selectedPost.discription || ""}
+                      defaultValue={content || ""}
+                      onChange={(e)=>setContent(e.target.value)}
                     />
                   </div>
 
                   <div className="edit_post_footer text-end">
-                    <button className="btn primary_btn">Save</button>
+                    <button className="btn primary_btn" type="submit" onClick={handleSaveAndEditPost}>Save</button>
                   </div>
                 </div>
               </div>
@@ -197,7 +257,7 @@ const GeneratedPostResult = () => {
                         (post: any) => (
                           <div
                             className="social_media_item box-shadow bg-white"
-                            key={post.linkedIn_id}
+                            key={post.linkedin_id}
                           >
                             <div className="item_header">
                               <div className="item_left">
@@ -210,8 +270,11 @@ const GeneratedPostResult = () => {
                                 <button
                                   className="btn primary_btn_outline"
                                   onClick={() => {
-                                    setSelectedPost(post);
-                                    setIsModalOpen(true);
+                                    handleEditFunction(
+                                      post,
+                                      "linkedin",
+                                      generatedPostDetails?.id
+                                    );
                                   }}
                                 >
                                   Edit
@@ -224,7 +287,7 @@ const GeneratedPostResult = () => {
                                   onClick={() =>
                                     deletePostFromServer(
                                       generatedPostDetails?.id,
-                                      post?.linkedIn_id,
+                                      post?.linkedin_id,
                                       "linkedin"
                                     )
                                   }
@@ -244,7 +307,19 @@ const GeneratedPostResult = () => {
                               </div>
                             ) : (
                               <div className="add_media">
-                                <input type="file" className="media_input" />
+                                <input
+                                  type="file"
+                                  className="media_input"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handleImageUpload(
+                                      e,
+                                      post.linkedin_id,
+                                      "linkedin",
+                                      generatedPostDetails?.id
+                                    )
+                                  }
+                                />
                                 <div className="media_text">
                                   <i className="bi bi-plus-circle"></i>
                                   <span>Add media</span>
@@ -304,9 +379,12 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                  onClick={() => {
-                                    setSelectedPost(post);
-                                    setIsModalOpen(true);
+                                   onClick={() => {
+                                    handleEditFunction(
+                                      post,
+                                      "twitter",
+                                      generatedPostDetails?.id
+                                    );
                                   }}
                                 >
                                   Edit
@@ -342,11 +420,13 @@ const GeneratedPostResult = () => {
                                 <input
                                   type="file"
                                   className="media_input"
+                                  accept="image/*"
                                   onChange={(e) =>
                                     handleImageUpload(
                                       e,
                                       post.twitter_id,
-                                      "twitter"
+                                      "twitter",
+                                      generatedPostDetails?.id
                                     )
                                   }
                                 />
@@ -399,9 +479,12 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                  onClick={() => {
-                                    setSelectedPost(post);
-                                    setIsModalOpen(true);
+                                    onClick={() => {
+                                    handleEditFunction(
+                                      post,
+                                      "facebook",
+                                      generatedPostDetails?.id
+                                    );
                                   }}
                                 >
                                   Edit
@@ -434,7 +517,19 @@ const GeneratedPostResult = () => {
                               </div>
                             ) : (
                               <div className="add_media">
-                                <input type="file" className="media_input" />
+                                <input
+                                  type="file"
+                                  className="media_input"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handleImageUpload(
+                                      e,
+                                      post.facebook_id,
+                                      "facebook",
+                                      generatedPostDetails?.id
+                                    )
+                                  }
+                                />
                                 <div className="media_text">
                                   <i className="bi bi-plus-circle"></i>
                                   <span>Add media</span>
@@ -484,9 +579,12 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                  onClick={() => {
-                                    setSelectedPost(post);
-                                    setIsModalOpen(true);
+                                     onClick={() => {
+                                    handleEditFunction(
+                                      post,
+                                      "instagram",
+                                      generatedPostDetails?.id
+                                    );
                                   }}
                                 >
                                   Edit
@@ -518,7 +616,19 @@ const GeneratedPostResult = () => {
                               </div>
                             ) : (
                               <div className="add_media">
-                                <input type="file" className="media_input" />
+                                <input
+                                  type="file"
+                                  className="media_input"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handleImageUpload(
+                                      e,
+                                      post.instagram_id,
+                                      "instagram",
+                                      generatedPostDetails?.id
+                                    )
+                                  }
+                                />
                                 <div className="media_text">
                                   <i className="bi bi-plus-circle"></i>
                                   <span>Add media</span>
@@ -568,9 +678,12 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                  onClick={() => {
-                                    setSelectedPost(post);
-                                    setIsModalOpen(true);
+                                     onClick={() => {
+                                    handleEditFunction(
+                                      post,
+                                      "tiktok",
+                                      generatedPostDetails?.id
+                                    );
                                   }}
                                 >
                                   Edit
@@ -602,7 +715,19 @@ const GeneratedPostResult = () => {
                               </div>
                             ) : (
                               <div className="add_media">
-                                <input type="file" className="media_input" />
+                                <input
+                                  type="file"
+                                  className="media_input"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handleImageUpload(
+                                      e,
+                                      post.tiktok_id,
+                                      "tiktok",
+                                      generatedPostDetails?.id
+                                    )
+                                  }
+                                />
                                 <div className="media_text">
                                   <i className="bi bi-plus-circle"></i>
                                   <span>Add media</span>
