@@ -72,6 +72,7 @@ const GeneratedPostResult = () => {
       console.log(response.data, "response.data");
 
       if (response.status === 201 || response.status === 200) {
+        toast.success("Added image successfully");
         setGeneratedPostDetails((prev: any) => {
           const updatedPosts = { ...prev };
           const posts = updatedPosts.data[`${platform}_posts`];
@@ -154,7 +155,14 @@ const GeneratedPostResult = () => {
       console.log(response.data, "response.data"); 
       if (response.status === 201 || response.status === 200) {
           setLocalImage(null)
-          setIsModalOpen(false);
+   
+            const updatedPost = {
+    ...selectedPost,
+    image: response.data.image,
+    discription: [content],
+  };
+  toast.success("Updated image and content successfully");
+  setSelectedPost(updatedPost); 
          setGeneratedPostDetails((prev: any) => {
           const updatedPosts = { ...prev };
           const posts = updatedPosts.data[`${CollectPlatform}_posts`];
