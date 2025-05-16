@@ -10,6 +10,7 @@ import {
 } from "../Services/Services";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
+import ScheduleModal from "./ScheduleModal";
 
 const GeneratedPostResult = () => {
   const { id } = useParams();
@@ -25,6 +26,20 @@ const GeneratedPostResult = () => {
   const [content, setContent] = useState<string>("");
   const [UUIDS, setUUIDS] = useState<string>("");
   const [localImage, setLocalImage] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  // const [selectedDateTime, setSelectedDateTime] = useState<string>("");
+
+    const handleScheduleClick = () => {
+
+    setShowModal(true);
+  };
+
+   const handleSchedule = (scheduledDate: string) => {
+    console.log("Scheduled Date Object:", scheduledDate);
+     
+    // You can now use `selectedDateTime` anywhere in your parent
+  };
+
   console.log(generatedPostDetails);
   useEffect(() => {
     if (id) {
@@ -50,6 +65,11 @@ const GeneratedPostResult = () => {
 
   const handleClose = () => {
     setIsModalOpen(false);
+    setFileData(null);
+    setLocalImage(null);
+    setSelectedPost(null)
+    setContent("");
+    setCollectPlatform("");
   };
 
   const handleImageUpload = async (
@@ -77,9 +97,8 @@ const GeneratedPostResult = () => {
           const updatedPosts = { ...prev };
           const posts = updatedPosts.data[`${platform}_posts`];
           const updated = posts.map((post: any) =>
-             post[`${platform}_id`] ===
-            postId
-              ?   { ...post, image: response.data.image }
+            post[`${platform}_id`] === postId
+              ? { ...post, image: response.data.image }
               : post
           );
           updatedPosts.data[`${platform}_posts`] = updated;
@@ -125,63 +144,66 @@ const GeneratedPostResult = () => {
     }
   };
 
-  const handleEditFunction =  (post:any,platform:string,uuid:string) => {
+  const handleEditFunction = (post: any, platform: string, uuid: string) => {
     setSelectedPost(post);
     setCollectPlatform(platform);
     setIsModalOpen(true);
-    setContent(post?.discription?.join('\n') || '');
-    setUUIDS(uuid)
+    setContent(post?.discription?.join("\n") || "");
+    setUUIDS(uuid);
     setFileData(null);
   };
 
-
-  const handleSaveAndEditPost=async()=>{
-    try{
-      let formData
-      if(fileData){
-          formData=new FormData()
+  const handleSaveAndEditPost = async () => {
+    try {
+      let formData = new FormData();
+      if (fileData) {
+        formData.append("image", fileData);
       }
-      console.log(content,"content")
-      formData?.append("image",fileData)
-      formData?.append("content", JSON.stringify([content]));
+      formData.append("content", JSON.stringify([content]));
       const postId = selectedPost[`${CollectPlatform}_id`];
 
-        const response = await UpdateImageSocialMedia(
+      const response = await UpdateImageSocialMedia(
         UUIDS,
         postId,
         CollectPlatform,
         formData
       );
-      console.log(response.data, "response.data"); 
+      console.log(response.data, "response.data");
       if (response.status === 201 || response.status === 200) {
-          setLocalImage(null)
-   
-            const updatedPost = {
-    ...selectedPost,
-    image: response.data.image,
-    discription: [content],
-  };
-  toast.success("Updated image and content successfully");
-  setSelectedPost(updatedPost); 
-         setGeneratedPostDetails((prev: any) => {
+        // setLocalImage(null);
+        const updatedPost = {
+          ...selectedPost,
+          discription: [content],
+        };
+
+        toast.success("Updated image and content successfully");
+        setSelectedPost(updatedPost);
+        setGeneratedPostDetails((prev: any) => {
           const updatedPosts = { ...prev };
           const posts = updatedPosts.data[`${CollectPlatform}_posts`];
-          const updated = posts.map((post: any) =>
-             post[`${CollectPlatform}_id`] ===
-            postId
-              ?   { ...post, image: response.data.image ,discription:[content] }
-              : post
-          );
+          let updated;
+          if (fileData) {
+            updated = posts.map((post: any) =>
+              post[`${CollectPlatform}_id`] === postId
+                ? { ...post, image: localImage, discription: [content] }
+                : post
+            );
+          } else {
+            updated = posts.map((post: any) =>
+              post[`${CollectPlatform}_id`] === postId
+                ? { ...post, discription: [content] }
+                : post
+            );
+          }
+
           updatedPosts.data[`${CollectPlatform}_posts`] = updated;
           return updatedPosts;
         });
       }
-
     } catch (error: any) {
       console.log("Failed to handleSaveAndEditPost.", error);
     }
-
-  }
+  };
 
   return (
     <>
@@ -191,6 +213,15 @@ const GeneratedPostResult = () => {
         <SideBar />
         <div className="inner_content ">
           <div className="keyword_tool_content  generate_post">
+            <div className="content_header mb-4">
+              <h2 className="font_25 font_600 mb-2">
+                <i className="bi bi-people-fill me-1 text_blue"></i> Post
+                Generator
+                <span className="text_blue">
+                  /{generatedPostDetails?.fileName}
+                </span>
+              </h2>
+            </div>
             {isModalOpen && selectedPost ? (
               <div className="edit_post_wrapper box-shadow">
                 <button
@@ -205,23 +236,28 @@ const GeneratedPostResult = () => {
                   </h2>
                 </div>
                 <div className="edit_post_body">
-                  {(selectedPost.image ||localImage) ? (
+                  {selectedPost.image || localImage ? (
                     <div className="social_post_img my-3">
                       <img
-                          src={localImage || selectedPost.image}
+                        src={localImage || selectedPost.image}
                         className="img-fluid"
                         alt="image"
                       />
                     </div>
                   ) : (
                     <div className="add_media">
-                      <input type="file" className="media_input"   accept="image/*" onChange={(e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFileData(file);
-      setLocalImage(URL.createObjectURL(file)); // ⬅️ Preview the selected image
-    }
-  }} />
+                      <input
+                        type="file"
+                        className="media_input"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFileData(file);
+                            setLocalImage(URL.createObjectURL(file)); // ⬅️ Preview the selected image
+                          }
+                        }}
+                      />
                       <div className="media_text">
                         <i className="bi bi-plus-circle"></i>
                         <span>Add media</span>
@@ -234,12 +270,18 @@ const GeneratedPostResult = () => {
                       id="post_content"
                       aria-label="post_content"
                       defaultValue={content || ""}
-                      onChange={(e)=>setContent(e.target.value)}
+                      onChange={(e) => setContent(e.target.value)}
                     />
                   </div>
 
                   <div className="edit_post_footer text-end">
-                    <button className="btn primary_btn" type="submit" onClick={handleSaveAndEditPost}>Save</button>
+                    <button
+                      className="btn primary_btn"
+                      type="submit"
+                      onClick={handleSaveAndEditPost}
+                    >
+                      Save
+                    </button>
                   </div>
                 </div>
               </div>
@@ -272,9 +314,10 @@ const GeneratedPostResult = () => {
                                 <button className="btn primary_btn_outline">
                                   Publish
                                 </button>
-                                <button className="btn primary_btn_outline">
+                                <button className="btn primary_btn_outline" onClick={() => handleScheduleClick()}>
                                   Schedule
                                 </button>
+                                {/* <input type="datetime-local" /> */}
                                 <button
                                   className="btn primary_btn_outline"
                                   onClick={() => {
@@ -387,7 +430,7 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                   onClick={() => {
+                                  onClick={() => {
                                     handleEditFunction(
                                       post,
                                       "twitter",
@@ -487,7 +530,7 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                    onClick={() => {
+                                  onClick={() => {
                                     handleEditFunction(
                                       post,
                                       "facebook",
@@ -587,7 +630,7 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                     onClick={() => {
+                                  onClick={() => {
                                     handleEditFunction(
                                       post,
                                       "instagram",
@@ -686,7 +729,7 @@ const GeneratedPostResult = () => {
                                 </button>
                                 <button
                                   className="btn primary_btn_outline"
-                                     onClick={() => {
+                                  onClick={() => {
                                     handleEditFunction(
                                       post,
                                       "tiktok",
@@ -766,6 +809,12 @@ const GeneratedPostResult = () => {
                 )}
               </div>
             )}
+
+             <ScheduleModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSchedule={handleSchedule}
+      />
           </div>
         </div>
       </main>

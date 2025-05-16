@@ -171,7 +171,7 @@ const GeneratePost = () => {
               <h2 className="font_25 font_600 mb-2">
                 <i className="bi bi-people-fill me-1 text_blue"></i> Post
                 Generator
-                <span className="text_blue">/ Research number one</span>
+                {/* <span className="text_blue">/ Research number one</span> */}
               </h2>
             </div>
             <div className="generate_post_form keyword_search_form">
