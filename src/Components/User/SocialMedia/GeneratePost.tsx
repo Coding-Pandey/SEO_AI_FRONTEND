@@ -152,10 +152,7 @@ const GeneratePost = () => {
         });
       }
     } catch (error: any) {
-      toast.error("Failed to delete file.", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      console.log("Failed to delete file.");
     }
   };
 

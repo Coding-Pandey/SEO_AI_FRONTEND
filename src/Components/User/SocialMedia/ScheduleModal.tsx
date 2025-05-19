@@ -96,19 +96,15 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
         days.push(
           <div
+          className="date_text"
             key={day.toString()}
             onClick={() => {
               if (!isDisabled) setSelectedDate(cloneDay);
             }}
             style={{
-              flex: 1,
-              height: 30,
-              lineHeight: "30px",
-              textAlign: "center",
               cursor: isDisabled ? "default" : "pointer",
               backgroundColor: isSelected ? "#357edd" : "transparent",
               color: isDisabled ? "#ccc" : isSelected ? "#fff" : "#000",
-              borderRadius: "50%",
               userSelect: "none",
               opacity: isDisabled ? 0.5 : 1,
             }}
@@ -119,7 +115,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
         day = addDays(day, 1);
       }
       rows.push(
-        <div key={day.toString()} style={{ display: "flex", marginBottom: 5 }}>
+        <div className="date_row" key={day.toString()} style={{ display: "flex", marginBottom: 5 }}>
           {days}
         </div>
       );
@@ -156,14 +152,15 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
       return;
     }
 
-    console.log(selectedDate, "selectedDate");
-    console.log(selectedTime, "selectedTime");
     const [h, m] = selectedTime.split(":").map(Number);
-    console.log(h, m, "h, m");
     const scheduledDate = new Date(selectedDate);
     scheduledDate.setHours(h, m, 0, 0);
     const isoString = scheduledDate.toISOString();
     onSchedule(isoString);
+    setSelectedTime('')
+    setHour("")
+    setMinute("")
+    setSelectedDate(today)
   };
 
   return (

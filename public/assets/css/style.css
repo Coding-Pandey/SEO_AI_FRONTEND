@@ -104,6 +104,36 @@ a {
 
 }
 
+.secondary_btn {
+       background-color: var(--white-color);
+
+    color: var(--secondary-color);
+
+    border: 2px solid var(--secondary-color);
+
+    border-radius: 6px;
+
+    padding: 8px 20px;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.secondary_btn_outline:hover {
+
+    background-color: var(--secondary-color);
+
+    color: var(--white-color);
+
+    border: 2px solid var(--secondary-color);
+
+    border-radius: 6px;
+
+    padding: 8px 20px;
+    font-size: 16px;
+    line-height: 20px;
+
+}
+
 
 
 .primary_btn_outline,
@@ -123,6 +153,9 @@ a {
     line-height: 20px;
 
 }
+
+
+
 
 
 
@@ -1758,6 +1791,18 @@ form .row {
     color: var(--secondary-color);
 }
 
+.date_row{
+    justify-content: space-around;
+}
+.date_text {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
 .suggest_time_wrapper {
     display: flex;
     align-items: center;
@@ -1902,3 +1947,29 @@ form .row {
   }
   
   
+  .custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* backdrop */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.custom-modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.schedule_box p {
+  margin-bottom: 12px;
+}

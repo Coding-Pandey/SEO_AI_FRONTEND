@@ -1,7 +1,106 @@
+import { useEffect, useState } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
+import {
+  deletePlannerSocialMediaData,
+  GetPlannerSocialMediaData,
+} from "../Services/Services";
+import Loading from "../../Page/Loading/Loading";
+import { toast } from "react-toastify";
+
+const platforms = [
+  "linkedin_posts",
+  "twitter_posts",
+  "facebook_posts",
+  "instagram_posts",
+  "tiktok_posts",
+];
+
+function formatScheduleDate(scheduleTime: any) {
+  const scheduleDate = new Date(scheduleTime);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const isSameDay = (d1: any, d2: any) =>
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear();
+
+  if (isSameDay(scheduleDate, today)) return { text: "Today", isToday: true };
+  if (isSameDay(scheduleDate, yesterday))
+    return { text: "Yesterday", isToday: false };
+
+  return { text: scheduleDate.toLocaleDateString("en-GB"), isToday: false }; // DD/MM/YYYY
+}
 
 const Planner = () => {
+  const [plannerData, setPlannerData] = useState<any>({});
+  const [loadingData, setLoadingData] = useState(false);
+  const [deleteItem, setDeleteItem] = useState<{
+    uuid: string;
+    platform: string;
+  } | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+
+  useEffect(() => {
+    fetchPlannerData();
+  }, []);
+
+  const fetchPlannerData = async () => {
+    try {
+      setLoadingData(true);
+      const response = await GetPlannerSocialMediaData();
+      if (response.status === 200 || response.status === 201) {
+        setPlannerData(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetchPlannerData:", error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  const filteredPosts = () => {
+    let posts: any[] = [];
+    if (!selectedPlatform) {
+      platforms.forEach((plat) => {
+        if (plannerData[plat]?.length) {
+          posts = posts.concat(plannerData[plat]);
+        }
+      });
+    } else {
+      const key = `${selectedPlatform}_posts`;
+      if (plannerData[key]?.length) posts = plannerData[key];
+    }
+    if (selectedDate) {
+      posts = posts.filter((post) => {
+        const postDate = new Date(post.schedule_time).toLocaleDateString(
+          "en-CA"
+        );
+
+        return postDate === selectedDate;
+      });
+    }
+    return posts;
+  };
+
+  const handleDeletePlanner = async (platform: string, uuid: string) => {
+    try {
+      const response = await deletePlannerSocialMediaData(platform, uuid);
+      if (response.status === 200) {
+        toast.success("Post deleted successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+        fetchPlannerData();
+      }
+    } catch (error: any) {
+      console.log("Error during handleDeletePlanner", Error);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -26,96 +125,145 @@ const Planner = () => {
                       className="form-select"
                       id="social_post"
                       aria-label="social_post"
+                      value={selectedPlatform}
+                      onChange={(e) => setSelectedPlatform(e.target.value)}
                     >
                       <option value="">All Platforms</option>
-                      <option value="1">LinkedIn</option>
-                      <option value="2">X</option>
-                      <option value="3">Facebook</option>
+                      <option value="linkedin">LinkedIn</option>
+                      <option value="twitter">Twitter</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="facebook">Facebook</option>
+                      <option value="tiktok">TikTok</option>
                     </select>
                   </div>
                   <div className="form_input">
                     <input
                       type="date"
                       className="form-control"
-                      placeholder="This week"
+                      placeholder="Select date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
                     />
                   </div>
                 </div>
               </div>
 
               <div className="post_list_content">
-                <div className="table-responsive">
-                  <table className="table">
-                    <tbody>
-                      {[...Array(7)].map((_, i) => (
-                        <tr key={i}>
-                          <th scope="row">
-                            <img
-                              src="https://img.freepik.com/free-photo/modern-equipped-computer-lab_23-2149241213.jpg?t=st=1745327949~exp=1745331549~hmac=eb72dc233e5bbacd949f3c5860f88e02215575f5ec3f16f974e9df500dd70a97&w=996"
-                              className="img-fluid"
-                              alt="Post"
-                            />
-                          </th>
-                          <td>
-                            <p className="font_16 table-content">
-                              Your marketing needs speed & efficiency our "Plug
-                              & Play, Grow' Accelerator delivers. Ready? Out
-                              costs, scale faster. Our plug-and-play solution
-                              transforms marketing.
-                            </p>
-                          </td>
-                          <td>
-                            <i
-                              className={`bi ${
-                                i % 3 === 0
-                                  ? "bi-linkedin"
-                                  : i % 3 === 1
-                                  ? "bi-facebook"
-                                  : "bi-twitter-x"
-                              } social_icon`}
-                            ></i>
-                          </td>
-                          <td>
-                            <span
-                              className={`post_day ${
-                                i % 3 === 0 ? "today" : ""
-                              }`}
-                            >
-                              {i % 3 === 0
-                                ? "Today"
-                                : i % 3 === 1
-                                ? "Yesterday"
-                                : "25.04.2025"}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              className="btn primary_btn_outline"
-                              data-bs-toggle="modal"
-                              data-bs-target="#scheduleModal"
-                            >
-                              Re-schedule
-                            </button>
-                          </td>
-                          <td>
-                            <button className="btn primary_btn_outline">
-                              Edit
-                            </button>
-                          </td>
-                          <td>
-                            <button
-                              className="btn text_orange font_20 pe-0"
-                              data-bs-toggle="modal"
-                              data-bs-target="#deleteSchedule"
-                            >
-                              <i className="bi bi-x"></i>
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {loadingData ? (
+                  <Loading />
+                ) : (
+                  <div className="table-responsive">
+                    <table className="table">
+                      <tbody>
+                        <tbody>
+                          {filteredPosts().length === 0 ? (
+                            <tr>
+                              <td colSpan={7} className="text-center py-4">
+                                <p className="font_16 text-muted">
+                                  No posts available
+                                </p>
+                              </td>
+                            </tr>
+                          ) : (
+                            filteredPosts().map((item: any) => {
+                              const { text, isToday } = formatScheduleDate(
+                                item.schedule_time
+                              );
+                              const socialIconClass = item.content.facebook_id
+                                ? "bi-facebook"
+                                : item.content.linkedin_id
+                                ? "bi-linkedin"
+                                : item.content.instagram_id
+                                ? "bi-instagram"
+                                : item.content.tiktok_id
+                                ? "bi-tiktok"
+                                : item.content.twitter_id
+                                ? "bi-twitter"
+                                : "";
+
+                              const socialMediaPost = item.content.facebook_id
+                                ? "facebook_posts"
+                                : item.content.linkedin_id
+                                ? "linkedin_posts"
+                                : item.content.instagram_id
+                                ? "instagram_posts"
+                                : item.content.tiktok_id
+                                ? "tiktok_posts"
+                                : item.content.twitter_id
+                                ? "twitter_posts"
+                                : "";
+
+                              return (
+                                <tr key={item.uuid}>
+                                  <th scope="row">
+                                    <img
+                                      src={
+                                        item.content.image
+                                          ? item.content.image
+                                          : "https://img.favpng.com/22/14/20/computer-icons-user-profile-png-favpng-t5jjbVtARafBFMz6SeBYs6wmS.jpg"
+                                      }
+                                      className="img-fluid"
+                                      alt="Post"
+                                    />
+                                  </th>
+                                  <td>
+                                    <p className="font_16 table-content">
+                                      {item.content.discription?.[0] ||
+                                        "No description available"}
+                                    </p>
+                                  </td>
+                                  <td>
+                                    <i
+                                      className={`bi ${socialIconClass} social_icon`}
+                                    ></i>
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`post_day ${
+                                        isToday ? "today" : ""
+                                      }`}
+                                    >
+                                      {text}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="btn primary_btn_outline"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#scheduleModal"
+                                    >
+                                      Re-schedule
+                                    </button>
+                                  </td>
+                                  <td>
+                                    <button className="btn primary_btn_outline">
+                                      Edit
+                                    </button>
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="btn text_orange font_20 pe-0"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#deleteSchedule"
+                                      onClick={() =>
+                                        setDeleteItem({
+                                          platform: socialMediaPost,
+                                          uuid: item.uuid,
+                                        })
+                                      }
+                                    >
+                                      <i className="bi bi-x"></i>
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -169,6 +317,15 @@ const Planner = () => {
                     className="btn primary_btn ok_btn"
                     data-bs-dismiss="modal"
                     aria-label="Close"
+                    onClick={() => {
+                      if (deleteItem) {
+                        handleDeletePlanner(
+                          deleteItem.platform,
+                          deleteItem.uuid
+                        );
+                        setDeleteItem(null); // Reset after deletion
+                      }
+                    }}
                   >
                     Yes
                   </button>
