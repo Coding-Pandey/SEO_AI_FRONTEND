@@ -30,6 +30,7 @@ const GeneratedPostResult = () => {
   const [showModal, setShowModal] = useState(false);
   const [SuccessScheduleModel, setSuccessScheduleModel] = useState(false);
   const [ScheduleDateAndTime, setScheduleDateAndTime] = useState("");
+  const [LoadingApi, setLoadingApi] = useState<boolean>(false);
   const handleScheduleClick = (
     uuid: string,
     postData: any,
@@ -39,6 +40,7 @@ const GeneratedPostResult = () => {
     setUUIDS(uuid);
     setSelectedPost(postData);
     setShowModal(true);
+    setScheduleDateAndTime('')
     setCollectPlatform(platform);
   };
 
@@ -164,7 +166,7 @@ const GeneratedPostResult = () => {
       }
       formData.append("content", JSON.stringify([content]));
       const postId = selectedPost[`${CollectPlatform}_id`];
-
+      setLoadingApi(true)
       const response = await UpdateImageSocialMedia(
         UUIDS,
         postId,
@@ -174,6 +176,7 @@ const GeneratedPostResult = () => {
       console.log(response.data, "response.data");
       if (response.status === 201 || response.status === 200) {
         // setLocalImage(null);
+         setLoadingApi(false)
         const updatedPost = {
           ...selectedPost,
           discription: [content],
@@ -204,6 +207,7 @@ const GeneratedPostResult = () => {
         });
       }
     } catch (error: any) {
+      setLoadingApi(false)
       console.log("Failed to handleSaveAndEditPost.", error);
     }
   };
@@ -378,7 +382,7 @@ const GeneratedPostResult = () => {
                       type="submit"
                       onClick={handleSaveAndEditPost}
                     >
-                      Save
+                       {LoadingApi ?"Please Wait..." : "Save"}  
                     </button>
                   </div>
                 </div>

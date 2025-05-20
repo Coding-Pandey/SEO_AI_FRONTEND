@@ -20,6 +20,7 @@ const GeneratePost = () => {
   const [audience, setAudience] = useState<string[]>([]);
   const [additional, setAdditional] = useState<string[]>([]);
   const [generatedPostData, setGeneratedPostData] = useState<any[]>([]);
+
   const navigate = useNavigate();
  
   useEffect(() => {

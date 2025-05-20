@@ -4,9 +4,11 @@ import SideBar from "../SideBar/SideBar";
 import {
   deletePlannerSocialMediaData,
   GetPlannerSocialMediaData,
+  UpdateScheduleSocialMediaPlanner,
 } from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
 import { toast } from "react-toastify";
+import ScheduleModal from "./ScheduleModal";
 
 const platforms = [
   "linkedin_posts",
@@ -43,6 +45,19 @@ const Planner = () => {
   } | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [SuccessScheduleModel, setSuccessScheduleModel] = useState(false);
+  const [REScheduleDateAndTime, setREScheduleDateAndTime] = useState("");
+  const [PlatformId, setPlatformId] = useState<string>("");
+  const [CollectPlatform, setCollectPlatform] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [UUIDS, setUUIDS] = useState<string>("");
+  const [localImage, setLocalImage] = useState<string | null>(null);
+  const [fileData, setFileData] = useState<any>(null);
+    const [LoadingApi, setLoadingApi] = useState<boolean>(false);
+  // console.log(plannerData,"plannerData")
 
   useEffect(() => {
     fetchPlannerData();
@@ -101,6 +116,161 @@ const Planner = () => {
     }
   };
 
+  const formatScheduledDate = (isoString: string) => {
+    const date = new Date(isoString);
+
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const getOrdinal = (n: number) => {
+      if (n > 3 && n < 21) return `${n}th`;
+      switch (n % 10) {
+        case 1:
+          return `${n}st`;
+        case 2:
+          return `${n}nd`;
+        case 3:
+          return `${n}rd`;
+        default:
+          return `${n}th`;
+      }
+    };
+
+    const dayName = days[date.getDay()];
+    const monthName = months[date.getMonth()];
+    const day = getOrdinal(date.getDate());
+
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12; // Convert to 12-hour format
+
+    return `${dayName}, ${monthName} ${day} at ${hours}:${minutes} ${ampm}`;
+  };
+
+  const handleScheduleClick = (
+    uuid: string,
+    platform: string,
+    postPlatformId: string
+  ) => {
+    // console.log(postPlatformId,uuid,platform,"hfgshghdsf")
+    setUUIDS(uuid);
+    setShowModal(true);
+    setCollectPlatform(platform);
+    setPlatformId(postPlatformId);
+    setREScheduleDateAndTime("");
+  };
+
+  const handleCloseSchedule = () => {
+    setSuccessScheduleModel(false);
+    setREScheduleDateAndTime("");
+  };
+
+  const handleSchedule = async (scheduledDate: string) => {
+    setREScheduleDateAndTime(scheduledDate);
+    // console.log(scheduledDate,"scheduledDate")
+
+    let formData = new FormData();
+    formData.append("id", PlatformId);
+    formData.append("reschedule_time", scheduledDate);
+
+    try {
+      const response = await UpdateScheduleSocialMediaPlanner(
+        CollectPlatform,
+        UUIDS,
+        formData
+      );
+      console.log(response.data, "response.data");
+      if (response.status === 201 || response.status === 200) {
+        toast.success("Updated Schedule successfully");
+        setShowModal(false);
+        fetchPlannerData();
+        setUUIDS("");
+        setPlatformId("");
+        setCollectPlatform("");
+        setSuccessScheduleModel(true);
+      }
+    } catch (error) {
+      console.error("Error is create schedule", error);
+    }
+  };
+
+
+    const handleEditFunction = (post: any, platform: string, uuid: string,postPlatformId:string) => {
+    setSelectedPost(post);
+    setCollectPlatform(platform);
+    setIsModalOpen(true);
+    setContent(post?.discription?.join("\n") || "");
+    setUUIDS(uuid);
+    setFileData(null);
+    setPlatformId(postPlatformId);
+  };
+
+
+    const handleClose = () => {
+    setIsModalOpen(false);
+    setFileData(null);
+    setLocalImage(null);
+    setSelectedPost(null);
+    setContent("");
+    setCollectPlatform("");
+    setPlatformId("");
+    fetchPlannerData();
+  };
+
+    const handleSaveAndEditPost = async () => {
+      try {
+        let formData = new FormData();
+        if (fileData) {
+          formData.append("image", fileData);
+        }
+        formData.append("content", content);
+        formData.append("id", PlatformId);
+        setLoadingApi(true)
+        const response = await UpdateScheduleSocialMediaPlanner(
+          CollectPlatform,
+          UUIDS,
+          formData
+        );
+        console.log(response.data, "response.data");
+        if (response.status === 201 || response.status === 200) {
+          // setLocalImage(null);
+          setLoadingApi(false)
+          const updatedPost = {
+            ...selectedPost,
+            discription: [content],
+          };
+  
+          toast.success("Updated image and content successfully");
+          setSelectedPost(updatedPost);
+        }
+      } catch (error: any) {
+        setLoadingApi(false)
+        console.log("Failed to handleSaveAndEditPost.", error);
+      }
+    };
+
   return (
     <>
       <Header />
@@ -113,6 +283,70 @@ const Planner = () => {
                 <i className="bi bi-people-fill me-1 text_blue"></i> Planner
               </h2>
             </div>
+             {isModalOpen && selectedPost ? (
+              <div className="edit_post_wrapper box-shadow">
+                <button
+                  className="btn text_orange font_20 edit_post_close"
+                  aria-label="close_icon"
+                >
+                  <i className="bi bi-x" onClick={handleClose}></i>
+                </button>
+                <div className="edit_post_header">
+                  <h2 className="post_heading font_20 font_500">
+                    Edit Your Post
+                  </h2>
+                </div>
+                <div className="edit_post_body">
+                  {selectedPost.image || localImage ? (
+                    <div className="social_post_img my-3">
+                      <img
+                        src={localImage || selectedPost.image}
+                        className="img-fluid"
+                        alt="image"
+                      />
+                    </div>
+                  ) : (
+                    <div className="add_media">
+                      <input
+                        type="file"
+                        className="media_input"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFileData(file);
+                            setLocalImage(URL.createObjectURL(file)); // ⬅️ Preview the selected image
+                          }
+                        }}
+                      />
+                      <div className="media_text">
+                        <i className="bi bi-plus-circle"></i>
+                        <span>Add media</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="edit_post_content">
+                    <textarea
+                      id="post_content"
+                      aria-label="post_content"
+                      defaultValue={content || ""}
+                      onChange={(e) => setContent(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="edit_post_footer text-end">
+                    <button
+                      className="btn primary_btn"
+                      type="submit"
+                      onClick={handleSaveAndEditPost}
+                    >
+                      {LoadingApi ?"Please Wait..." : "Save"}   
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
 
             <div className="plan_post_wrapper">
               <div className="post_list_header">
@@ -149,153 +383,180 @@ const Planner = () => {
               </div>
 
               <div className="post_list_content">
-                {loadingData ? (
-                  <Loading />
-                ) : (
+                {loadingData && <Loading />}
+             
                   <div className="table-responsive">
                     <table className="table">
                       <tbody>
-                        <tbody>
-                          {filteredPosts().length === 0 ? (
-                            <tr>
-                              <td colSpan={7} className="text-center py-4">
-                                <p className="font_16 text-muted">
-                                  No posts available
-                                </p>
-                              </td>
-                            </tr>
-                          ) : (
-                            filteredPosts().map((item: any) => {
-                              const { text, isToday } = formatScheduleDate(
-                                item.schedule_time
-                              );
-                              const socialIconClass = item.content.facebook_id
-                                ? "bi-facebook"
-                                : item.content.linkedin_id
-                                ? "bi-linkedin"
-                                : item.content.instagram_id
-                                ? "bi-instagram"
-                                : item.content.tiktok_id
-                                ? "bi-tiktok"
-                                : item.content.twitter_id
-                                ? "bi-twitter"
-                                : "";
+                        {filteredPosts().length === 0 ? (
+                          <tr>
+                            <td colSpan={7} className="text-center py-4">
+                              <p className="font_16 text-muted">
+                                No posts available
+                              </p>
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredPosts().map((item: any) => {
+                            const { text, isToday } = formatScheduleDate(
+                              item.schedule_time
+                            );
+                            const socialIconClass = item.content.facebook_id
+                              ? "bi-facebook"
+                              : item.content.linkedin_id
+                              ? "bi-linkedin"
+                              : item.content.instagram_id
+                              ? "bi-instagram"
+                              : item.content.tiktok_id
+                              ? "bi-tiktok"
+                              : item.content.twitter_id
+                              ? "bi-twitter"
+                              : "";
 
-                              const socialMediaPost = item.content.facebook_id
-                                ? "facebook_posts"
-                                : item.content.linkedin_id
-                                ? "linkedin_posts"
-                                : item.content.instagram_id
-                                ? "instagram_posts"
-                                : item.content.tiktok_id
-                                ? "tiktok_posts"
-                                : item.content.twitter_id
-                                ? "twitter_posts"
-                                : "";
+                            const socialMediaPost = item.content.facebook_id
+                              ? "facebook_posts"
+                              : item.content.linkedin_id
+                              ? "linkedin_posts"
+                              : item.content.instagram_id
+                              ? "instagram_posts"
+                              : item.content.tiktok_id
+                              ? "tiktok_posts"
+                              : item.content.twitter_id
+                              ? "twitter_posts"
+                              : "";
 
-                              return (
-                                <tr key={item.uuid}>
-                                  <th scope="row">
-                                    <img
-                                      src={
-                                        item.content.image
-                                          ? item.content.image
-                                          : "https://img.favpng.com/22/14/20/computer-icons-user-profile-png-favpng-t5jjbVtARafBFMz6SeBYs6wmS.jpg"
-                                      }
-                                      className="img-fluid"
-                                      alt="Post"
-                                    />
-                                  </th>
-                                  <td>
-                                    <p className="font_16 table-content">
-                                      {item.content.discription?.[0] ||
-                                        "No description available"}
-                                    </p>
-                                  </td>
-                                  <td>
-                                    <i
-                                      className={`bi ${socialIconClass} social_icon`}
-                                    ></i>
-                                  </td>
-                                  <td>
-                                    <span
-                                      className={`post_day ${
-                                        isToday ? "today" : ""
-                                      }`}
-                                    >
-                                      {text}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <button
-                                      className="btn primary_btn_outline"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#scheduleModal"
-                                    >
-                                      Re-schedule
-                                    </button>
-                                  </td>
-                                  <td>
-                                    <button className="btn primary_btn_outline">
-                                      Edit
-                                    </button>
-                                  </td>
-                                  <td>
-                                    <button
-                                      className="btn text_orange font_20 pe-0"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#deleteSchedule"
-                                      onClick={() =>
-                                        setDeleteItem({
-                                          platform: socialMediaPost,
-                                          uuid: item.uuid,
-                                        })
-                                      }
-                                    >
-                                      <i className="bi bi-x"></i>
-                                    </button>
-                                  </td>
-                                </tr>
-                              );
-                            })
-                          )}
-                        </tbody>
+                            const socialMediaId = item.content.facebook_id
+                              ? "facebook_id"
+                              : item.content.linkedin_id
+                              ? "linkedin_id"
+                              : item.content.instagram_id
+                              ? "instagram_id"
+                              : item.content.tiktok_id
+                              ? "tiktok_id"
+                              : item.content.twitter_id
+                              ? "twitter_id"
+                              : "";
+
+                            return (
+                              <tr key={item.uuid}>
+                                <th scope="row">
+                                  <img
+                                    src={
+                                      item.content.image
+                                        ? item.content.image
+                                        : "https://img.favpng.com/22/14/20/computer-icons-user-profile-png-favpng-t5jjbVtARafBFMz6SeBYs6wmS.jpg"
+                                    }
+                                    className="img-fluid"
+                                    alt="Post"
+                                  />
+                                </th>
+                                <td>
+                                  <p className="font_16 table-content">
+                                    {item.content.discription?.[0] ||
+                                      "No description available"}
+                                  </p>
+                                </td>
+                                <td>
+                                  <i
+                                    className={`bi ${socialIconClass} social_icon`}
+                                  ></i>
+                                </td>
+                                <td>
+                                  <span
+                                    className={`post_day ${
+                                      isToday ? "today" : ""
+                                    }`}
+                                  >
+                                    {text}
+                                  </span>
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn primary_btn_outline"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#scheduleModal"
+                                    onClick={() =>
+                                      handleScheduleClick(
+                                        item.uuid,
+                                        socialMediaPost,
+                                        item.content?.[socialMediaId]
+                                      )
+                                    }
+                                  >
+                                    Re-schedule
+                                  </button>
+                                </td>
+                                <td>
+                                  <button className="btn primary_btn_outline"  onClick={() => {
+                                    handleEditFunction(
+                                      item.content,
+                                      socialMediaPost,
+                                      item.uuid,
+                                      item.content?.[socialMediaId]
+                                    );
+                                  }}>
+                                    Edit
+                                  </button>
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn text_orange font_20 pe-0"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteSchedule"
+                                    onClick={() =>
+                                      setDeleteItem({
+                                        platform: socialMediaPost,
+                                        uuid: item.uuid,
+                                      })
+                                    }
+                                  >
+                                    <i className="bi bi-x"></i>
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
                       </tbody>
                     </table>
                   </div>
-                )}
+              
               </div>
             </div>
+               )}
           </div>
         </div>
       </main>
       <>
-        {/* Schedule Modal */}
-        <div
-          className="modal fade"
-          id="scheduleModal"
-          tabIndex={-1}
-          aria-labelledby="scheduleModalLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div className="modal-content">
-              <div className="modal-body schedule_box">
+        <ScheduleModal
+          show={showModal}
+          onClose={() => {
+            setShowModal(false);
+            setUUIDS("");
+            setCollectPlatform("");
+            setPlatformId("");
+          }}
+          onSchedule={handleSchedule}
+        />
+
+        {SuccessScheduleModel && (
+          <div className="custom-modal-overlay">
+            <div className="custom-modal-content">
+              <div className="schedule_box">
                 <p className="font_16 mb-1">Your post has been scheduled</p>
                 <p className="font_14 text_blue">
-                  Monday, April 24th at 8:17 AM
+                  {formatScheduledDate(REScheduleDateAndTime)}
                 </p>
                 <button
                   className="btn primary_btn ok_btn"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
+                  onClick={handleCloseSchedule}
                 >
                   OK
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Delete Schedule Modal */}
         <div

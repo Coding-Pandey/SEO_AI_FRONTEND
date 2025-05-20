@@ -326,3 +326,12 @@ export const deletePlannerSocialMediaData = async (posts: string,uuid: string,) 
     throw error;
   }
 };
+
+  export const UpdateScheduleSocialMediaPlanner = async (post:string,uuid:string,formData:any) => {
+  try { 
+    const response = await axiosInstance.patch(`/api/update_scheduled_posts/${post}/${uuid}`,formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
