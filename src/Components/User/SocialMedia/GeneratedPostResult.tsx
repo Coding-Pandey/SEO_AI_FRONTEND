@@ -345,6 +345,23 @@ const GeneratedPostResult = () => {
                         className="img-fluid"
                         alt="image"
                       />
+                       <div className="add_media">
+                        <input
+                          type="file"
+                          className="media_input"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setFileData(file);
+                              setLocalImage(URL.createObjectURL(file)); // ⬅️ Preview the selected image
+                            }
+                          }}
+                        />
+                        <div className="media_text">
+                          <span>Upload file</span>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div className="add_media">

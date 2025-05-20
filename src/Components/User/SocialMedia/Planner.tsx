@@ -56,7 +56,7 @@ const Planner = () => {
   const [UUIDS, setUUIDS] = useState<string>("");
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [fileData, setFileData] = useState<any>(null);
-    const [LoadingApi, setLoadingApi] = useState<boolean>(false);
+  const [LoadingApi, setLoadingApi] = useState<boolean>(false);
   // console.log(plannerData,"plannerData")
 
   useEffect(() => {
@@ -216,8 +216,12 @@ const Planner = () => {
     }
   };
 
-
-    const handleEditFunction = (post: any, platform: string, uuid: string,postPlatformId:string) => {
+  const handleEditFunction = (
+    post: any,
+    platform: string,
+    uuid: string,
+    postPlatformId: string
+  ) => {
     setSelectedPost(post);
     setCollectPlatform(platform);
     setIsModalOpen(true);
@@ -227,8 +231,7 @@ const Planner = () => {
     setPlatformId(postPlatformId);
   };
 
-
-    const handleClose = () => {
+  const handleClose = () => {
     setIsModalOpen(false);
     setFileData(null);
     setLocalImage(null);
@@ -239,37 +242,37 @@ const Planner = () => {
     fetchPlannerData();
   };
 
-    const handleSaveAndEditPost = async () => {
-      try {
-        let formData = new FormData();
-        if (fileData) {
-          formData.append("image", fileData);
-        }
-        formData.append("content", content);
-        formData.append("id", PlatformId);
-        setLoadingApi(true)
-        const response = await UpdateScheduleSocialMediaPlanner(
-          CollectPlatform,
-          UUIDS,
-          formData
-        );
-        console.log(response.data, "response.data");
-        if (response.status === 201 || response.status === 200) {
-          // setLocalImage(null);
-          setLoadingApi(false)
-          const updatedPost = {
-            ...selectedPost,
-            discription: [content],
-          };
-  
-          toast.success("Updated image and content successfully");
-          setSelectedPost(updatedPost);
-        }
-      } catch (error: any) {
-        setLoadingApi(false)
-        console.log("Failed to handleSaveAndEditPost.", error);
+  const handleSaveAndEditPost = async () => {
+    try {
+      let formData = new FormData();
+      if (fileData) {
+        formData.append("image", fileData);
       }
-    };
+      formData.append("content", content);
+      formData.append("id", PlatformId);
+      setLoadingApi(true);
+      const response = await UpdateScheduleSocialMediaPlanner(
+        CollectPlatform,
+        UUIDS,
+        formData
+      );
+      console.log(response.data, "response.data");
+      if (response.status === 201 || response.status === 200) {
+        // setLocalImage(null);
+        setLoadingApi(false);
+        const updatedPost = {
+          ...selectedPost,
+          discription: [content],
+        };
+
+        toast.success("Updated image and content successfully");
+        setSelectedPost(updatedPost);
+      }
+    } catch (error: any) {
+      setLoadingApi(false);
+      console.log("Failed to handleSaveAndEditPost.", error);
+    }
+  };
 
   return (
     <>
@@ -283,7 +286,7 @@ const Planner = () => {
                 <i className="bi bi-people-fill me-1 text_blue"></i> Planner
               </h2>
             </div>
-             {isModalOpen && selectedPost ? (
+            {isModalOpen && selectedPost ? (
               <div className="edit_post_wrapper box-shadow">
                 <button
                   className="btn text_orange font_20 edit_post_close"
@@ -304,6 +307,23 @@ const Planner = () => {
                         className="img-fluid"
                         alt="image"
                       />
+                      <div className="add_media">
+                        <input
+                          type="file"
+                          className="media_input"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setFileData(file);
+                              setLocalImage(URL.createObjectURL(file)); // ⬅️ Preview the selected image
+                            }
+                          }}
+                        />
+                        <div className="media_text">
+                          <span>Upload file</span>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div className="add_media">
@@ -341,50 +361,49 @@ const Planner = () => {
                       type="submit"
                       onClick={handleSaveAndEditPost}
                     >
-                      {LoadingApi ?"Please Wait..." : "Save"}   
+                      {LoadingApi ? "Please Wait..." : "Save"}
                     </button>
                   </div>
                 </div>
               </div>
             ) : (
-
-            <div className="plan_post_wrapper">
-              <div className="post_list_header">
-                <div className="header_left">
-                  <h2 className="font_25 font_600">Posts</h2>
-                </div>
-                <div className="header_right">
-                  <div className="form_input">
-                    <select
-                      className="form-select"
-                      id="social_post"
-                      aria-label="social_post"
-                      value={selectedPlatform}
-                      onChange={(e) => setSelectedPlatform(e.target.value)}
-                    >
-                      <option value="">All Platforms</option>
-                      <option value="linkedin">LinkedIn</option>
-                      <option value="twitter">Twitter</option>
-                      <option value="instagram">Instagram</option>
-                      <option value="facebook">Facebook</option>
-                      <option value="tiktok">TikTok</option>
-                    </select>
+              <div className="plan_post_wrapper">
+                <div className="post_list_header">
+                  <div className="header_left">
+                    <h2 className="font_25 font_600">Posts</h2>
                   </div>
-                  <div className="form_input">
-                    <input
-                      type="date"
-                      className="form-control"
-                      placeholder="Select date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                    />
+                  <div className="header_right">
+                    <div className="form_input">
+                      <select
+                        className="form-select"
+                        id="social_post"
+                        aria-label="social_post"
+                        value={selectedPlatform}
+                        onChange={(e) => setSelectedPlatform(e.target.value)}
+                      >
+                        <option value="">All Platforms</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="twitter">Twitter</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="tiktok">TikTok</option>
+                      </select>
+                    </div>
+                    <div className="form_input">
+                      <input
+                        type="date"
+                        className="form-control"
+                        placeholder="Select date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="post_list_content">
-                {loadingData && <Loading />}
-             
+                <div className="post_list_content">
+                  {loadingData && <Loading />}
+
                   <div className="table-responsive">
                     <table className="table">
                       <tbody>
@@ -487,14 +506,17 @@ const Planner = () => {
                                   </button>
                                 </td>
                                 <td>
-                                  <button className="btn primary_btn_outline"  onClick={() => {
-                                    handleEditFunction(
-                                      item.content,
-                                      socialMediaPost,
-                                      item.uuid,
-                                      item.content?.[socialMediaId]
-                                    );
-                                  }}>
+                                  <button
+                                    className="btn primary_btn_outline"
+                                    onClick={() => {
+                                      handleEditFunction(
+                                        item.content,
+                                        socialMediaPost,
+                                        item.uuid,
+                                        item.content?.[socialMediaId]
+                                      );
+                                    }}
+                                  >
                                     Edit
                                   </button>
                                 </td>
@@ -520,10 +542,9 @@ const Planner = () => {
                       </tbody>
                     </table>
                   </div>
-              
+                </div>
               </div>
-            </div>
-               )}
+            )}
           </div>
         </div>
       </main>

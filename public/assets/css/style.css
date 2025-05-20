@@ -1134,8 +1134,25 @@ form .row {
     right: 30px;
     top: 10px;
 }
+.edit_post_wrapper .social_post_img {
+    position: relative;
+}
 
-
+.edit_post_wrapper .social_post_img .add_media {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: auto;
+    background-color: #ffffffcc;
+    padding: 5px 10px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #000;
+    cursor: pointer;
+   }
+.edit_post_wrapper .social_post_img .add_media input{
+    cursor: pointer;
+}
 .edit_post_wrapper .post_heading{
     text-align: center;
     border-bottom: 1px solid #d8d8d8;
@@ -1679,6 +1696,13 @@ form .row {
     }
 
     /* sign page end*/
+    .edit_post_wrapper .social_post_img .add_media {
+        right: 5px;
+        top: 5px;
+        padding: 4px 10px;
+        font-size: 12px;
+        line-height: 16px;
+    }
 }
 
 @media only screen and (max-width:480px) {
