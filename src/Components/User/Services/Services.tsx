@@ -335,3 +335,14 @@ export const deletePlannerSocialMediaData = async (posts: string,uuid: string,) 
     throw error;
   }
 };
+
+
+
+  export const UpdateFileNameSocialMedia = async (uuid:string,formData:any) => {
+  try { 
+    const response = await axiosInstance.patch(`/api/edit_file_name/${uuid}`,formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

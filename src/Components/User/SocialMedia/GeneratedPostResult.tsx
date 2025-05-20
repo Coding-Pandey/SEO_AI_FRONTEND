@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import Loading from "../../Page/Loading/Loading";
 import {
   AddScheduleSocialMedia,
+  deleteSocialMediaData,
   deleteSocialMediaPost,
   GetGeneratedPostById,
+  UpdateFileNameSocialMedia,
   UpdateImageSocialMedia,
 } from "../Services/Services";
 import { toast } from "react-toastify";
@@ -31,21 +33,21 @@ const GeneratedPostResult = () => {
   const [SuccessScheduleModel, setSuccessScheduleModel] = useState(false);
   const [ScheduleDateAndTime, setScheduleDateAndTime] = useState("");
   const [LoadingApi, setLoadingApi] = useState<boolean>(false);
+  const [ShowFileModal, setShowFileModal] = useState<boolean>(false);
+
   const handleScheduleClick = (
     uuid: string,
     postData: any,
     platform: string
   ) => {
-    console.log(postData,"postData")
+    console.log(postData, "postData");
     setUUIDS(uuid);
     setSelectedPost(postData);
     setShowModal(true);
-    setScheduleDateAndTime('')
+    setScheduleDateAndTime("");
     setCollectPlatform(platform);
   };
 
-
- 
   useEffect(() => {
     if (id) {
       fetchGeneratedPost(id);
@@ -166,7 +168,7 @@ const GeneratedPostResult = () => {
       }
       formData.append("content", JSON.stringify([content]));
       const postId = selectedPost[`${CollectPlatform}_id`];
-      setLoadingApi(true)
+      setLoadingApi(true);
       const response = await UpdateImageSocialMedia(
         UUIDS,
         postId,
@@ -176,7 +178,7 @@ const GeneratedPostResult = () => {
       console.log(response.data, "response.data");
       if (response.status === 201 || response.status === 200) {
         // setLocalImage(null);
-         setLoadingApi(false)
+        setLoadingApi(false);
         const updatedPost = {
           ...selectedPost,
           discription: [content],
@@ -207,7 +209,7 @@ const GeneratedPostResult = () => {
         });
       }
     } catch (error: any) {
-      setLoadingApi(false)
+      setLoadingApi(false);
       console.log("Failed to handleSaveAndEditPost.", error);
     }
   };
@@ -270,7 +272,7 @@ const GeneratedPostResult = () => {
     setScheduleDateAndTime("");
   };
 
-    const handleSchedule = async (scheduledDate: string) => {
+  const handleSchedule = async (scheduledDate: string) => {
     setScheduleDateAndTime(scheduledDate);
     const formData = {
       uuid: UUIDS,
@@ -283,11 +285,12 @@ const GeneratedPostResult = () => {
       // console.log(response.data, "response.data");
       if (response.status === 201 || response.status === 200) {
         toast.success("Added Schedule successfully");
-         setGeneratedPostDetails((prev: any) => {
+        setGeneratedPostDetails((prev: any) => {
           const updatedPosts = { ...prev };
           const posts = updatedPosts.data[`${CollectPlatform}_posts`];
           const updated = posts.map((post: any) =>
-            post[`${CollectPlatform}_id`] === selectedPost[`${CollectPlatform}_id`]
+            post[`${CollectPlatform}_id`] ===
+            selectedPost[`${CollectPlatform}_id`]
               ? { ...post, isSchedule: true }
               : post
           );
@@ -306,6 +309,60 @@ const GeneratedPostResult = () => {
     }
   };
 
+  const handleChangeFilename = async () => {
+    if (!content.trim()) {
+      toast.warning("Please enter a Filename");
+      return;
+    }
+    if (!UUIDS) {
+      toast.error("Missing UUID");
+      return;
+    }
+    try {
+      let formData = new FormData();
+      formData.append("new_file_name", content);
+      const response = await UpdateFileNameSocialMedia(UUIDS, formData);
+      if (response.status === 200 || response.status === 201) {
+        toast.success("FileName updated successfully");
+        setGeneratedPostDetails((prev: any) =>
+          prev.id === UUIDS ? { ...prev, fileName: content } : prev
+        );
+        setShowFileModal(false);
+        setContent("");
+        setUUIDS("");
+      }
+    } catch (error: any) {
+      console.error("Error updating title:", error);
+    }
+  };
+
+  const handleCloseFileModel = () => {
+    setShowFileModal(false);
+    setContent("");
+    setUUIDS("");
+  };
+
+    const handleDelete = async (uuid: string) => {
+      try {
+        const isConfirmed = window.confirm(
+          "Are you sure you want to delete this set?"
+        );
+        if (!isConfirmed) {
+          return;
+        }
+        const formData = { uuid };
+        const response = await deleteSocialMediaData(formData);
+        if (response.status === 200) {
+          navigate("/social/GeneratePost")
+          toast.success("File successfully deleted!", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        }
+      } catch (error: any) {
+        console.log("Failed to delete file.");
+      }
+    };
 
   return (
     <>
@@ -322,8 +379,80 @@ const GeneratedPostResult = () => {
                 <span className="text_blue">
                   /{generatedPostDetails?.fileName}
                 </span>
+                <span
+                  className="heading_edit"
+                  onClick={() => {
+                    setShowFileModal(true);
+                    setUUIDS(generatedPostDetails?.id);
+                    setContent(generatedPostDetails?.fileName);
+                  }}
+                >
+                  <i
+                    className="bi bi-pencil-fill"
+                    style={{ cursor: "pointer" }}
+                  ></i>
+                </span>
               </h2>
             </div>
+            {ShowFileModal && (
+              <div className="modal-overlays">
+                <div
+                  className="modal-contents"
+                  style={{ position: "relative" }}
+                >
+                  <button
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "transparent",
+                      border: "none",
+                      fontSize: "20px",
+                      cursor: "pointer",
+                    }}
+                    onClick={handleCloseFileModel}
+                    aria-label="Close"
+                  >
+                    &times;
+                  </button>
+
+                  <h4>Edit File Name.</h4>
+
+                  <label className="pb-2">Filename :</label>
+                  <textarea
+                    className="form-control mb-3"
+                    rows={3}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <button
+                      className="btn btn-success"
+                      style={{
+                        backgroundColor: "rgb(250, 122, 78)",
+                        color: "white",
+                        border: "none",
+                      }}
+                      onClick={handleChangeFilename}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={handleCloseFileModel}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {isModalOpen && selectedPost ? (
               <div className="edit_post_wrapper box-shadow">
                 <button
@@ -345,7 +474,7 @@ const GeneratedPostResult = () => {
                         className="img-fluid"
                         alt="image"
                       />
-                       <div className="add_media">
+                      <div className="add_media">
                         <input
                           type="file"
                           className="media_input"
@@ -399,15 +528,15 @@ const GeneratedPostResult = () => {
                       type="submit"
                       onClick={handleSaveAndEditPost}
                     >
-                       {LoadingApi ?"Please Wait..." : "Save"}  
+                      {LoadingApi ? "Please Wait..." : "Save"}
                     </button>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="multi_post_wrapper">
+            ) : 
+              (<div className="multi_post_wrapper">
                 <div className="download_media mb-3">
-                  <button className="btn primary_btn">Delete the set</button>
+                  <button className="btn primary_btn" onClick={() => handleDelete(generatedPostDetails?.id)} >Delete the set</button>
                   <button
                     className="btn primary_btn ms-2"
                     onClick={() => navigate("/social/GeneratePost")}
@@ -431,7 +560,10 @@ const GeneratedPostResult = () => {
                             <div className="item_header">
                               <div className="item_left">
                                 {post?.isSchedule ? (
-                                  <button className="secondary_btn secondary_btn_outline"  style={{ marginRight: '10px' }}>
+                                  <button
+                                    className="secondary_btn secondary_btn_outline"
+                                    style={{ marginRight: "10px" }}
+                                  >
                                     Scheduled
                                   </button>
                                 ) : (
@@ -557,29 +689,32 @@ const GeneratedPostResult = () => {
                           >
                             <div className="item_header">
                               <div className="item_left">
-                                   {post?.isSchedule ? (
-                                  <button className="secondary_btn secondary_btn_outline"  style={{ marginRight: '10px' }}>
+                                {post?.isSchedule ? (
+                                  <button
+                                    className="secondary_btn secondary_btn_outline"
+                                    style={{ marginRight: "10px" }}
+                                  >
                                     Scheduled
                                   </button>
                                 ) : (
                                   <>
-                                <button className="btn primary_btn_outline">
-                                  Publish
-                                </button>
-                                <button
-                                  className="btn primary_btn_outline"
-                                  onClick={() =>
-                                    handleScheduleClick(
-                                      generatedPostDetails?.id,
-                                      post,
-                                      "twitter"
-                                    )
-                                  }
-                                >
-                                  Schedule
-                                </button>
-                                </>
-                              )}
+                                    <button className="btn primary_btn_outline">
+                                      Publish
+                                    </button>
+                                    <button
+                                      className="btn primary_btn_outline"
+                                      onClick={() =>
+                                        handleScheduleClick(
+                                          generatedPostDetails?.id,
+                                          post,
+                                          "twitter"
+                                        )
+                                      }
+                                    >
+                                      Schedule
+                                    </button>
+                                  </>
+                                )}
                                 <button
                                   className="btn primary_btn_outline"
                                   onClick={() => {
@@ -674,30 +809,33 @@ const GeneratedPostResult = () => {
                           >
                             <div className="item_header">
                               <div className="item_left">
-                                    {post?.isSchedule ? (
-                                  <button className="secondary_btn secondary_btn_outline"  style={{ marginRight: '10px' }}>
+                                {post?.isSchedule ? (
+                                  <button
+                                    className="secondary_btn secondary_btn_outline"
+                                    style={{ marginRight: "10px" }}
+                                  >
                                     Scheduled
                                   </button>
                                 ) : (
                                   <>
-                                <button className="btn primary_btn_outline">
-                                  Publish
-                                </button>
-                                <button
-                                  className="btn primary_btn_outline"
-                                  onClick={() =>
-                                    handleScheduleClick(
-                                      generatedPostDetails?.id,
-                                      post,
-                                      "facebook"
-                                    )
-                                  }
-                                >
-                                  Schedule
-                                </button>
-                                </>
-                              )}
-                                
+                                    <button className="btn primary_btn_outline">
+                                      Publish
+                                    </button>
+                                    <button
+                                      className="btn primary_btn_outline"
+                                      onClick={() =>
+                                        handleScheduleClick(
+                                          generatedPostDetails?.id,
+                                          post,
+                                          "facebook"
+                                        )
+                                      }
+                                    >
+                                      Schedule
+                                    </button>
+                                  </>
+                                )}
+
                                 <button
                                   className="btn primary_btn_outline"
                                   onClick={() => {
@@ -793,29 +931,32 @@ const GeneratedPostResult = () => {
                             <div className="item_header">
                               <div className="item_left">
                                 {post?.isSchedule ? (
-                                  <button className="secondary_btn secondary_btn_outline"  style={{ marginRight: '10px' }}>
+                                  <button
+                                    className="secondary_btn secondary_btn_outline"
+                                    style={{ marginRight: "10px" }}
+                                  >
                                     Scheduled
                                   </button>
                                 ) : (
                                   <>
-                               <button className="btn primary_btn_outline">
-                                  Publish
-                                </button>
-                                <button
-                                  className="btn primary_btn_outline"
-                                  onClick={() =>
-                                    handleScheduleClick(
-                                      generatedPostDetails?.id,
-                                      post,
-                                      "instagram"
-                                    )
-                                  }
-                                >
-                                  Schedule
-                                </button>
-                                </>
-                              )}
-                               
+                                    <button className="btn primary_btn_outline">
+                                      Publish
+                                    </button>
+                                    <button
+                                      className="btn primary_btn_outline"
+                                      onClick={() =>
+                                        handleScheduleClick(
+                                          generatedPostDetails?.id,
+                                          post,
+                                          "instagram"
+                                        )
+                                      }
+                                    >
+                                      Schedule
+                                    </button>
+                                  </>
+                                )}
+
                                 <button
                                   className="btn primary_btn_outline"
                                   onClick={() => {
@@ -909,30 +1050,33 @@ const GeneratedPostResult = () => {
                           >
                             <div className="item_header">
                               <div className="item_left">
-                                 {post?.isSchedule ? (
-                                  <button className="secondary_btn secondary_btn_outline"  style={{ marginRight: '10px' }}>
+                                {post?.isSchedule ? (
+                                  <button
+                                    className="secondary_btn secondary_btn_outline"
+                                    style={{ marginRight: "10px" }}
+                                  >
                                     Scheduled
                                   </button>
                                 ) : (
                                   <>
-                                <button className="btn primary_btn_outline">
-                                  Publish
-                                </button>
-                                <button
-                                  className="btn primary_btn_outline"
-                                  onClick={() =>
-                                    handleScheduleClick(
-                                      generatedPostDetails?.id,
-                                      post,
-                                      "tiktok"
-                                    )
-                                  }
-                                >
-                                  Schedule
-                                </button>
-                                </>
-                              )}
-                               
+                                    <button className="btn primary_btn_outline">
+                                      Publish
+                                    </button>
+                                    <button
+                                      className="btn primary_btn_outline"
+                                      onClick={() =>
+                                        handleScheduleClick(
+                                          generatedPostDetails?.id,
+                                          post,
+                                          "tiktok"
+                                        )
+                                      }
+                                    >
+                                      Schedule
+                                    </button>
+                                  </>
+                                )}
+
                                 <button
                                   className="btn primary_btn_outline"
                                   onClick={() => {
@@ -1013,8 +1157,8 @@ const GeneratedPostResult = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            )}
+              </div>)
+             }
 
             <ScheduleModal
               show={showModal}
