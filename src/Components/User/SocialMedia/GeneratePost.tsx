@@ -9,6 +9,7 @@ import {
 import Loading from "../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
 
 const GeneratePost = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -22,7 +23,7 @@ const GeneratePost = () => {
   const [generatedPostData, setGeneratedPostData] = useState<any[]>([]);
 
   const navigate = useNavigate();
- 
+
   useEffect(() => {
     fetchPPCClusterData();
   }, []);
@@ -157,6 +158,10 @@ const GeneratePost = () => {
     }
   };
 
+  const handleNavigate = (id: string) => {
+    navigate(`/social/GeneratedPostResult/${id}`);
+  };
+
   return (
     <>
       {loading && <Loading />}
@@ -169,87 +174,15 @@ const GeneratePost = () => {
               <h2 className="font_25 font_600 mb-2">
                 <i className="bi bi-people-fill me-1 text_blue"></i> Post
                 Generator
-                {/* <span className="text_blue">/ Research number one</span> */}
               </h2>
             </div>
             <div className="generate_post_form keyword_search_form">
               <div className="row gy-3 ">
-                {/* Previously Created */}
-                <div className="col-12 col-xl-5">
-                  <div className="previously_created_warpper">
-                    <h2 className="font_25 font_500 mb-4">
-                      Previously Created ({generatedPostData.length}/10)
-                    </h2>
-                    <ul className="previous_post p-0">
-                      {generatedPostData.map((item: any) => {
-                        const expirationDate = new Date(item.last_reset);
-                        const currentDate = new Date();
-
-                        // Set both dates to midnight for accurate day comparison
-                        const expDate = new Date(
-                          expirationDate.getFullYear(),
-                          expirationDate.getMonth(),
-                          expirationDate.getDate()
-                        );
-                        const currDate = new Date(
-                          currentDate.getFullYear(),
-                          currentDate.getMonth(),
-                          currentDate.getDate()
-                        );
-
-                        const remainingDays = Math.ceil(
-                          (expDate.getTime() - currDate.getTime()) /
-                            (1000 * 60 * 60 * 24)
-                        );
-
-                        const isExpired = remainingDays < 0;
-                        const isExpiringToday = remainingDays === 0;
-
-                        return (
-                          <li className="previous_item row" key={item.uuid}>
-                            <div className="col-7">
-                              <h3 className="font_16 font_600">
-                                {item.file_name}
-                              </h3>
-                              <p className="font_16 mb-0">
-                                {isExpired
-                                  ? "File Expired"
-                                  : isExpiringToday
-                                  ? "Expires today"
-                                  : `Expires in ${remainingDays} day${
-                                      remainingDays > 1 ? "s" : ""
-                                    }`}
-                              </p>
-                            </div>
-                            <div className="col-5 text-end">
-                              <button
-                                className="btn primary_btn"
-                                disabled={isExpired}
-                                onClick={() => {
-                                  navigate(
-                                    `/social/GeneratedPostResult/${item.uuid}`
-                                  );
-                                }}
-                                style={{
-                                  opacity: isExpired ? 0.5 : 1,
-                                  cursor: isExpired ? "not-allowed" : "pointer",
-                                }}
-                              >
-                                View
-                              </button>
-                              <button
-                                className="btn pe-0 text_orange font_20"
-                                onClick={() => handleDelete(item.uuid)}
-                              >
-                                <i className="bi bi-x"></i>
-                              </button>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                </div>
+                <PreviouslyCreatedPosts
+                  posts={generatedPostData}
+                  onDelete={handleDelete}
+                  onNavigate={handleNavigate}
+                />
 
                 {/* Generate New Post */}
                 <div className="col-12 col-xl-7">

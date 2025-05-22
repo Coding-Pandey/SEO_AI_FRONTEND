@@ -2,11 +2,16 @@ import { useState, KeyboardEvent, useEffect } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { language_options, location_options } from "../../Page/store";
-import { deletePpcClusterData, GetPpcClusterData, SEOPPCGenerateKeyword } from "../Services/Services";
+import {
+  deletePpcClusterData,
+  GetPpcClusterData,
+  SEOPPCGenerateKeyword,
+} from "../Services/Services";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../Page/Loading/Loading";
+import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
 
 interface PpcCluster {
   uuid: string;
@@ -24,28 +29,28 @@ const CreateCampaign = () => {
   const [ppcClusterData, setPpcClusterData] = useState<PpcCluster[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const navigate = useNavigate();
- 
-    useEffect(()=>{
-      fetchPPCClusterData()
-    },[])
-  
-    const fetchPPCClusterData = async () => {
-      try {
-        setLoadingData(true);
-        const response = await GetPpcClusterData();
-        if (response.status === 200 || response.status === 201) {
-          setPpcClusterData(response.data);
-        }
-      } catch (error: any) {
-        setLoadingData(false);
-        console.error("Error fetchPPCClusterData:", error);
-      } finally {
-        setLoadingData(false);
+
+  useEffect(() => {
+    fetchPPCClusterData();
+  }, []);
+
+  const fetchPPCClusterData = async () => {
+    try {
+      setLoadingData(true);
+      const response = await GetPpcClusterData();
+      if (response.status === 200 || response.status === 201) {
+        setPpcClusterData(response.data);
       }
-    };
+    } catch (error: any) {
+      setLoadingData(false);
+      console.error("Error fetchPPCClusterData:", error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === "," ) {
+    if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       addKeyword(input);
     }
@@ -66,7 +71,12 @@ const CreateCampaign = () => {
   const handleSubmit = async () => {
     const selectedLocationIds = country.map((c: any) => c.value);
     const selectedLanguageId = Number(language);
-    const finalKeywords = keywords.length > 0 ? keywords.join(",") : input.trim() !== "" ? input.trim() : "";
+    const finalKeywords =
+      keywords.length > 0
+        ? keywords.join(",")
+        : input.trim() !== ""
+        ? input.trim()
+        : "";
     // Construct the data to send
     const formData = {
       keywords: finalKeywords,
@@ -90,7 +100,6 @@ const CreateCampaign = () => {
     } catch (error: any) {
       setLoading(false);
       console.error("Error handleSubmit:", error);
-     
     }
   };
 
@@ -100,28 +109,40 @@ const CreateCampaign = () => {
     label: location.country,
   }));
 
-  
-    const handleDelete = async (uuid: string) => {
-        try {
-          const isConfirmed = window.confirm("Are you sure you want to delete this file?");
-          if (!isConfirmed) {
-            return;  
-          }
-          const formData = { uuid };
-          const response = await deletePpcClusterData(formData);
-          if (response.status === 200) {
-            setPpcClusterData(prevData => prevData.filter(item => item.uuid !== uuid));
-            toast.success("File successfully deleted!", { position: "top-right", autoClose: 3000 });
-          }
-        } catch (error: any) {
-          toast.error("Failed to delete file.", { position: "top-right", autoClose: 3000 });
-        }
-    };
-   
+  const handleDelete = async (uuid: string) => {
+    try {
+      const isConfirmed = window.confirm(
+        "Are you sure you want to delete this file?"
+      );
+      if (!isConfirmed) {
+        return;
+      }
+      const formData = { uuid };
+      const response = await deletePpcClusterData(formData);
+      if (response.status === 200) {
+        setPpcClusterData((prevData) =>
+          prevData.filter((item) => item.uuid !== uuid)
+        );
+        toast.success("File successfully deleted!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error: any) {
+      toast.error("Failed to delete file.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
+    const handleNavigate = (id: string) => {
+    navigate(`/ppc/CampaignSuggestionById/${id}`);
+  };
 
   return (
     <>
-     {loadingData && <Loading/>  }
+      {loadingData && <Loading />}
       <Header />
       <main className="main_wrapper">
         <SideBar />
@@ -135,50 +156,16 @@ const CreateCampaign = () => {
             </div>
             <div className="keyword_search_form">
               <div className="row gy-3">
-                <div className="col-12 col-xl-5">
-               
-                  <div className="previously_created_warpper">
-  <h2 className="font_25 font_500 mb-4">
-    Previously Created ({ppcClusterData.length}/10)
-  </h2>
-  <ul className="previous_post p-0">
-    {ppcClusterData.map((item:any) => {
-  const expirationDate = new Date(item.last_reset);
-  const currentDate = new Date();
-
-  // Set both dates to midnight for accurate day comparison
-  const expDate = new Date(expirationDate.getFullYear(), expirationDate.getMonth(), expirationDate.getDate());
-  const currDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-  
-  const remainingDays = Math.ceil((expDate.getTime() - currDate.getTime()) / (1000 * 60 * 60 * 24));
-  
-  const isExpired = remainingDays < 0;
-  const isExpiringToday = remainingDays === 0;
- 
-      return (
-        <li className="previous_item row" key={item.uuid}>
-          <div className="col-7">
-            <h3 className="font_16 font_600">{item.file_name}</h3>
-            <p className="font_16 mb-0">
-              {isExpired ? "File Expired" : isExpiringToday ? "Expires today" : `Expires in ${remainingDays} day${remainingDays > 1 ? "s" : ""}`}
-            </p>
-          </div>
-          <div className="col-5 text-end">
-            <button className="btn primary_btn" disabled={isExpired} onClick={()=>{navigate(`/ppc/CampaignSuggestionById/${item.uuid}`)}}
-          style={{ opacity: isExpired ? 0.5 : 1, cursor: isExpired ? "not-allowed" : "pointer" }}>View</button>
-            <button className="btn pe-0 text_orange font_20" onClick={() => handleDelete(item.uuid)}>
-              <i className="bi bi-x"></i>
-            </button>
-          </div>
-        </li>
-      );
-    })}
-  </ul>
-                </div>
-                </div>
+                 <PreviouslyCreatedPosts
+                  posts={ppcClusterData}
+                  onDelete={handleDelete}
+                  onNavigate={handleNavigate}
+                /> 
                 <div className="col-12 col-xl-7">
                   <form>
-                  <h2 className="font_25 font_500 mb-3">Generate New Posts</h2>
+                    <h2 className="font_25 font_500 mb-3">
+                      Generate New Posts
+                    </h2>
                     {keywords.length > 10 && (
                       <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
                         Error: Limit Reached. Please enter no more than 10
@@ -225,7 +212,7 @@ const CreateCampaign = () => {
                     <input
                       type="text"
                       className="form-control mb-2"
-                       placeholder="Enter keywords (press Enter or comma to add)"
+                      placeholder="Enter keywords (press Enter or comma to add)"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
@@ -278,7 +265,7 @@ const CreateCampaign = () => {
                             (keywords.length === 0 && input.trim() === "") ||
                             keywords.length > 10 ||
                             country.length === 0 ||
-                            !language 
+                            !language
                           }
                         >
                           {loading ? "Please wait..." : "Start"}
@@ -297,21 +284,3 @@ const CreateCampaign = () => {
 };
 
 export default CreateCampaign;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
