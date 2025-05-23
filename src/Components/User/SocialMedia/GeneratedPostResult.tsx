@@ -377,7 +377,10 @@ const GeneratedPostResult = () => {
                 <i className="bi bi-people-fill me-1 text_blue"></i> Post
                 Generator
                 <span className="text_blue">
-                  /{generatedPostDetails?.fileName}
+                  /{generatedPostDetails?.fileName
+                  ? generatedPostDetails.fileName.charAt(0).toUpperCase() +
+                    generatedPostDetails.fileName.slice(1)
+                  : ""}
                 </span>
                 <span
                   className="heading_edit"

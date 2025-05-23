@@ -21,6 +21,9 @@ const PreviouslyCreatedPosts: React.FC<Props> = ({ posts, onDelete,onNavigate })
         <h2 className="font_25 font_500 mb-4">
           Previously Created ({posts.length}/10)
         </h2>
+          {posts.length === 0 ? (
+        <p className="text-muted">No previously created files available at the moment.</p>
+      ) : (
         <ul className="previous_post p-0">
           {posts.map((item) => {
             const expirationDate = new Date(item.last_reset);
@@ -84,6 +87,7 @@ const PreviouslyCreatedPosts: React.FC<Props> = ({ posts, onDelete,onNavigate })
             );
           })}
         </ul>
+        )}
       </div>
     </div>
   );

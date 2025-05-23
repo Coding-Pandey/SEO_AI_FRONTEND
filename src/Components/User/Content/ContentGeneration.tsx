@@ -7,13 +7,16 @@ import {
   KeyboardEvent,
   MouseEvent,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import Loading from "../../Page/Loading/Loading";
 import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
 import {
+  AddGenerateContent,
   deleteContentPreviousList,
   GetContentPreviousList,
+  GetFormDetails,
 } from "./ContentServices";
 
 interface contentData {
@@ -24,110 +27,33 @@ interface contentData {
 const ContentGeneration = () => {
   const navigate = useNavigate();
   const [ContentData, setContentData] = useState<contentData[]>([]);
+  const [FormDynamictData, setFormDynamictData] = useState<any>({});
   const [loadingData, setLoadingData] = useState<boolean>(false);
-  const [contentType, setContentType] = useState<string>("");
+  const [contentType, setContentType] = useState<number | "">("");
   const [FileName, setFileName] = useState<string>("");
   const [PostObjectives, setPostObjectives] = useState<string[]>([]);
   const [TargetAudience, setTargetAudience] = useState<string[]>([]);
   const [AddInstructions, setAddInstructions] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = e.target.value;
-    setContentType(selectedValue);
-  };
-
-  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
-
-    setPostObjectives((prev) => {
-      let updatedObjectives;
-      if (checked) {
-        updatedObjectives = [...prev, value];
-      } else {
-        updatedObjectives = prev.filter((item) => item !== value);
-      }
-      return updatedObjectives;
-    });
-  };
-
-  const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
-    setTargetAudience((prev) => {
-      let updatedObjectives;
-      if (checked) {
-        updatedObjectives = [...prev, value];
-      } else {
-        updatedObjectives = prev.filter((item) => item !== value);
-      }
-      return updatedObjectives;
-    });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    // Filter accepted files: .doc, .docx only
-    const allowedExtensions = /(\.doc|\.docx)$/i;
-    const validFiles = Array.from(files).filter((file) =>
-      allowedExtensions.test(file.name)
-    );
-
-    if (validFiles.length !== files.length) {
-      toast.error("Only .doc and .docx files are allowed");
-    }
-
-    setUploadedFiles((prev) => [...prev, ...validFiles]);
-  };
-
-  const handleRemoveFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleAddLink = () => {
-    const trimmedLink = linkInput.trim();
-    if (trimmedLink && !links.includes(trimmedLink)) {
-      setLinks([...links, trimmedLink]);
-      setLinkInput("");
-    }
-  };
-
-  const handleRemoveLink = (index: number) => {
-    setLinks((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setLinkInput(e.target.value);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddLink();
-    }
-  };
-
-  const handleAddButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    handleAddLink();
-  };
-
   useEffect(() => {
-    fetchPPCClusterData();
+    fetchGenerateData();
   }, []);
 
-  const fetchPPCClusterData = async () => {
+  const fetchGenerateData = async () => {
     try {
       setLoadingData(true);
       const response = await GetContentPreviousList();
+      const responseForm = await GetFormDetails();
+      // console.log(responseForm.data, "responseForm");
       if (response.status === 200 || response.status === 201) {
         setContentData(response.data);
+        setFormDynamictData(responseForm.data);
       }
     } catch (error: any) {
-      setLoadingData(false);
       console.error("Error fetchPPCClusterData:", error);
     } finally {
       setLoadingData(false);
@@ -165,6 +91,158 @@ const ContentGeneration = () => {
     navigate(`/ppc/ContentGenerationById/${id}`);
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setContentType(Number(e.target.value));
+  };
+
+  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+
+    setPostObjectives((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, value];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== value);
+      }
+      return updatedObjectives;
+    });
+  };
+
+  const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setTargetAudience((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, value];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== value);
+      }
+      return updatedObjectives;
+    });
+  };
+
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = e.target.files;
+  //   if (!files) return;
+
+  //   // Filter accepted files: .doc, .docx only
+  //   const allowedExtensions = /(\.doc|\.docx)$/i;
+  //   const validFiles = Array.from(files).filter((file) =>
+  //     allowedExtensions.test(file.name)
+  //   );
+
+  //   if (validFiles.length !== files.length) {
+  //     toast.error("Only .doc and .docx files are allowed");
+  //   }
+
+  //   setUploadedFiles((prev) => [...prev, ...validFiles]);
+  // };
+
+  
+ 
+   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const allowedExtensions = /(\.doc|\.docx)$/i;
+
+    if (!allowedExtensions.test(file.name)) {
+      toast.error("Only .doc and .docx files are allowed");
+      return;
+    }
+
+    setUploadedFiles([file]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+ 
+
+
+  const handleAddLink = () => {
+    const trimmedLink = linkInput.trim();
+    if (trimmedLink && !links.includes(trimmedLink)) {
+      setLinks([...links, trimmedLink]);
+      setLinkInput("");
+    }
+  };
+
+  const handleRemoveLink = (index: number) => {
+    setLinks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setLinkInput(e.target.value);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddLink();
+    }
+  };
+
+  const handleAddButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    handleAddLink();
+  };
+
+  const handleGenerateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      if (!FileName) {
+        toast.error("Please enter information page name");
+        return;
+      }
+
+      if (PostObjectives.length > 10) {
+        toast.error("Please select a maximum of 10 post keywords");
+        return;
+      }
+
+      if (!AddInstructions.trim() && uploadedFiles.length === 0) {
+        toast.error(
+          "Please provide additional instructions or upload at least one file"
+        );
+        return;
+      }
+
+      setLoadingData(true);
+      const formData = new FormData();
+      formData.append("file_name", FileName);
+      formData.append("content_type", String(contentType));
+      formData.append("objectives", JSON.stringify(PostObjectives));
+      formData.append("audience", JSON.stringify(TargetAudience));
+      formData.append("text_data", AddInstructions); 
+      if (uploadedFiles.length > 0) {
+        formData.append("file", uploadedFiles[0]);
+      }
+      formData.append("links", JSON.stringify(links));
+      const response = await AddGenerateContent(formData);
+      if (response.status === 200 || response.status === 201) {
+        // console.log("response.data",response.data)
+        const dataResult=response.data
+        localStorage.setItem("keywordToolResult", JSON.stringify(dataResult));
+        localStorage.setItem("FormDataDetails", JSON.stringify(formData));
+        navigate("/content/ContentGenerationResult", { state: dataResult });
+      }
+    } catch (error: any) {
+      console.error("Error handle Generate Submit:", error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
   return (
     <>
       {loadingData && <Loading />}
@@ -179,9 +257,9 @@ const ContentGeneration = () => {
                   src="/assets/images/content_icon.png"
                   alt="icon"
                   className="img-fluid heading_icon"
+                   style={{marginRight:"10px"}}
                 />
                 Content Generator{" "}
-                {/* <span className="text_blue">/ Research number one</span> */}
               </h2>
             </div>
 
@@ -196,7 +274,7 @@ const ContentGeneration = () => {
 
                 {/* Right Form Panel */}
                 <div className="col-12 col-xl-7">
-                  <form>
+                  <form onSubmit={handleGenerateSubmit}>
                     {!contentType ? (
                       <div className="row content_select mb-3">
                         <div className="col-12">
@@ -207,23 +285,13 @@ const ContentGeneration = () => {
                             onChange={handleSelectChange}
                           >
                             <option value="">Content Type</option>
-                            <option value="Information Page">
-                              Information Page
-                            </option>
-                            <option value="Blog article">Blog article</option>
-                            <option value="Press Releases & News Pages">
-                              Press Releases & News Pages
-                            </option>
-                            <option value="Case Study Pages">
-                              Case Study Pages
-                            </option>
-                            <option value="FAQs">FAQs</option>
-                            <option value="Campaign Landing Pages">
-                              Campaign Landing Pages
-                            </option>
-                            <option value="Product description">
-                              Product description
-                            </option>
+                            {FormDynamictData?.content_types?.map(
+                              (item: any) => (
+                                <option key={item.id} value={item.id}>
+                                  {item.content_type}
+                                </option>
+                              )
+                            )}
                           </select>
                         </div>
                       </div>
@@ -261,23 +329,13 @@ const ContentGeneration = () => {
                               value={contentType}
                               onChange={handleSelectChange}
                             >
-                              <option value="Information Page">
-                                Information Page
-                              </option>
-                              <option value="Blog article">Blog article</option>
-                              <option value="Press Releases & News Pages">
-                                Press Releases & News Pages
-                              </option>
-                              <option value="Case Study Pages">
-                                Case Study Pages
-                              </option>
-                              <option value="FAQs">FAQs</option>
-                              <option value="Campaign Landing Pages">
-                                Campaign Landing Pages
-                              </option>
-                              <option value="Product description">
-                                Product description
-                              </option>
+                              {FormDynamictData?.content_types?.map(
+                                (item: any) => (
+                                  <option key={item.id} value={item.id}>
+                                    {item.content_type}
+                                  </option>
+                                )
+                              )}
                             </select>
                           </div>
 
@@ -403,7 +461,8 @@ const ContentGeneration = () => {
                                 type="file"
                                 id="post_upload"
                                 accept=".doc,.docx"
-                                multiple
+                                 ref={fileInputRef}
+                                // multiple
                                 onChange={handleFileChange}
                               />
                               <div className="doc_left">
@@ -479,7 +538,7 @@ const ContentGeneration = () => {
                           </div>
 
                           <div className="col-12">
-                            <button className="btn primary_btn">
+                            <button className="btn primary_btn" type="submit">
                               Generate
                             </button>
                           </div>

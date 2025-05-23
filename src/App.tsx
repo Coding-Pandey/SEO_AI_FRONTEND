@@ -20,7 +20,7 @@ const CreateCampaignSuggestionResult = lazy(() => import("./Components/User/PPC/
 const SuggestionsResultById = lazy(() => import("./Components/User/SeoProcess/SuggestionsResultById"));
 const CampaignSuggestionById = lazy(() => import("./Components/User/PPC/CampaignSuggestionById")); 
 const Planner = lazy(() => import("./Components/User/SocialMedia/Planner")); 
-
+const ContentGenerationResult = lazy(() => import("./Components/User/Content/ContentGenerationResult")); 
 
 function App() {
   return (
@@ -48,11 +48,10 @@ function App() {
 
             <Route path="/social/GeneratePost" element={<GeneratePost />} />
             <Route path="/social/GeneratedPostResult/:id" element={<GeneratedPostResult />} />
- 
             <Route path="/social/Planner" element={<Planner />} />
             
             <Route path="/content/ContentGeneration" element={<ContentGeneration />} />
-            
+            <Route path="/content/ContentGenerationResult" element={<ContentGenerationResult />} />
       
             
           </Route>
