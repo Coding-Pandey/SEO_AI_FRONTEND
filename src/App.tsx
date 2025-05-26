@@ -5,7 +5,6 @@ import Loading from "./Components/Page/Loading/Loading";
 import PageNotFound from "./Components/Page/PageNotFound";
 import ProtectedRoutes from "./ProtectedRoutes/ProtectedRoutes";
 import Logout from "./Components/Page/Logout";
- 
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
@@ -21,6 +20,8 @@ const SuggestionsResultById = lazy(() => import("./Components/User/SeoProcess/Su
 const CampaignSuggestionById = lazy(() => import("./Components/User/PPC/CampaignSuggestionById")); 
 const Planner = lazy(() => import("./Components/User/SocialMedia/Planner")); 
 const ContentGenerationResult = lazy(() => import("./Components/User/Content/ContentGenerationResult")); 
+const ContentSuggestionResult = lazy(() => import("./Components/User/Content/ContentSuggestionResult")); 
+const ContentPreviousList = lazy(() => import("./Components/User/Content/ContentPreviousList")); 
 
 function App() {
   return (
@@ -52,8 +53,8 @@ function App() {
             
             <Route path="/content/ContentGeneration" element={<ContentGeneration />} />
             <Route path="/content/ContentGenerationResult" element={<ContentGenerationResult />} />
-      
-            
+            <Route path="/content/ContentSuggestionResult" element={<ContentSuggestionResult />} />
+             <Route path="/content/ContentPreviousList/:id" element={<ContentPreviousList />} />
           </Route>
 
           {/* 404 Route */}

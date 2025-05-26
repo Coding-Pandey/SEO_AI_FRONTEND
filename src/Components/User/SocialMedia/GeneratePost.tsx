@@ -44,8 +44,20 @@ const GeneratePost = () => {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+    // if (e.target.files && e.target.files.length > 0) {
+    //   setFile(e.target.files[0]);
+    // }
+    const file = e.target.files?.[0];
+    const allowedExtensions = /(\.doc|\.docx)$/i;
+
+    if (file) {
+      if (!allowedExtensions.test(file.name)) {
+        toast.error("Only .doc and .docx files are allowed!");
+        e.target.value = "";
+        return;
+      }
+
+      setFile(file); // Your state setter
     }
   };
 
@@ -242,6 +254,7 @@ const GeneratePost = () => {
                             type="file"
                             id="post_upload"
                             onChange={handleFileChange}
+                            accept=".doc,.docx"
                           />
                           <div className="doc_left">
                             <p className="font_16 mb-1">

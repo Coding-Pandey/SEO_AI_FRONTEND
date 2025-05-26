@@ -1477,6 +1477,14 @@ form .row {
 }
 
 
+.new-section {
+  background-color: #aeddf5;  
+  border: 1px solid #7dc9f8;
+  transition: background-color 0.6s ease;
+}
+
+
+
 /* Create content end */
 
 

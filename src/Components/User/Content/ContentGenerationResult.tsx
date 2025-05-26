@@ -1,42 +1,52 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { toast } from "react-toastify";
 import TitleOrFileUpdateModal from "../../Page/TitleOrFileUpdateModal";
+import Loading from "../../Page/Loading/Loading";
+import { MoreGenerateSuggestion } from "./ContentServices";
 
 const ContentGenerationResult = () => {
   const location = useLocation();
-  //   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [generateKeywordDetails, setGenerateKeywordDetails] = useState<any>({});
-//   const [FormPreDetails, setFormPreDetails] = useState<any>(null);
+  const [FormPreDetails, setFormPreDetails] = useState<any>(null);
   const [sections, setSections] = useState<any>([]);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [editSection, setEditSection] = useState<any>({});
   const [showModal, setShowModal] = useState<boolean>(false);
   const [modalTitleValue, setModalTitleValue] = useState<string>("");
   const [Message, setMessage] = useState<string>("");
-  console.log(generateKeywordDetails);
+  const [loadingData, setloadingData] = useState<boolean>(false);
+
+  // console.log(generateKeywordDetails, "generateKeywordDetails");
 
   useEffect(() => {
-    // if (location.state) {
-    const storedData = localStorage.getItem("keywordToolResult");
-    // const formDataDetail = localStorage.getItem("FormDataDetails");
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      const updatedData = {
-        ...parsedData,
-        data: {
-          ...parsedData.data,
-          id: "12",
-        },
-      };
-      localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
-      setGenerateKeywordDetails(updatedData);
-      setSections(updatedData?.data?.Sections);
-    //   setFormPreDetails(formDataDetail);
+    if (location.state) {
+      const storedData = localStorage.getItem("keywordToolResult");
+
+      const formDataDetail = localStorage.getItem("FormDataDetails");
+      if (formDataDetail) {
+        const parsedFormData = JSON.parse(formDataDetail);
+        setFormPreDetails(parsedFormData);
+      }
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+
+        const updatedData = {
+          ...parsedData,
+          data: {
+            ...parsedData.data,
+            id: "12",
+          },
+        };
+        localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
+        setGenerateKeywordDetails(updatedData);
+        setSections(updatedData?.data?.Sections);
+      }
     }
-    // }
   }, [location.state]);
 
   const handleEdit = (section: any) => {
@@ -86,6 +96,7 @@ const ContentGenerationResult = () => {
       },
     };
     localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
+    setGenerateKeywordDetails(updatedData);
   };
 
   const handleInputChange = (
@@ -183,26 +194,77 @@ const ContentGenerationResult = () => {
     setMessage("Add More");
     setEditSection(newSection);
     setEditModalOpen(true);
+  };
 
-    //   // add to local sections array (you can push this after editing too, depending on logic)
-    //   setSections((prevSections: any[]) => [...prevSections, newSection]);
+  const handleAddSection = async () => {
+    try {
+      const Instructions = FormPreDetails?.AddInstructions;
+      const preUploadFile = FormPreDetails?.temp_file_path;
 
-    //   // update localStorage immediately if needed
-    //   const updatedData = {
-    //     ...generateKeywordDetails,
-    //     data: {
-    //       ...generateKeywordDetails.data,
-    //       Sections: [...sections, newSection],
-    //     },
-    //   };
+      const formData = new FormData();
+      // formData.append("file_name", FileName);
+      // formData.append("content_type", String(contentType));
+      // formData.append("objectives", JSON.stringify(PostObjectives));
+      // formData.append("audience", JSON.stringify(TargetAudience));
+      // formData.append("links", JSON.stringify(links));
+      formData.append("generated_blog", generateKeywordDetails);
+      formData.append("text_data", Instructions);
+      formData.append("file_path", preUploadFile);
+      setloadingData(true);
+      const response = await MoreGenerateSuggestion(formData);
+      if (response.status === 200 || response.status === 201) {
+        const newSectionsWithId = response.data.Sections.map(
+          (section: any) => ({
+            ...section,
+            section_id: Math.floor(Math.random() * 1000000),
+            color: "new",
+          })
+        );
 
-    //   localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
-    //   setGenerateKeywordDetails(updatedData);
+        const updatedData = {
+          ...generateKeywordDetails,
+          data: {
+            ...generateKeywordDetails.data,
+            Sections: [
+              ...(generateKeywordDetails.data.Sections || []),
+              ...newSectionsWithId,
+            ],
+          },
+        };
+
+        // // Save updated section IDs for highlighting
+        // const newIds = newSectionsWithId.map((section) => section.section_id);
+        // setNewSectionIds(newIds);
+        setSections([
+          ...(generateKeywordDetails.data.Sections || []),
+          ...newSectionsWithId,
+        ]);
+        localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
+        setGenerateKeywordDetails(updatedData);
+      }
+    } catch (error) {
+      console.log("Error during handleAddSection", error);
+    } finally {
+      setloadingData(false);
+    }
+  };
+
+  const AddGenerate = async () => {
+    try {
+      setloadingData(true);
+      const dataResult = generateKeywordDetails;
+      localStorage.setItem("ClusterData", JSON.stringify(dataResult));
+      navigate("/content/ContentSuggestionResult", { state: dataResult });
+    } catch (error) {
+      console.log("Error during AddGenerate", error);
+    } finally {
+      setloadingData(false);
+    }
   };
 
   return (
     <>
-      {/* {loadingData && <Loading />} */}
+      {loadingData && <Loading />}
       <Header />
       <main className="main_wrapper">
         <SideBar />
@@ -373,7 +435,9 @@ const ContentGenerationResult = () => {
                           )}
                           {sections?.map((section: any) => (
                             <div
-                              className="content_item_box"
+                              className={`content_item_box ${
+                                section.color === "new" ? "new-section" : ""
+                              }`}
                               key={section.section_id}
                             >
                               <div className="content_item_header">
@@ -400,14 +464,18 @@ const ContentGenerationResult = () => {
                                 </div>
                               </div>
                               <div className="content_body">
-                                <p className="font_16">{section.Content}</p>
+                                {/* <p className="font_16">{section.Content}</p> */}
+                                <ReactMarkdown>{section.Content}</ReactMarkdown>
                               </div>
                             </div>
                           ))}
                         </div>
 
                         <div className="content_suggest_btn">
-                          <button className="btn primary_btn_outline">
+                          <button
+                            className="btn primary_btn_outline"
+                            onClick={handleAddSection}
+                          >
                             Suggest more
                           </button>
                           <button
@@ -420,7 +488,10 @@ const ContentGenerationResult = () => {
                       </div>
 
                       <div className="card-footer text-center">
-                        <button className="btn primary_btn content_gen_btn">
+                        <button
+                          className="btn primary_btn content_gen_btn"
+                          onClick={AddGenerate}
+                        >
                           Generate
                         </button>
                       </div>

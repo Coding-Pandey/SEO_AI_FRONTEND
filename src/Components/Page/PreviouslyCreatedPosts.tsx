@@ -65,9 +65,6 @@ const PreviouslyCreatedPosts: React.FC<Props> = ({ posts, onDelete,onNavigate })
                   <button
                     className="btn primary_btn"
                     disabled={isExpired}
-                    // onClick={() =>
-                    //   navigate(`/social/GeneratedPostResult/${item.uuid}`)
-                    // }
                     onClick={() => onNavigate(item.uuid)}
                     style={{
                       opacity: isExpired ? 0.5 : 1,

@@ -35,7 +35,7 @@ const ContentGeneration = () => {
   const [TargetAudience, setTargetAudience] = useState<string[]>([]);
   const [AddInstructions, setAddInstructions] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
 
@@ -51,6 +51,7 @@ const ContentGeneration = () => {
       // console.log(responseForm.data, "responseForm");
       if (response.status === 200 || response.status === 201) {
         setContentData(response.data);
+        // console.log(responseForm,"responseForm")
         setFormDynamictData(responseForm.data);
       }
     } catch (error: any) {
@@ -88,7 +89,7 @@ const ContentGeneration = () => {
   };
 
   const handleNavigate = (id: string) => {
-    navigate(`/ppc/ContentGenerationById/${id}`);
+    navigate(`/content/ContentPreviousList/${id}`);
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -139,9 +140,7 @@ const ContentGeneration = () => {
   //   setUploadedFiles((prev) => [...prev, ...validFiles]);
   // };
 
-  
- 
-   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
@@ -165,8 +164,6 @@ const ContentGeneration = () => {
       fileInputRef.current.value = "";
     }
   };
- 
-
 
   const handleAddLink = () => {
     const trimmedLink = linkInput.trim();
@@ -223,17 +220,33 @@ const ContentGeneration = () => {
       formData.append("content_type", String(contentType));
       formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
-      formData.append("text_data", AddInstructions); 
+      formData.append("text_data", AddInstructions);
+      let newFileUpload;
       if (uploadedFiles.length > 0) {
-        formData.append("file", uploadedFiles[0]);
+        const file = uploadedFiles[0];
+        formData.append("file", file);
+        newFileUpload = file.name;
       }
       formData.append("links", JSON.stringify(links));
+      const newFormData = {
+        FileName,
+        contentType,
+        PostObjectives,
+        TargetAudience,
+        AddInstructions,
+        uploadedFiles: newFileUpload,
+        links,
+      };
       const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
         // console.log("response.data",response.data)
-        const dataResult=response.data
+        const dataResult = response.data;
+        const tempfile = {
+          ...newFormData,
+          temp_file_path: response?.data?.temp_file_path,
+        };
         localStorage.setItem("keywordToolResult", JSON.stringify(dataResult));
-        localStorage.setItem("FormDataDetails", JSON.stringify(formData));
+        localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
         navigate("/content/ContentGenerationResult", { state: dataResult });
       }
     } catch (error: any) {
@@ -257,7 +270,7 @@ const ContentGeneration = () => {
                   src="/assets/images/content_icon.png"
                   alt="icon"
                   className="img-fluid heading_icon"
-                   style={{marginRight:"10px"}}
+                  style={{ marginRight: "10px" }}
                 />
                 Content Generator{" "}
               </h2>
@@ -461,7 +474,7 @@ const ContentGeneration = () => {
                                 type="file"
                                 id="post_upload"
                                 accept=".doc,.docx"
-                                 ref={fileInputRef}
+                                ref={fileInputRef}
                                 // multiple
                                 onChange={handleFileChange}
                               />
