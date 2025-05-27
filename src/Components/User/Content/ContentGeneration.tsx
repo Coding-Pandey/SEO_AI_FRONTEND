@@ -18,6 +18,7 @@ import {
   GetContentPreviousList,
   GetFormDetails,
 } from "./ContentServices";
+import ContentForm from "./ContentForm";
 
 interface contentData {
   uuid: string;
@@ -35,9 +36,11 @@ const ContentGeneration = () => {
   const [TargetAudience, setTargetAudience] = useState<string[]>([]);
   const [AddInstructions, setAddInstructions] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [FileUrl, setFileUrl] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
+ 
 
   useEffect(() => {
     fetchGenerateData();
@@ -213,7 +216,7 @@ const ContentGeneration = () => {
         );
         return;
       }
-
+      setFileUrl([])
       setLoadingData(true);
       const formData = new FormData();
       formData.append("file_name", FileName);
@@ -239,11 +242,11 @@ const ContentGeneration = () => {
       };
       const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
-        // console.log("response.data",response.data)
+        console.log("response.data",response.data)
         const dataResult = response.data;
         const tempfile = {
           ...newFormData,
-          temp_file_path: response?.data?.temp_file_path,
+          temp_file_path:dataResult.temp_file_path,
         };
         localStorage.setItem("keywordToolResult", JSON.stringify(dataResult));
         localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
@@ -284,281 +287,34 @@ const ContentGeneration = () => {
                   onDelete={handleDelete}
                   onNavigate={handleNavigate}
                 />
-
+ 
                 {/* Right Form Panel */}
                 <div className="col-12 col-xl-7">
-                  <form onSubmit={handleGenerateSubmit}>
-                    {!contentType ? (
-                      <div className="row content_select mb-3">
-                        <div className="col-12">
-                          <select
-                            className="form-select"
-                            aria-label="Default select example"
-                            value={contentType}
-                            onChange={handleSelectChange}
-                          >
-                            <option value="">Content Type</option>
-                            {FormDynamictData?.content_types?.map(
-                              (item: any) => (
-                                <option key={item.id} value={item.id}>
-                                  {item.content_type}
-                                </option>
-                              )
-                            )}
-                          </select>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {PostObjectives?.length > 10 && (
-                          <p className="keyword_error font_16">
-                            Error: Limit Reached: Please enter no more than 10
-                            keywords
-                          </p>
-                        )}
-
-                        <div className="row content_type">
-                          <div className="col-12">
-                            <label
-                              htmlFor="generate_post_name"
-                              className="font_20 font_500 mb-2"
-                            >
-                              Name your information page*
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="generate_post_name"
-                              placeholder="Enter Page Name"
-                              value={FileName}
-                              onChange={(e) => setFileName(e.target.value)}
-                            />
-                          </div>
-
-                          <div className="col-12">
-                            <select
-                              className="form-select"
-                              aria-label="Default select example"
-                              value={contentType}
-                              onChange={handleSelectChange}
-                            >
-                              {FormDynamictData?.content_types?.map(
-                                (item: any) => (
-                                  <option key={item.id} value={item.id}>
-                                    {item.content_type}
-                                  </option>
-                                )
-                              )}
-                            </select>
-                          </div>
-
-                          {/* Post Objective */}
-                          <div className="col-12">
-                            <div className="multicheckbox">
-                              <div
-                                className={`form_input ${
-                                  PostObjectives?.length > 10
-                                    ? "error-border"
-                                    : ""
-                                }`}
-                              >
-                                <h3 className="font_20 font_500 mb-3">
-                                  Define Post Objective
-                                </h3>
-                                <div className="row mb-2">
-                                  {[
-                                    "Educate the Audience",
-                                    "Facilitate Next Steps",
-                                    "Establish Credibility",
-                                    "Guide Decision-Making",
-                                    "Compare & Contrast",
-                                    "Support Brand Voice & Tone",
-                                    "Drive Engagement",
-                                    "Demonstrate Authority",
-                                  ].map((label, index) => {
-                                    const value = label
-                                      .toLowerCase()
-                                      .replace(/\s+/g, "_");
-                                    return (
-                                      <div
-                                        className="col-12 col-lg-6"
-                                        key={index}
-                                      >
-                                        <input
-                                          type="checkbox"
-                                          id={`objective${index}`}
-                                          name={`objective${index}`}
-                                          value={value}
-                                          checked={PostObjectives.includes(
-                                            value
-                                          )}
-                                          onChange={handleObjectiveChange}
-                                        />
-                                        <label
-                                          htmlFor={`objective${index}`}
-                                          className="font_16 ms-1"
-                                        >
-                                          {label}
-                                        </label>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-
-                              {/* Target Audience */}
-                              <div className="form_input">
-                                <h3 className="font_20 font_500 mb-3">
-                                  Target Audience
-                                </h3>
-                                <div className="row mb-2">
-                                  {[
-                                    "Buyer Persona 1 - First Last Name",
-                                    "Buyer Persona 2 - First Last Name",
-                                    "Buyer Persona 3 - First Last Name",
-                                    "General Industry Audience",
-                                  ].map((label, index) => (
-                                    <div className="col-12" key={index}>
-                                      <input
-                                        type="checkbox"
-                                        id={`persona${index}`}
-                                        name={`persona${index}`}
-                                        value={label}
-                                        checked={TargetAudience.includes(label)}
-                                        onChange={handleTargetAudience}
-                                      />
-                                      <label
-                                        htmlFor={`persona${index}`}
-                                        className="font_16 ms-1"
-                                      >
-                                        {label}
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Textarea */}
-                          <div className="col-12">
-                            <label
-                              htmlFor="post_msg"
-                              className="font_20 font_500 mb-2"
-                            >
-                              Add more context/ instructions
-                            </label>
-                            <textarea
-                              className="form-control"
-                              placeholder="Describe your message"
-                              id="post_msg"
-                              style={{ height: "120px" }}
-                              value={AddInstructions}
-                              onChange={(e) =>
-                                setAddInstructions(e.target.value)
-                              }
-                            ></textarea>
-                          </div>
-
-                          {/* File Upload */}
-                          <div className="col-12">
-                            <label
-                              htmlFor="post_upload"
-                              className="font_20 font_500 mb-2"
-                            >
-                              Upload Campaign Files
-                            </label>
-                            <div className="doc_file_wrapper">
-                              <input
-                                className="form-control upload_input"
-                                type="file"
-                                id="post_upload"
-                                accept=".doc,.docx"
-                                ref={fileInputRef}
-                                // multiple
-                                onChange={handleFileChange}
-                              />
-                              <div className="doc_left">
-                                <p className="font_16 mb-1">
-                                  Drag and drop files here or{" "}
-                                  <span className="text_blue">browse</span> to
-                                  upload
-                                </p>
-                              </div>
-                            </div>
-
-                            <ul className="upload_content_item file_upload_list">
-                              {uploadedFiles.map((file, index) => (
-                                <li key={index}>
-                                  <span>
-                                    <i className="bi bi-file-earmark-doc-fill me-1"></i>{" "}
-                                    {file.name}
-                                  </span>
-                                  <button
-                                    className="btn text_orange font_20 pe-0"
-                                    aria-label="remove_icon"
-                                    onClick={() => handleRemoveFile(index)}
-                                  >
-                                    <i className="bi bi-x"></i>
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="col-12">
-                            <label
-                              htmlFor="add_link"
-                              className="font_20 font_500 mb-2"
-                            >
-                              Add Links
-                            </label>
-                            <div className="add_link_wrapper">
-                              <input
-                                className="form-control link_input"
-                                type="text"
-                                id="add_link"
-                                value={linkInput}
-                                onChange={handleInputChange}
-                                onKeyDown={handleKeyDown}
-                                placeholder="Enter URL here"
-                              />
-                              <button
-                                className="btn primary_btn_outline"
-                                onClick={handleAddButtonClick}
-                                type="button"
-                              >
-                                Add
-                              </button>
-                            </div>
-
-                            <ul className="upload_content_item links_upload_list">
-                              {links.map((link, index) => (
-                                <li key={index}>
-                                  <span>
-                                    <i className="bi bi-link me-1"></i> {link}
-                                  </span>
-                                  <button
-                                    className="btn text_orange font_20 pe-0"
-                                    aria-label="remove_icon"
-                                    onClick={() => handleRemoveLink(index)}
-                                  >
-                                    <i className="bi bi-x"></i>
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="col-12">
-                            <button className="btn primary_btn" type="submit">
-                              Generate
-                            </button>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </form>
+                  <ContentForm
+                    contentType={String(contentType)}
+                    FileName={FileName}
+                    PostObjectives={PostObjectives}
+                    TargetAudience={TargetAudience}
+                    AddInstructions={AddInstructions}
+                    uploadedFiles={uploadedFiles}
+                    FileUrl={FileUrl}
+                    linkInput={linkInput}
+                    links={links}
+                    FormDynamictData={FormDynamictData}
+                    handleSelectChange={handleSelectChange}
+                    handleObjectiveChange={handleObjectiveChange}
+                    handleTargetAudience={handleTargetAudience}
+                    setFileName={setFileName}
+                    setAddInstructions={setAddInstructions}
+                    fileInputRef={fileInputRef}
+                    handleFileChange={handleFileChange}
+                    handleRemoveFile={handleRemoveFile}
+                    handleInputChange={handleInputChange}
+                    handleKeyDown={handleKeyDown}
+                    handleAddButtonClick={handleAddButtonClick}
+                    handleRemoveLink={handleRemoveLink}
+                    handleGenerateSubmit={handleGenerateSubmit}
+                  />
                 </div>
               </div>
             </div>

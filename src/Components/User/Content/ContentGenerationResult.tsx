@@ -1,12 +1,24 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
-import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "react-toastify";
 import TitleOrFileUpdateModal from "../../Page/TitleOrFileUpdateModal";
 import Loading from "../../Page/Loading/Loading";
-import { MoreGenerateSuggestion } from "./ContentServices";
+import {
+  EditGenerateContent,
+  GetFormDetails,
+  MoreGenerateSuggestion,
+} from "./ContentServices";
+import ContentForm from "./ContentForm";
 
 const ContentGenerationResult = () => {
   const location = useLocation();
@@ -20,17 +32,57 @@ const ContentGenerationResult = () => {
   const [modalTitleValue, setModalTitleValue] = useState<string>("");
   const [Message, setMessage] = useState<string>("");
   const [loadingData, setloadingData] = useState<boolean>(false);
+  const [FormDynamictData, setFormDynamictData] = useState<any>({});
+  const [contentType, setContentType] = useState<number | "">("");
+  const [FileName, setFileName] = useState<string>("");
+  const [PostObjectives, setPostObjectives] = useState<string[]>([]);
+  const [TargetAudience, setTargetAudience] = useState<string[]>([]);
+  const [AddInstructions, setAddInstructions] = useState<string>("");
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [FileUrl, setFileUrl] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [linkInput, setLinkInput] = useState<string>("");
+  const [links, setLinks] = useState<string[]>([]);
+  const [EditFormOpen, setEditFormOpen] = useState<boolean>(false);
+console.log(generateKeywordDetails,"generateKeywordDetails")
+ 
 
-  // console.log(generateKeywordDetails, "generateKeywordDetails");
+  useEffect(() => {
+    fetchGenerateData();
+  }, []);
+
+  const fetchGenerateData = async () => {
+    try {
+      setloadingData(true);
+      const responseForm = await GetFormDetails();
+      if (responseForm.status === 200 || responseForm.status === 201) {
+        setFormDynamictData(responseForm.data);
+      }
+    } catch (error: any) {
+      console.error("Error fetchPPCClusterData:", error);
+    } finally {
+      setloadingData(false);
+    }
+  };
 
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("keywordToolResult");
 
       const formDataDetail = localStorage.getItem("FormDataDetails");
+
       if (formDataDetail) {
         const parsedFormData = JSON.parse(formDataDetail);
         setFormPreDetails(parsedFormData);
+        setFileName(parsedFormData?.FileName || "");
+        setContentType(parsedFormData?.contentType || "");
+        setPostObjectives(parsedFormData?.PostObjectives || []);
+        setTargetAudience(parsedFormData?.TargetAudience || []);
+        setAddInstructions(parsedFormData?.AddInstructions || "");
+        setLinks(parsedFormData?.links || []);
+        if (parsedFormData?.temp_file_path?.length > 0) {
+          setFileUrl([parsedFormData?.temp_file_path]);
+        }
       }
       if (storedData) {
         const parsedData = JSON.parse(storedData);
@@ -200,7 +252,6 @@ const ContentGenerationResult = () => {
     try {
       const Instructions = FormPreDetails?.AddInstructions;
       const preUploadFile = FormPreDetails?.temp_file_path;
-
       const formData = new FormData();
       // formData.append("file_name", FileName);
       // formData.append("content_type", String(contentType));
@@ -262,6 +313,194 @@ const ContentGenerationResult = () => {
     }
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setContentType(Number(e.target.value));
+  };
+
+  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+
+    setPostObjectives((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, value];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== value);
+      }
+      return updatedObjectives;
+    });
+  };
+
+  const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setTargetAudience((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, value];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== value);
+      }
+      return updatedObjectives;
+    });
+  };
+
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = e.target.files;
+  //   if (!files) return;
+
+  //   // Filter accepted files: .doc, .docx only
+  //   const allowedExtensions = /(\.doc|\.docx)$/i;
+  //   const validFiles = Array.from(files).filter((file) =>
+  //     allowedExtensions.test(file.name)
+  //   );
+
+  //   if (validFiles.length !== files.length) {
+  //     toast.error("Only .doc and .docx files are allowed");
+  //   }
+
+  //   setUploadedFiles((prev) => [...prev, ...validFiles]);
+  // };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const allowedExtensions = /(\.doc|\.docx)$/i;
+
+    if (!allowedExtensions.test(file.name)) {
+      toast.error("Only .doc and .docx files are allowed");
+      return;
+    }
+
+    setUploadedFiles([file]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    setFileUrl((prev) => prev.filter((_, i) => i !== index));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleAddLink = () => {
+    const trimmedLink = linkInput.trim();
+    if (trimmedLink && !links.includes(trimmedLink)) {
+      setLinks([...links, trimmedLink]);
+      setLinkInput("");
+    }
+  };
+
+  const handleRemoveLink = (index: number) => {
+    setLinks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleInputChanges = (e: ChangeEvent<HTMLInputElement>) => {
+    setLinkInput(e.target.value);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddLink();
+    }
+  };
+
+  const handleAddButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    handleAddLink();
+  };
+
+  const handleGenerateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      if (!FileName) {
+        toast.error("Please enter information page name");
+        return;
+      }
+
+      if (PostObjectives.length > 10) {
+        toast.error("Please select a maximum of 10 post keywords");
+        return;
+      }
+
+      if (
+        !AddInstructions.trim() &&
+        uploadedFiles.length === 0 &&
+        FileUrl.length === 0
+      ) {
+        toast.error(
+          "Please provide additional instructions or upload at least one file"
+        );
+        return;
+      }
+
+      setloadingData(true);
+      const formData = new FormData();
+      formData.append("file_name", FileName);
+      formData.append("content_type", String(contentType));
+      formData.append("objectives", JSON.stringify(PostObjectives));
+      formData.append("audience", JSON.stringify(TargetAudience));
+      formData.append("text_data", AddInstructions);
+      let newFileUpload;
+      if (uploadedFiles.length > 0) {
+        const file = uploadedFiles[0];
+        formData.append("file", file);
+        newFileUpload = file.name;
+      }
+      // if (FileUrl.length > 0) {
+      //   const tempFile = FileUrl[0];
+      //   formData.append("temp_file_path", tempFile);
+      // }
+      formData.append("temp_file_path", generateKeywordDetails?.temp_file_path);
+      formData.append("links", JSON.stringify(links));
+      const newFormData = {
+        FileName,
+        contentType,
+        PostObjectives,
+        TargetAudience,
+        AddInstructions,
+        uploadedFiles: newFileUpload,
+        links,
+      };
+      const response = await EditGenerateContent(formData);
+      if (response.status === 200 || response.status === 201) {
+        const dataResult = response.data;
+        console.log(dataResult,"dataResult");
+        const tempfile = {
+          ...newFormData,
+          temp_file_path: dataResult?.temp_file_path,
+        };
+        const updatedNewData = {
+          ...dataResult,
+          data: {
+            ...dataResult.data,
+            id: "12",
+          },
+        };
+        localStorage.setItem(
+          "keywordToolResult",
+          JSON.stringify(updatedNewData)
+        );
+        localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
+        setFileUrl([dataResult?.temp_file_path])
+        setGenerateKeywordDetails(updatedNewData);
+        setSections(updatedNewData?.data?.Sections);
+        setEditFormOpen(false);
+        toast.success("Updated Successfully");
+      }
+    } catch (error: any) {
+      console.error("Error handle Generate Submit:", error);
+    } finally {
+      setloadingData(false);
+    }
+  };
+
   return (
     <>
       {loadingData && <Loading />}
@@ -296,8 +535,48 @@ const ContentGenerationResult = () => {
               </button>
             </h2>
           </div>
-
-          {editModalOpen ? (
+          {EditFormOpen ? (
+            <div className="generate_post_form keyword_search_form">
+              <div className="row justify-content-center gy-3">
+                <div className="col-12 col-xl-7 card_box box-shadow p-0">
+                  <div className="text-end">
+                    <button
+                      className="btn text_orange font_20 close_btn"
+                      aria-label="remove_icon"
+                      onClick={() => setEditFormOpen(false)}
+                    >
+                      <i className="bi bi-x"></i>
+                    </button>
+                  </div>
+                  <ContentForm
+                    contentType={String(contentType)}
+                    FileName={FileName}
+                    PostObjectives={PostObjectives}
+                    TargetAudience={TargetAudience}
+                    AddInstructions={AddInstructions}
+                    uploadedFiles={uploadedFiles}
+                    FileUrl={FileUrl}
+                    linkInput={linkInput}
+                    links={links}
+                    FormDynamictData={FormDynamictData}
+                    handleSelectChange={handleSelectChange}
+                    handleObjectiveChange={handleObjectiveChange}
+                    handleTargetAudience={handleTargetAudience}
+                    setFileName={setFileName}
+                    setAddInstructions={setAddInstructions}
+                    fileInputRef={fileInputRef}
+                    handleFileChange={handleFileChange}
+                    handleRemoveFile={handleRemoveFile}
+                    handleInputChange={handleInputChanges}
+                    handleKeyDown={handleKeyDown}
+                    handleAddButtonClick={handleAddButtonClick}
+                    handleRemoveLink={handleRemoveLink}
+                    handleGenerateSubmit={handleGenerateSubmit}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : editModalOpen ? (
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -369,7 +648,12 @@ const ContentGenerationResult = () => {
                 <div className="col-12 col-xl-7">
                   <div className="d-flex justify-content-between mb-3">
                     <h3 className="font_25 font_600 mb-0">Draft</h3>
-                    <button className="btn primary_btn_outline">Edit</button>
+                    <button
+                      className="btn primary_btn_outline"
+                      onClick={() => setEditFormOpen(true)}
+                    >
+                      Edit
+                    </button>
                   </div>
 
                   {generateKeywordDetails && (
@@ -436,7 +720,7 @@ const ContentGenerationResult = () => {
                           {sections?.map((section: any) => (
                             <div
                               className={`content_item_box ${
-                                section.color === "new" ? "new-section" : ""
+                                section.color === "new" ? "active" : ""
                               }`}
                               key={section.section_id}
                             >
@@ -464,7 +748,6 @@ const ContentGenerationResult = () => {
                                 </div>
                               </div>
                               <div className="content_body">
-                                {/* <p className="font_16">{section.Content}</p> */}
                                 <ReactMarkdown>{section.Content}</ReactMarkdown>
                               </div>
                             </div>

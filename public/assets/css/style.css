@@ -1361,6 +1361,7 @@ form .row {
     font-size: 16px;
     line-height: 22px;
     border: 2px solid #e7e7e7;
+    word-break: break-all;
 }
 
 .draft_card {

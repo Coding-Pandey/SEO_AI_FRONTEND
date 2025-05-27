@@ -30,6 +30,15 @@ export const GetFormDetails = async () => {
   }
 };
 
+  export const EditGenerateContent = async (formData:any) => {
+  try { 
+    const response = await axiosInstance.post(`/api/edit_content_generation`,formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const deleteContentPreviousList = async (formData: { uuid: string }) => {
   try {
     const response = await axiosInstance.delete("/api/content_delete_data", {

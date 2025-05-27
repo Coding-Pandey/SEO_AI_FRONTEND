@@ -51,7 +51,7 @@ const TitleOrFileUpdateModal: React.FC<EditTitleModalProps> = ({
           <label className="pb-2 font_25">{message}:</label>
           <textarea
             className="form-control mb-3"
-            rows={3}
+            rows={6}
             value={modalTitleValue}
             onChange={(e) => setModalTitleValue(e.target.value)}
             required
