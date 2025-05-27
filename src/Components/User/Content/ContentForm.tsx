@@ -19,7 +19,7 @@ interface ContentFormProps {
   setAddInstructions: (val: string) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleRemoveFile: (index: number) => void;
+  handleRemoveFile: (index: number, message: string) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleAddButtonClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -238,7 +238,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
                     <button
                       className="btn text_orange font_20 pe-0"
                       aria-label="remove_icon"
-                      onClick={() => handleRemoveFile(index)}
+                      onClick={() => handleRemoveFile(index, "upload")}
                     >
                       <i className="bi bi-x"></i>
                     </button>
@@ -257,7 +257,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
                         type="button"
                         className="btn text_orange font_20 pe-0"
                         aria-label="remove_icon"
-                        onClick={() => handleRemoveFile(index)}
+                        onClick={() => handleRemoveFile(index, "fileurl")}
                       >
                         <i className="bi bi-x"></i>
                       </button>

@@ -44,8 +44,7 @@ const ContentGenerationResult = () => {
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
   const [EditFormOpen, setEditFormOpen] = useState<boolean>(false);
-console.log(generateKeywordDetails,"generateKeywordDetails")
- 
+  console.log(generateKeywordDetails, "generateKeywordDetails");
 
   useEffect(() => {
     fetchGenerateData();
@@ -379,9 +378,13 @@ console.log(generateKeywordDetails,"generateKeywordDetails")
     }
   };
 
-  const handleRemoveFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
-    setFileUrl((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveFile = (index: number, message: string) => {
+    if (message === "fileurl") {
+      setFileUrl((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -471,7 +474,7 @@ console.log(generateKeywordDetails,"generateKeywordDetails")
       const response = await EditGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
         const dataResult = response.data;
-        console.log(dataResult,"dataResult");
+        console.log(dataResult, "dataResult");
         const tempfile = {
           ...newFormData,
           temp_file_path: dataResult?.temp_file_path,
@@ -488,7 +491,7 @@ console.log(generateKeywordDetails,"generateKeywordDetails")
           JSON.stringify(updatedNewData)
         );
         localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
-        setFileUrl([dataResult?.temp_file_path])
+        setFileUrl([dataResult?.temp_file_path]);
         setGenerateKeywordDetails(updatedNewData);
         setSections(updatedNewData?.data?.Sections);
         setEditFormOpen(false);

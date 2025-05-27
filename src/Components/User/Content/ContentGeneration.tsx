@@ -40,7 +40,6 @@ const ContentGeneration = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
- 
 
   useEffect(() => {
     fetchGenerateData();
@@ -161,8 +160,11 @@ const ContentGeneration = () => {
     }
   };
 
-  const handleRemoveFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveFile = (index: number, message: string) => {
+    if (message === "upload") {
+      setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -216,7 +218,7 @@ const ContentGeneration = () => {
         );
         return;
       }
-      setFileUrl([])
+      setFileUrl([]);
       setLoadingData(true);
       const formData = new FormData();
       formData.append("file_name", FileName);
@@ -242,11 +244,11 @@ const ContentGeneration = () => {
       };
       const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
-        console.log("response.data",response.data)
+        console.log("response.data", response.data);
         const dataResult = response.data;
         const tempfile = {
           ...newFormData,
-          temp_file_path:dataResult.temp_file_path,
+          temp_file_path: dataResult.temp_file_path,
         };
         localStorage.setItem("keywordToolResult", JSON.stringify(dataResult));
         localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
@@ -287,7 +289,7 @@ const ContentGeneration = () => {
                   onDelete={handleDelete}
                   onNavigate={handleNavigate}
                 />
- 
+
                 {/* Right Form Panel */}
                 <div className="col-12 col-xl-7">
                   <ContentForm
