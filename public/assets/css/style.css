@@ -1496,6 +1496,14 @@ form .row {
     }
 }
 
+@media only screen and (max-width:767px) {
+    .upload_content_item li {
+        width: 100%;
+        font-size: 14px;
+        line-height: 20px;
+    }
+}
+
 
 @media only screen and (max-width:1599px) {
     .post_list_content table th {
@@ -2164,4 +2172,255 @@ form .row {
 
 .schedule_box p {
   margin-bottom: 12px;
+}
+
+.nav-link.active i {
+    color: var(--secondary-color);
+}
+
+.nav-link:focus-visible {
+    box-shadow: none;
+}
+
+
+.settings_tabs_wrapper {
+    height: 400px;
+    position: sticky;
+    top: 80px;
+}
+
+
+.settings_tabs_wrapper .nav-pills .nav-link.active,
+.settings_tabs_wrapper .nav-pills .show>.nav-link {
+    background-color: transparent;
+    color: var(--secondary-color);
+}
+
+.settings_tabs_wrapper .nav-pills .nav-link.active i {
+    color: var(--secondary-color);
+}
+
+.settings_tabs_wrapper .nav-pills .nav-link {
+    color: var(--black-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.settings_tabs_wrapper .nav-pills {
+    row-gap: 5px;
+}
+
+.profile_content .profile_pic {
+    width: 120px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+.setting_tab_content form {
+    row-gap: 25px;
+}
+
+.psw_wrapper {
+    position: relative;
+    width: 450px;
+}
+
+.psw_wrapper i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.intergration_card {
+    position: relative;
+    display: flex;
+    border: 1px solid var(--gray-color);
+    height: 100%;
+    cursor: pointer;
+}
+
+.intergration_card .integrate_btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 18px;
+    line-height: 26px;
+    background: transparent;
+}
+
+.intergration_card .left_part {
+    width: 40px;
+}
+
+img.img-fluid.integrated_icon {
+    width: 30px;
+}
+
+.intergration_card .left_part i {
+    font-size: 20px;
+    line-height: 25px;
+}
+
+.intergration_card .right_part {
+    width: calc(100% - 45px);
+}
+
+.source_modal .schedule_box .ok_btn {
+    padding: 10px !important;
+    width: 150px;
+    height: 120px;
+}
+
+.source_file_wrapper .file_note {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    padding: 12px 12px;
+}
+
+.source_file_wrapper .outer_grid {
+    row-gap: 25px;
+}
+
+.source_file_wrapper .outer_grid .row {
+    row-gap: 15px;
+}
+
+/* .source_file_wrapper .card_box {
+    height: 100%;
+} */
+
+.source_file_wrapper .upload_content_item li {
+    background-color: #f4f4f4;
+    width: 100%;
+    padding: 5px 10px;
+}
+
+.source_file_wrapper .upload_content_item li .btn,
+.source_file_wrapper .upload_content_item li .btn:hover {
+    font-size: 14px;
+    line-height: 18px;
+    padding: 5px 20px;
+}
+
+.source_file_wrapper .upload_content_item .left_part {
+    width: calc(100% - 100px);
+}
+
+.source_file_wrapper .upload_content_item .right_part {
+    width: 100px;
+    display: flex;
+    column-gap: 10px;
+}
+
+.add_media {
+    width: 100%;
+    border: 1px solid gray;
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: gray;
+    margin: 10px 0px;
+    column-gap: 6px;
+    position: relative;
+}
+
+.add_media .media_input {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0px;
+    bottom: 0px;
+    opacity: 0;
+    z-index: 9;
+    cursor: pointer;
+}
+
+.add_media .media_text {
+    display: flex;
+    column-gap: 6px;
+    align-items: center;
+}
+
+/* .source_form_wrapper .doc_file_wrapper {
+    padding: 10px 15px;
+} */
+
+.modal .source_form_wrapper {
+    padding: 30px 40px;
+}
+
+
+.doc_left {
+    width: 100%;
+    text-align: center;
+}
+
+.add_media {
+    cursor: pointer;
+}
+
+
+.modal_btn,
+.modal_btn:hover {
+    width: 130px;
+    height: 110px;
+    font-size: 20px;
+    line-height: 26px;
+    margin-top: 20px;
+}
+
+.modal_close {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    color: var(--primary-color);
+}
+
+
+
+@media only screen and (max-width:1199px) {
+    .settings_tabs_wrapper {
+        height: auto;
+    }
+}
+
+@media only screen and (max-width:767px) {
+    .psw_wrapper {
+        width: 100%;
+    }
+
+    .doc_file_wrapper {
+        padding: 10px 15px;
+    }
+
+}
+
+@media only screen and (max-width:440px) {
+
+    .modal_btn,
+    .modal_btn:hover {
+        width: 100px;
+        height: 90px;
+        font-size: 18px;
+        line-height: 24px;
+    }
+
+    .schedule_box {
+        height: 40vh;
+    }
+
+    .profile_content .profile_pic {
+        width: 90px;
+    }
+
+    .intergration_card {
+        padding: 20px 10px;
+    }
 }

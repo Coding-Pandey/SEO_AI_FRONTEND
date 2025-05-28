@@ -1,33 +1,36 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../../ContextApi/AuthContext/AuthContext";
-import { useEffect } from "react";
-import { GetSocialMediaData } from "../Services/Services";
+import { useEffect, useState } from "react";
+import { GetUserDetails } from "../Services/Services";
 
 const Header = () => {
-  const { users } = useAuth();
-
-  useEffect(() => {
-    fetchPPCClusterData();
-  }, []);
-
-  const fetchPPCClusterData = async () => {
-    try {
-      const response = await GetSocialMediaData();
-      if (response.status === 200 || response.status === 201) {
-        //  console.log(response.data);
-      }
-    } catch (error: any) {
-      
-      console.error("Error fetchPPCClusterData:", error);
-    }  
-  };
+   const [userDetails, setUserDetails] = useState<any>({});
+ 
+   useEffect(() => {
+     fetchUserDetails();
+   }, []);
+ 
+   const fetchUserDetails = async () => {
+     try {
+       const response = await GetUserDetails();
+       if (response.status === 200 || response.status === 201) {
+          console.log(response.data,"Profile");
+          setUserDetails(response.data)
+       }
+     } catch (error: any) {
+       console.error("Error fetchUserDetails:", error);
+     }
+   };
 
   return (
     <header>
       <nav className="navbar navbar-expand-md">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/dashboard">
-            <img  src="/assets/images/logo.svg" className="img-fluid main-logo" alt="logo" />
+            <img
+              src="/assets/images/logo.svg"
+              className="img-fluid main-logo"
+              alt="logo"
+            />
           </Link>
 
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -53,6 +56,11 @@ const Header = () => {
                 <i className="bi bi-bell"></i>
               </Link>
             </li>
+            <li>
+              <Link to="/ProfileSetting" className="nav-link active">
+                <i className="bi bi-gear" aria-label="settings_icons"></i>
+              </Link>
+            </li>
             <li className="nav-item dropdown">
               <Link
                 className="nav-link dropdown-toggle"
@@ -66,9 +74,9 @@ const Header = () => {
                   className="img-fluid profile-icon"
                   alt="profile-icon"
                 />
-                {users?.user?.username &&
-                  users.user.username.charAt(0).toUpperCase() +
-                    users.user.username.slice(1)}
+                {userDetails?.username &&
+                  userDetails?.username.charAt(0).toUpperCase() +
+                    userDetails?.username.slice(1)}
               </Link>
               <ul className="dropdown-menu">
                 <li>
@@ -92,7 +100,11 @@ const Header = () => {
             aria-labelledby="offcanvasExampleLabel"
           >
             <div className="offcanvas-header">
-              <img src="/assets/images/logo.svg" className="img-fluid main-logo" alt="logo" />
+              <img
+                src="/assets/images/logo.svg"
+                className="img-fluid main-logo"
+                alt="logo"
+              />
               <button
                 type="button"
                 className="btn-close"
@@ -155,7 +167,10 @@ const Header = () => {
                       </Link>
                     </li>
                     <li className="dropdown-item">
-                      <Link className="submenu-link active" to="/seo/keywordTool">
+                      <Link
+                        className="submenu-link active"
+                        to="/seo/keywordTool"
+                      >
                         Keyword tool
                       </Link>
                     </li>
@@ -265,7 +280,10 @@ const Header = () => {
                       </Link>
                     </li>
                     <li className="dropdown-item">
-                      <Link className="submenu-link" to="/content/ContentGeneration">
+                      <Link
+                        className="submenu-link"
+                        to="/content/ContentGeneration"
+                      >
                         Content Generation
                       </Link>
                     </li>

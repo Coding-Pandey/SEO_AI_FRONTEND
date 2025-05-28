@@ -108,7 +108,7 @@ const SideBar = () => {
 
       <ul className="nav flex-column sidebar-bottom">
         <li className="sidebar-item">
-          <Link className="nav-link" to="#">
+          <Link className="nav-link" to="/ProfileSetting">
             <i className="bi bi-gear"></i> Settings
           </Link>
         </li>
