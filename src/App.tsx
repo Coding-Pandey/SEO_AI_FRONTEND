@@ -6,6 +6,7 @@ import PageNotFound from "./Components/Page/PageNotFound";
 import ProtectedRoutes from "./ProtectedRoutes/ProtectedRoutes";
 import Logout from "./Components/Page/Logout";
  
+ 
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
@@ -24,7 +25,7 @@ const ContentGenerationResult = lazy(() => import("./Components/User/Content/Con
 const ContentSuggestionResult = lazy(() => import("./Components/User/Content/ContentSuggestionResult")); 
 const ContentPreviousList = lazy(() => import("./Components/User/Content/ContentPreviousList")); 
 const ProfileSetting = lazy(() => import("./Components/User/Pages/ProfileSetting")); 
-
+const ProfileSettingSuccess = lazy(() => import("./Components/User/Pages/ProfileSettingSuccess")); 
 function App() {
   return (
     <>
@@ -59,6 +60,7 @@ function App() {
             <Route path="/content/ContentPreviousList/:id" element={<ContentPreviousList />} />
           
            <Route path="/ProfileSetting" element={<ProfileSetting />} />
+           <Route path="/ProfileSettingSuccess/:category" element={<ProfileSettingSuccess />} />
           
           </Route>
 

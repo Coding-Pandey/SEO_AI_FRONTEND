@@ -5,7 +5,6 @@ import {
   SEOPPCClusterUploadPaylaod,
 } from "../UserInterface/UserInterface";
 
-
 export const GetUserDetails = async () => {
   try {
     const response = await axiosInstance.get("/api/user/info");
@@ -290,72 +289,102 @@ export const GetGeneratedPostById = async (uuid: string) => {
   }
 };
 
-export const deleteSocialMediaPost = async (uuid: string,id: string,platform: string) => {
+export const deleteSocialMediaPost = async (
+  uuid: string,
+  id: string,
+  platform: string
+) => {
   try {
-    const response = await axiosInstance.delete(`/api/socialmedia_${platform}/${uuid}/post/${id}`);
+    const response = await axiosInstance.delete(
+      `/api/socialmedia_${platform}/${uuid}/post/${id}`
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-  export const UpdateImageSocialMedia = async (uuid:string,id:string,platform: string,formData:any) => {
-  try { 
-    const response = await axiosInstance.patch(`/api/socialmedia_${platform}/${uuid}/post/${id}`,formData);
+export const UpdateImageSocialMedia = async (
+  uuid: string,
+  id: string,
+  platform: string,
+  formData: any
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/socialmedia_${platform}/${uuid}/post/${id}`,
+      formData
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-  export const AddScheduleSocialMedia = async (formData:any) => {
-  try { 
-    const response = await axiosInstance.post(`/api/schedule_socialmedia_post`,formData);
+export const AddScheduleSocialMedia = async (formData: any) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/schedule_socialmedia_post`,
+      formData
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
-
-
 
 export const GetPlannerSocialMediaData = async () => {
   try {
-    const response = await axiosInstance.get("/api/socialmedia_scheduled_posts");
+    const response = await axiosInstance.get(
+      "/api/socialmedia_scheduled_posts"
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-export const deletePlannerSocialMediaData = async (posts: string,uuid: string,) => {
+export const deletePlannerSocialMediaData = async (
+  posts: string,
+  uuid: string
+) => {
   try {
-    const response = await axiosInstance.delete(`/api/socialmedia_scheduled_posts/${posts}/${uuid}`);
+    const response = await axiosInstance.delete(
+      `/api/socialmedia_scheduled_posts/${posts}/${uuid}`
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-  export const UpdateScheduleSocialMediaPlanner = async (post:string,uuid:string,formData:any) => {
-  try { 
-    const response = await axiosInstance.patch(`/api/update_scheduled_posts/${post}/${uuid}`,formData);
+export const UpdateScheduleSocialMediaPlanner = async (
+  post: string,
+  uuid: string,
+  formData: any
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/update_scheduled_posts/${post}/${uuid}`,
+      formData
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-
-
-  export const UpdateFileNameSocialMedia = async (uuid:string,formData:any) => {
-  try { 
-    const response = await axiosInstance.patch(`/api/edit_file_name/${uuid}`,formData);
+export const UpdateFileNameSocialMedia = async (
+  uuid: string,
+  formData: any
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/edit_file_name/${uuid}`,
+      formData
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
-
-
-

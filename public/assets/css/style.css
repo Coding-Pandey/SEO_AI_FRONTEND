@@ -1484,6 +1484,24 @@ form .row {
   transition: background-color 0.6s ease;
 }
 
+.connected-message {
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  max-width: 100%;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.connected-message strong {
+  display: inline-block;
+  color: rgb(250, 122, 78); /* Bootstrap primary */
+  font-weight: 600;
+  margin-left: 5px;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
 
 
 /* Create content end */

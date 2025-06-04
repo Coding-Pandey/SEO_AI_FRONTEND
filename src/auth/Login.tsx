@@ -66,7 +66,9 @@ const Login = () => {
         email: profile.email,
         oAuthId: profile.sub,
         role: "user",
+        image_url:profile.picture
       };
+  
       const response = await googleLoginService(userDetails);
       const { access_token, user } = response.data;
       if (response.status === 201 || response.status === 200) {
