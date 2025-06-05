@@ -1502,6 +1502,19 @@ form .row {
   overflow-wrap: break-word;
 }
 
+.uploaded-file-name {
+  font-size: 14px;
+  margin-top: 10px;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  max-width: 100%;
+  word-break: break-all;
+}
+
+
 
 
 /* Create content end */

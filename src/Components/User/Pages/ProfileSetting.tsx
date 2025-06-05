@@ -3,18 +3,48 @@ import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { GetUserDetails } from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
-import { GetConnectIntegrations, GetIntegrationData } from "./ProfileServices";
+import {
+  DeleteSource,
+  GetConnectIntegrations,
+  GetIntegrationData,
+  GetUploadedSourceFile,
+} from "./ProfileServices";
 import IntegrationsTab from "./IntegrationsTab";
 import SourceFileModal from "./SourceFileModal";
-import BuyerPersonaModal from "./BuyerPersonaModal";
+import { toast } from "react-toastify";
+import DeleteConfirmModal from "./DeleteConfirmModal";
+// import BuyerPersonaModal from "./BuyerPersonaModal";
+
+interface FileItem {
+  file_name: string;
+  category: string;
+  uuid_id: string;
+  uploaded_file_name: string;
+}
 
 const ProfileSetting = () => {
   const [userDetails, setUserDetails] = useState<any>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [IntegratedData, setIntegratedData] = useState<any>([]);
+  // const [SourceFileData, setSourceFileData] = useState<any>([]);
+  const [ToneOfVoice, setToneOfVoice] = useState<any>([]);
+  const [IdealCustomerProfile, setIdealCustomerProfile] = useState<any>([]);
+  const [BuyerPersona, setBuyerPersona] = useState<any>([]);
+  const [BrandIdentity, setBrandIdentity] = useState<any>([]);
+  const [Offering, setOffering] = useState<any>([]);
+  const [CommonPainPoints, setCommonPainPoints] = useState<any>([]);
+  const [ValueProposition, setValueProposition] = useState<any>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>("");
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [isBuyerModalOpen, setIsBuyerModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
+  const [FileEditData, setFileEditData] = useState<any>({});
+
+  const openDeleteModal = (uuid: string) => {
+    setSelectedDeleteId(uuid);
+    setIsDeleteModalOpen(true);
+  };
+  // const [isBuyerModalOpen, setIsBuyerModalOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
 
   useEffect(() => {
@@ -26,9 +56,58 @@ const ProfileSetting = () => {
       setIsLoading(true);
       const response = await GetUserDetails();
       const responseSuccess = await GetIntegrationData();
+      const responseUploadFile = await GetUploadedSourceFile();
       if (response.status === 200 || response.status === 201) {
         setIntegratedData(responseSuccess?.data?.integrations);
         setUserDetails(response?.data);
+        const sourceFileList: FileItem[] =
+          responseUploadFile?.data?.uploaded_files;
+        console.log(sourceFileList, "sourceFileList");
+        const toneOfVoiceFiles: FileItem[] = Array.isArray(sourceFileList)
+          ? sourceFileList.filter(
+              (file: FileItem) => file.category === "Tone of voice"
+            )
+          : [];
+        setToneOfVoice(toneOfVoiceFiles);
+        const IdealCustomerFiles: FileItem[] = Array.isArray(sourceFileList)
+          ? sourceFileList.filter(
+              (file: FileItem) => file.category === "Ideal Customer Profile"
+            )
+          : [];
+        setIdealCustomerProfile(IdealCustomerFiles);
+        const BuyerPersonaFiles: FileItem[] = Array.isArray(sourceFileList)
+          ? sourceFileList.filter(
+              (file: FileItem) => file.category === "Buyer Persona"
+            )
+          : [];
+        setBuyerPersona(BuyerPersonaFiles);
+        const BrandIdentityFiles: FileItem[] = Array.isArray(sourceFileList)
+          ? sourceFileList.filter(
+              (file: FileItem) => file.category === "Brand Identity"
+            )
+          : [];
+        setBrandIdentity(BrandIdentityFiles);
+        const OfferingFiles: FileItem[] = Array.isArray(sourceFileList)
+          ? sourceFileList.filter(
+              (file: FileItem) => file.category === "Offering"
+            )
+          : [];
+        setOffering(OfferingFiles);
+        const CommonPainPointsFiles: FileItem[] = Array.isArray(sourceFileList)
+          ? sourceFileList.filter(
+              (file: FileItem) => file.category === "Common Pain Points"
+            )
+          : [];
+        setCommonPainPoints(CommonPainPointsFiles);
+        const ValuePropositionFiles: FileItem[] = Array.isArray(sourceFileList)
+          ? sourceFileList.filter(
+              (file: FileItem) => file.category === "Value Proposition"
+            )
+          : [];
+        setValueProposition(ValuePropositionFiles);
+        setIsDeleteModalOpen(false);
+        setSelectedDeleteId(null);
+        setShowModal(false);
       }
     } catch (error: any) {
       console.error("Error fetchUserDetails:", error);
@@ -52,6 +131,49 @@ const ProfileSetting = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDelete = async (uuid_id: string) => {
+    try {
+      setIsLoading(true);
+      const res = await DeleteSource(uuid_id);
+      if (res.status === 201 || res.status === 200) {
+        fetchUserDetails();
+        toast.success("Source File deleted successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
+    } catch (error) {
+      console.log(error, "Error during handle delete source file");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onhandleAddSouceFile = async () => {
+    fetchUserDetails();
+    toast.success("Source File Added successfully!", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+  };
+
+  const handleAddClose = () => {
+    setShowModal(false);
+    setFileEditData({})
+  };
+
+  const handleOpenModel = (title: string) => {
+    setShowModal(true);
+    setTitle(title);
+    setFileEditData({});
+  };
+
+  const handleEditOpenModel = (title: string, fileData: any = {}) => {
+    setShowModal(true);
+    setTitle(title);
+    setFileEditData(fileData);
   };
 
   return (
@@ -237,18 +359,60 @@ const ProfileSetting = () => {
                                     Ideal Customer Profile (0/1)
                                     <span className="text-danger">*</span>
                                   </h4>
-                                  <div
-                                    className="add_media"
-                                    onClick={() => {
-                                      setShowModal(true);
-                                      setTitle("Ideal Customer Profile");
-                                    }}
-                                  >
-                                    <div className="media_text">
-                                      <i className="bi bi-plus-circle"></i>
-                                      <span>Add</span>
+                                  <ul className="upload_content_item links_upload_list">
+                                    <div
+                                      className="add_media"
+                                      onClick={() =>
+                                        handleOpenModel(
+                                          "Ideal Customer Profile"
+                                        )
+                                      }
+                                    >
+                                      <div className="media_text">
+                                        <i className="bi bi-plus-circle"></i>
+                                        <span>Add</span>
+                                      </div>
                                     </div>
-                                  </div>
+                                    {IdealCustomerProfile?.map(
+                                      (file: FileItem) => (
+                                        <li key={file.uuid_id}>
+                                          <div className="left_part font_14">
+                                            <span>
+                                              <i className="bi bi-file-earmark-text-fill"></i>{" "}
+                                              {file.file_name}
+                                            </span>
+                                          </div>
+                                          <div className="right_part">
+                                            <button
+                                              type="button"
+                                              className="btn primary_btn_outline"
+                                              aria-label="edit_icon"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#toneCard"
+                                              onClick={() =>
+                                                handleEditOpenModel(
+                                                  "Ideal Customer Profile",
+                                                  file
+                                                )
+                                              }
+                                            >
+                                              Edit
+                                            </button>
+                                            <button
+                                              type="button"
+                                              className="btn text_orange font_25 px-0"
+                                              aria-label="remove_icon"
+                                              onClick={() =>
+                                                openDeleteModal(file.uuid_id)
+                                              }
+                                            >
+                                              <i className="bi bi-x"></i>
+                                            </button>
+                                          </div>
+                                        </li>
+                                      )
+                                    )}
+                                  </ul>
                                 </div>
                               </div>
                               <div className="col-12 col-lg-6">
@@ -265,41 +429,51 @@ const ProfileSetting = () => {
                                     >
                                       <div
                                         className="media_text"
-                                        onClick={() => {
-                                          setShowModal(true);
-                                          setTitle("Tone of voice");
-                                        }}
+                                        onClick={() =>
+                                          handleOpenModel("Tone of voice")
+                                        }
                                       >
                                         <i className="bi bi-plus-circle"></i>
                                         <span>Add</span>
                                       </div>
                                     </div>
-                                    <li>
-                                      <div className="left_part font_14">
-                                        <span>
-                                          <i className="bi bi-file-earmark-text-fill"></i>{" "}
-                                          Optiminder- tone of voice
-                                        </span>
-                                      </div>
-                                      <div className="right_part">
-                                        <button
-                                          type="button"
-                                          className="btn primary_btn_outline"
-                                          aria-label="edit_icon"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#toneCard"
-                                        >
-                                          Edit
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn text_orange font_25 px-0"
-                                          aria-label="remove_icon"
-                                        >
-                                          <i className="bi bi-x"></i>
-                                        </button>
-                                      </div>
-                                    </li>
+                                    {ToneOfVoice?.map((file: FileItem) => (
+                                      <li key={file.uuid_id}>
+                                        <div className="left_part font_14">
+                                          <span>
+                                            <i className="bi bi-file-earmark-text-fill"></i>{" "}
+                                            {file.file_name}
+                                          </span>
+                                        </div>
+                                        <div className="right_part">
+                                          <button
+                                            type="button"
+                                            className="btn primary_btn_outline"
+                                            aria-label="edit_icon"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#toneCard"
+                                            onClick={() =>
+                                              handleEditOpenModel(
+                                                "Tone of voice",
+                                                file
+                                              )
+                                            }
+                                          >
+                                            Edit
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn text_orange font_25 px-0"
+                                            aria-label="remove_icon"
+                                            onClick={() =>
+                                              openDeleteModal(file.uuid_id)
+                                            }
+                                          >
+                                            <i className="bi bi-x"></i>
+                                          </button>
+                                        </div>
+                                      </li>
+                                    ))}
                                   </ul>
                                 </div>
                               </div>
@@ -310,15 +484,12 @@ const ProfileSetting = () => {
                                     <span className="text-danger">*</span>
                                   </h4>
                                   <ul className="upload_content_item links_upload_list">
-                                    {[
-                                      "Tech- Savvy Tanya",
-                                      "Luxury-Loving Leo",
-                                    ].map((persona, index) => (
-                                      <li key={index}>
+                                    {BuyerPersona?.map((file: FileItem) => (
+                                      <li key={file.uuid_id}>
                                         <div className="left_part font_14">
                                           <span>
                                             <i className="bi bi-file-earmark-text-fill"></i>{" "}
-                                            {persona}
+                                            {file.file_name}
                                           </span>
                                         </div>
                                         <div className="right_part">
@@ -326,6 +497,14 @@ const ProfileSetting = () => {
                                             type="button"
                                             className="btn primary_btn_outline"
                                             aria-label="edit_icon"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#toneCard"
+                                            onClick={() =>
+                                              handleEditOpenModel(
+                                                "Buyer Persona",
+                                                file
+                                              )
+                                            }
                                           >
                                             Edit
                                           </button>
@@ -333,6 +512,9 @@ const ProfileSetting = () => {
                                             type="button"
                                             className="btn text_orange font_25 px-0"
                                             aria-label="remove_icon"
+                                            onClick={() =>
+                                              openDeleteModal(file.uuid_id)
+                                            }
                                           >
                                             <i className="bi bi-x"></i>
                                           </button>
@@ -343,7 +525,11 @@ const ProfileSetting = () => {
                                   <button
                                     type="button"
                                     className="btn primary_btn_outline"
-                                    onClick={() => setIsBuyerModalOpen(true)}
+                                    // onClick={() => setIsBuyerModalOpen(true)}
+
+                                    onClick={() =>
+                                      handleOpenModel("Buyer Persona")
+                                    }
                                   >
                                     Add
                                   </button>
@@ -363,39 +549,51 @@ const ProfileSetting = () => {
                                     >
                                       <div
                                         className="media_text"
-                                        onClick={() => {
-                                          setShowModal(true);
-                                          setTitle("Brand Identity");
-                                        }}
+                                        onClick={() =>
+                                          handleOpenModel("Brand Identity")
+                                        }
                                       >
                                         <i className="bi bi-plus-circle"></i>
                                         <span>Add</span>
                                       </div>
                                     </div>
-                                    <li>
-                                      <div className="left_part font_14">
-                                        <span>
-                                          <i className="bi bi-file-earmark-text-fill"></i>{" "}
-                                          Optiminder- tone of voice
-                                        </span>
-                                      </div>
-                                      <div className="right_part">
-                                        <button
-                                          type="button"
-                                          className="btn primary_btn_outline"
-                                          aria-label="edit_icon"
-                                        >
-                                          Edit
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn text_orange font_25 px-0"
-                                          aria-label="remove_icon"
-                                        >
-                                          <i className="bi bi-x"></i>
-                                        </button>
-                                      </div>
-                                    </li>
+                                    {BrandIdentity?.map((file: FileItem) => (
+                                      <li key={file.uuid_id}>
+                                        <div className="left_part font_14">
+                                          <span>
+                                            <i className="bi bi-file-earmark-text-fill"></i>{" "}
+                                            {file.file_name}
+                                          </span>
+                                        </div>
+                                        <div className="right_part">
+                                          <button
+                                            type="button"
+                                            className="btn primary_btn_outline"
+                                            aria-label="edit_icon"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#toneCard"
+                                            onClick={() =>
+                                              handleEditOpenModel(
+                                                "Brand Identity",
+                                                file
+                                              )
+                                            }
+                                          >
+                                            Edit
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn text_orange font_25 px-0"
+                                            aria-label="remove_icon"
+                                            onClick={() =>
+                                              openDeleteModal(file.uuid_id)
+                                            }
+                                          >
+                                            <i className="bi bi-x"></i>
+                                          </button>
+                                        </div>
+                                      </li>
+                                    ))}
                                   </ul>
                                 </div>
                               </div>
@@ -413,15 +611,12 @@ const ProfileSetting = () => {
                                     <span className="text-danger">*</span>
                                   </h4>
                                   <ul className="upload_content_item links_upload_list">
-                                    {[
-                                      "Risk Assessment",
-                                      "Account Verification",
-                                    ].map((offering, index) => (
-                                      <li key={index}>
+                                    {Offering?.map((file: FileItem) => (
+                                      <li key={file.uuid_id}>
                                         <div className="left_part font_14">
                                           <span>
                                             <i className="bi bi-file-earmark-text-fill"></i>{" "}
-                                            {offering}
+                                            {file.file_name}
                                           </span>
                                         </div>
                                         <div className="right_part">
@@ -429,6 +624,14 @@ const ProfileSetting = () => {
                                             type="button"
                                             className="btn primary_btn_outline"
                                             aria-label="edit_icon"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#toneCard"
+                                            onClick={() =>
+                                              handleEditOpenModel(
+                                                "Offering",
+                                                file
+                                              )
+                                            }
                                           >
                                             Edit
                                           </button>
@@ -436,6 +639,9 @@ const ProfileSetting = () => {
                                             type="button"
                                             className="btn text_orange font_25 px-0"
                                             aria-label="remove_icon"
+                                            onClick={() =>
+                                              openDeleteModal(file.uuid_id)
+                                            }
                                           >
                                             <i className="bi bi-x"></i>
                                           </button>
@@ -446,10 +652,7 @@ const ProfileSetting = () => {
                                   <button
                                     type="button"
                                     className="btn primary_btn_outline"
-                                    onClick={() => {
-                                      setShowModal(true);
-                                      setTitle("Offering");
-                                    }}
+                                    onClick={() => handleOpenModel("Offering")}
                                   >
                                     Add
                                   </button>
@@ -469,39 +672,51 @@ const ProfileSetting = () => {
                                     >
                                       <div
                                         className="media_text"
-                                        onClick={() => {
-                                          setShowModal(true);
-                                          setTitle("Common Pain Points");
-                                        }}
+                                        onClick={() =>
+                                          handleOpenModel("Common Pain Points")
+                                        }
                                       >
                                         <i className="bi bi-plus-circle"></i>
                                         <span>Add</span>
                                       </div>
                                     </div>
-                                    <li>
-                                      <div className="left_part font_14">
-                                        <span>
-                                          <i className="bi bi-file-earmark-text-fill"></i>{" "}
-                                          Optiminder- tone of voice
-                                        </span>
-                                      </div>
-                                      <div className="right_part">
-                                        <button
-                                          type="button"
-                                          className="btn primary_btn_outline"
-                                          aria-label="edit_icon"
-                                        >
-                                          Edit
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn text_orange font_25 px-0"
-                                          aria-label="remove_icon"
-                                        >
-                                          <i className="bi bi-x"></i>
-                                        </button>
-                                      </div>
-                                    </li>
+                                    {CommonPainPoints?.map((file: FileItem) => (
+                                      <li key={file.uuid_id}>
+                                        <div className="left_part font_14">
+                                          <span>
+                                            <i className="bi bi-file-earmark-text-fill"></i>{" "}
+                                            {file.file_name}
+                                          </span>
+                                        </div>
+                                        <div className="right_part">
+                                          <button
+                                            type="button"
+                                            className="btn primary_btn_outline"
+                                            aria-label="edit_icon"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#toneCard"
+                                            onClick={() =>
+                                              handleEditOpenModel(
+                                                "Common Pain Points",
+                                                file
+                                              )
+                                            }
+                                          >
+                                            Edit
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn text_orange font_25 px-0"
+                                            aria-label="remove_icon"
+                                            onClick={() =>
+                                              openDeleteModal(file.uuid_id)
+                                            }
+                                          >
+                                            <i className="bi bi-x"></i>
+                                          </button>
+                                        </div>
+                                      </li>
+                                    ))}
                                   </ul>
                                 </div>
                                 <div className="card_box">
@@ -517,39 +732,51 @@ const ProfileSetting = () => {
                                     >
                                       <div
                                         className="media_text"
-                                        onClick={() => {
-                                          setShowModal(true);
-                                          setTitle("Value Preposition");
-                                        }}
+                                        onClick={() =>
+                                          handleOpenModel("Value Proposition")
+                                        }
                                       >
                                         <i className="bi bi-plus-circle"></i>
                                         <span>Add</span>
                                       </div>
                                     </div>
-                                    <li>
-                                      <div className="left_part font_14">
-                                        <span>
-                                          <i className="bi bi-file-earmark-text-fill"></i>{" "}
-                                          Optiminder- tone of voice
-                                        </span>
-                                      </div>
-                                      <div className="right_part">
-                                        <button
-                                          type="button"
-                                          className="btn primary_btn_outline"
-                                          aria-label="edit_icon"
-                                        >
-                                          Edit
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn text_orange font_25 px-0"
-                                          aria-label="remove_icon"
-                                        >
-                                          <i className="bi bi-x"></i>
-                                        </button>
-                                      </div>
-                                    </li>
+                                    {ValueProposition?.map((file: FileItem) => (
+                                      <li key={file.uuid_id}>
+                                        <div className="left_part font_14">
+                                          <span>
+                                            <i className="bi bi-file-earmark-text-fill"></i>{" "}
+                                            {file.file_name}
+                                          </span>
+                                        </div>
+                                        <div className="right_part">
+                                          <button
+                                            type="button"
+                                            className="btn primary_btn_outline"
+                                            aria-label="edit_icon"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#toneCard"
+                                            onClick={() =>
+                                              handleEditOpenModel(
+                                                "Value Proposition",
+                                                file
+                                              )
+                                            }
+                                          >
+                                            Edit
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn text_orange font_25 px-0"
+                                            aria-label="remove_icon"
+                                            onClick={() =>
+                                              openDeleteModal(file.uuid_id)
+                                            }
+                                          >
+                                            <i className="bi bi-x"></i>
+                                          </button>
+                                        </div>
+                                      </li>
+                                    ))}
                                   </ul>
                                 </div>
                               </div>
@@ -558,137 +785,28 @@ const ProfileSetting = () => {
                         </div>
                       </div>
 
-                      {/* <div
-                        className="modal fade source_modal"
-                        id="buyerCard"
-                        tabIndex={-1}
-                        aria-labelledby="buyerTabLabel"
-                        aria-hidden="true"
-                        data-bs-backdrop="static"
-                        data-bs-keyboard="false"
-                      >
-                        <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                          <div className="modal-content">
-                            <div className="modal-body source_form_wrapper ideal_form">
-                              <h3 className="font_25 font_600 text-center mb-4">
-                                Create you Buyer Persona
-                              </h3>
-                              <p className="font_16 keyword_error">
-                                Please update the mission information
-                              </p>
-                              <div className="row">
-                                <div className="col-12">
-                                  <label
-                                    htmlFor="buyerPersona"
-                                    className="font_16 font_500 mb-2"
-                                  >
-                                    Name your buyer persona *
-                                  </label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    id="buyerPersona"
-                                  />
-                                </div>
-                                <div className="col-12">
-                                  <label
-                                    htmlFor="uploadpersona"
-                                    className="font_16 font_500 mb-2"
-                                  >
-                                    Upload persona description *
-                                  </label>
-                                  <div
-                                    className="doc_file_wrapper"
-                                    id="uploadpersona"
-                                  >
-                                    <input
-                                      className="form-control upload_input"
-                                      type="file"
-                                    />
-                                    <div className="doc_left">
-                                      <p className="font_14 mb-0">
-                                        Drag and drop files here or{" "}
-                                        <span className="text_blue font_500">
-                                          browse
-                                        </span>{" "}
-                                        to Upload
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <ul className="upload_content_item file_upload_list">
-                                    <li className="font_14">
-                                      <span>
-                                        <i className="bi bi-file-earmark-pdf-fill me-1"></i>{" "}
-                                        https:domain.com/file_name
-                                      </span>
-                                      <button
-                                        type="button"
-                                        className="btn text_orange font_16 pe-0"
-                                        aria-label="remove_icon"
-                                      >
-                                        <i className="bi bi-x"></i>
-                                      </button>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div className="col-12">
-                                  <label
-                                    htmlFor="uploadpersona2"
-                                    className="font_16 font_500 mb-2"
-                                  >
-                                    Upload persona specifile pain points *
-                                  </label>
-                                  <div
-                                    className="doc_file_wrapper"
-                                    id="uploadpersona2"
-                                  >
-                                    <input
-                                      className="form-control upload_input"
-                                      type="file"
-                                    />
-                                    <div className="doc_left">
-                                      <p className="font_14 mb-0">
-                                        Drag and drop files here or{" "}
-                                        <span className="text_blue font_500">
-                                          browse
-                                        </span>{" "}
-                                        to Upload
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-12 text-center">
-                                  <button
-                                    type="button"
-                                    className="btn primary_btn modal_btn"
-                                  >
-                                    Save
-                                  </button>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                className="btn modal_close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"
-                              >
-                                <i className="bi-x-circle-fill"></i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div> */}
-
                       <SourceFileModal
                         isOpen={showModal}
-                        onClose={() => setShowModal(false)}
+                        onClose={handleAddClose}
                         title={title}
+                        FileEditData={FileEditData}
+                        onAddSouceFile={onhandleAddSouceFile}
                       />
-                      <BuyerPersonaModal
+                      <DeleteConfirmModal
+                        isOpen={isDeleteModalOpen}
+                        onConfirm={() => {
+                          if (selectedDeleteId) handleDelete(selectedDeleteId);
+                        }}
+                        onCancel={() => {
+                          setIsDeleteModalOpen(false);
+                          setSelectedDeleteId(null);
+                        }}
+                      />
+                      {/* <BuyerPersonaModal
                         isOpen={isBuyerModalOpen}
                         onClose={() => setIsBuyerModalOpen(false)}
                         fileList={["https://domain.com/file_name.pdf"]}
-                      />
+                      /> */}
                     </div>
                   </div>
                 </div>
