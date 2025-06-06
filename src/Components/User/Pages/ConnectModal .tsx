@@ -1,5 +1,5 @@
  
-const ConnectModal = ({ onConnect }: { onConnect: () => void }) => {
+const ConnectModal = ({ onConnect ,  isConnected}: { onConnect: () => void;  isConnected: boolean; }) => {
   return (
     <div
       className="modal fade integrated_modal"
@@ -21,7 +21,7 @@ const ConnectModal = ({ onConnect }: { onConnect: () => void }) => {
               className="btn primary_btn ok_btn"
               onClick={onConnect}
             >
-              Connect
+              {isConnected ? "Re-Connect" : "Connect"}
             </button>
           </div>
           <button

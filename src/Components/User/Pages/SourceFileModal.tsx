@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { AddSourceFileData, UpdateSourceFileData } from "./ProfileServices";
+import { toast } from "react-toastify";
 
 interface IcpModalProps {
   isOpen: boolean;
@@ -113,6 +114,24 @@ const SourceFileModal: React.FC<IcpModalProps> = ({
     }
   };
 
+const handleDelete = () => {
+  setSelectedFile(null);
+  setSelectedFileName("");
+  if (fileInputRef.current) {
+    fileInputRef.current.value = "";
+  }
+
+  // Optionally, clear the edit data too (if you want to remove reference to the file completely)
+  // FileEditData = {}; ❌ Don't directly modify props
+
+  toast.success("File removed from the form", {
+    position: "top-right",
+    autoClose: 2000,
+  });
+};
+
+
+
   return (
     <div
       className={`modal fade ${
@@ -182,9 +201,24 @@ const SourceFileModal: React.FC<IcpModalProps> = ({
                   </p>
                 )}
                 {selectedFileName && !selectedFile && (
-                  <p className="font_14 mb-0 uploaded-file-name">
-                    {selectedFileName}
-                  </p>
+                  <div className="uploaded-file-name d-flex justify-content-between align-items-center font_14 mb-0">
+                    <div className="left_part d-flex align-items-center">
+                      <span>
+                        <i className="bi bi-file-earmark-text-fill me-2"></i>
+                        {selectedFileName}
+                      </span>
+                    </div>
+                    <div className="right_part">
+                      <button
+                        type="button"
+                        className="btn text_orange font_25 px-0"
+                        aria-label="remove_icon"
+                        onClick={() => handleDelete()}
+                      >
+                        <i className="bi bi-x"></i>
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
               <div className="col-12 text-center mt-3">

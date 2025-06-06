@@ -1,3 +1,4 @@
+import { useState } from "react";
 import ConnectModal from "./ConnectModal ";
 
 const integrationsList = [
@@ -57,6 +58,11 @@ const IntegrationsTab = ({
   setSelectedCategory: (category: string) => void;
   handleConnect: () => void;
 }) => {
+  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(null);
+
+  const getIsConnected = (category: string) =>
+    IntegratedData?.find((integration: any) => integration.provider === category)?.connected || false;
+
   return (
     <div
       className="tab-pane fade"
@@ -75,17 +81,15 @@ const IntegrationsTab = ({
 
             <ul className="list-unstyled integration_card_wrapper row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4 g-3">
               {integrationsList.map((item, index) => {
-                const isConnected =
-                  IntegratedData?.find(
-                    (integration: any) => integration.provider === item.category
-                  )?.connected || false;
+               const isConnected = getIsConnected(item.category);
 
                 return (
                   <li className="col" key={index}>
                     <div
                       className="intergration_card card_box"
-                      onClick={() => {
+                       onClick={() => {
                         setSelectedCategory(item.category);
+                        setSelectedIntegration(item.category);  
                       }}
                       data-bs-toggle={
                         item.name === "Search console" ? "modal" : ""
@@ -128,8 +132,7 @@ const IntegrationsTab = ({
           </div>
         </div>
       </div>
-
-       <ConnectModal onConnect={handleConnect} />
+       <ConnectModal onConnect={handleConnect} isConnected={selectedIntegration ? getIsConnected(selectedIntegration) : false} />
     </div>
   );
 };

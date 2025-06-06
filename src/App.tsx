@@ -7,6 +7,7 @@ import ProtectedRoutes from "./ProtectedRoutes/ProtectedRoutes";
 import Logout from "./Components/Page/Logout";
  
  
+ 
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
@@ -26,6 +27,8 @@ const ContentSuggestionResult = lazy(() => import("./Components/User/Content/Con
 const ContentPreviousList = lazy(() => import("./Components/User/Content/ContentPreviousList")); 
 const ProfileSetting = lazy(() => import("./Components/User/Pages/ProfileSetting")); 
 const ProfileSettingSuccess = lazy(() => import("./Components/User/Pages/ProfileSettingSuccess")); 
+const Reports = lazy(() => import("./Components/User/SeoProcess/Reports")); 
+
 function App() {
   return (
     <>
@@ -44,6 +47,7 @@ function App() {
             <Route path="/seo/keywordToolResult" element={<KeywordToolResult />} />
             <Route path="/seo/KeywordsSuggestionsResult" element={<KeywordsSuggestionsResult />} />
             <Route path="/seo/SuggestionsResultById/:id" element={<SuggestionsResultById />} />
+            <Route path="/seo/Reports" element={<Reports />} />
 
             <Route path="/ppc/CreateCampaign" element={<CreateCampaign />} />
             <Route path="/ppc/CreateCampaignKeywordResult" element={<CreateCampaignKeywordResult />} />

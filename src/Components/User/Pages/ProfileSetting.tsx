@@ -161,7 +161,7 @@ const ProfileSetting = () => {
 
   const handleAddClose = () => {
     setShowModal(false);
-    setFileEditData({})
+    setFileEditData({});
   };
 
   const handleOpenModel = (title: string) => {
