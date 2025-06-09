@@ -23,7 +23,7 @@ export const GetFilterData = async () => {
 
 export const AddSearchConsole = async (formData:any) => {
   try {
-    const response = await axiosInstance.post(`/api/search_console`,formData);
+    const response = await axiosInstance.post(`/api/search_console/`,formData);
     return response;
   } catch (error) {
     throw error;
@@ -32,7 +32,7 @@ export const AddSearchConsole = async (formData:any) => {
 
 export const AddRankingKeyword = async (formData:any) => {
   try {
-    const response = await axiosInstance.post(`/api/ranking_keywords`,formData);
+    const response = await axiosInstance.post(`/api/ranking_keywords/`,formData);
     return response;
   } catch (error) {
     throw error;

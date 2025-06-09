@@ -1,27 +1,56 @@
 import { useEffect, useState } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
-import { GetFilterData, GetWebListDetails } from "./SeoServices";
+import {
+  AddBrandedWordanalysis,
+  AddRankingKeyword,
+  AddSearchConsole,
+  GetFilterData,
+  GetWebListDetails,
+} from "./SeoServices";
 import Loading from "../../Page/Loading/Loading";
 import SelectSiteModal from "./SelectSiteModal";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import { DateRange } from "react-date-range";
+import { subMonths } from "date-fns";
+import LineChartGraph from "./charts/LineChart";
+import AreaChartGraph from "./charts/KeywordRankingChart";
+import CircleGraph from "./charts/CircleGraph";
 
 export interface Site {
   siteUrl: string;
   permissionLevel: string;
 }
 
-const getDateRange = () => {
-  const today = new Date();
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(today.getMonth() - 3);
-
-  const formatDate = (date: Date) => date.toISOString().split("T")[0];
-
-  return {
-    startDate: formatDate(threeMonthsAgo),
-    endDate: formatDate(today),
-  };
+type MetricData = {
+  Current: number;
+  Previous?: number;
+  Difference?: number;
+  "Change (%)"?: number;
+  Change_Direction?: string;
+  "Relative_Change (%)"?: number;
+  Percentage_Point_Change?: number;
+  Position_Change?: number;
+  Direction?: string;
+  Change_Type?: string;
 };
+
+type CardMatrix = Record<string, MetricData>;
+
+type DisplayItem = {
+  title: string;
+  value: number;
+  percent: string;
+  isDown: boolean;
+};
+
+function formatDateToYYYYMMDD(date: any) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 const Reports = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
@@ -32,11 +61,25 @@ const Reports = () => {
   const [selectedDeviceType, setSelectedDeviceType] =
     useState<string>("mobile");
   const [selectedSearchType, setSelectedSearchType] = useState<string>("web");
-  const [selectedCountry, setSelectedCountry] = useState<string>("UK");
-  const { startDate, endDate } = getDateRange();
-  const [selectedDate, setSelectedDate] = useState<string>(endDate);
+  const [selectedCountry, setSelectedCountry] = useState<string>("USA");
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [SearchConsole, setSearchConsole] = useState<any>({});
+  const [RankingKeyword, setRankingKeyword] = useState<any>({});
+  const [BrandedWordAnalysis, setBrandedWordAnalysis] = useState<any>({});
+  const [selectedMetric, setSelectedMetric] = useState<
+    "clicks" | "impressions" | "ctr" | "position"
+  >("clicks");
+  const today = new Date();
+  const threeMonthsAgo = subMonths(today, 3);
+  const [range, setRange] = useState([
+    {
+      startDate: subMonths(new Date(), 3),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
 
-  //   console.log(FilterData, "FilterData");
+  console.log(BrandedWordAnalysis,"BrandedWordAnalysis")
 
   useEffect(() => {
     fetchWebListDetails();
@@ -58,24 +101,37 @@ const Reports = () => {
     }
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     try {
       setIsLoading(true);
-      // const payload = {
-      //   site_url: selectedSite?.siteUrl,
-      //   search_type: selectedSearchType,
-      //   country: selectedCountry,
-      //   device_type: selectedDeviceType,
-      //   start_date: startDate,
-      //   end_date: endDate
-      // };
-      // const responseSearchConsole = await AddSearchConsole(payload);
-      // const responseRankingKeyword = await AddRankingKeyword(payload);
-      // const responseBrandedWordanalysis = await AddBrandedWordanalysis(payload);
-      //   if (response.status === 200 || response.status === 201) {
+      const payload = {
+        site_url: selectedSite?.siteUrl,
+        search_type: selectedSearchType,
+        country: selectedCountry,
+        device_type: selectedDeviceType,
+        start_date: formatDateToYYYYMMDD(range[0]?.startDate),
+        end_date: formatDateToYYYYMMDD(range[0]?.endDate),
+      };
 
-      setIsModalOpen(false);
-      //   }
+      const responseSearchConsole = await AddSearchConsole(payload);
+      const responseRankingKeyword = await AddRankingKeyword(payload);
+      const responseBrandedWordanalysis = await AddBrandedWordanalysis(payload);
+      if (
+        responseSearchConsole.status === 200 ||
+        responseRankingKeyword.status === 200 ||
+        responseBrandedWordanalysis.status === 200
+      ) {
+        setSearchConsole(responseSearchConsole?.data);
+        setRankingKeyword(responseRankingKeyword?.data);
+        setBrandedWordAnalysis(responseBrandedWordanalysis?.data);
+        console.log(responseSearchConsole.data, "responseSearchConsole");
+        console.log(responseRankingKeyword.data, "responseRankingKeyword");
+        console.log(
+          responseBrandedWordanalysis.data,
+          "responseBrandedWordanalysis"
+        );
+        setIsModalOpen(false);
+      }
     } catch (error: any) {
       console.error("Error fetchWebList:", error);
     } finally {
@@ -83,6 +139,57 @@ const Reports = () => {
     }
   };
 
+  const handleSelect = (ranges: any) => {
+    const { startDate, endDate } = ranges.selection;
+    setRange([
+      {
+        startDate,
+        endDate,
+        key: "selection",
+      },
+    ]);
+  };
+
+  const cardMatrix: CardMatrix | undefined = SearchConsole?.card_matrix;
+
+  const excludeTitles = ["Ranking_Keywords", "Ranking_URLs"];
+
+  const displayItems: DisplayItem[] = cardMatrix
+    ? Object.entries(cardMatrix)
+        .filter(([key]) => !excludeTitles.includes(key)) // exclude these keys
+        .map(([key, value]) => {
+          const percent =
+            value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
+          const isDown = percent < 0;
+          return {
+            title: key,
+            value: value.Current,
+            percent: `${percent}%`,
+            isDown,
+          };
+        })
+    : [];
+
+  const excludedItems = cardMatrix
+    ? Object.entries(cardMatrix)
+        .filter(([key]) => excludeTitles.includes(key))
+        .map(([key, value]) => {
+          const percent =
+            value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
+          const isDown = percent < 0;
+          return {
+            title: key.replace(/_/g, " "), // nicer display
+            value: value.Current,
+            percent: `${percent}%`,
+            isDown,
+          };
+        })
+    : [];
+
+  // Safe access with default empty array to avoid errors
+  const keywordRankingData: any[] = SearchConsole?.keywords_ranking ?? [];
+
+ 
   return (
     <>
       {isLoading && <Loading />}
@@ -269,46 +376,112 @@ const Reports = () => {
                                 </li>
 
                                 <li>
-                                  <div className="form_input d-flex align-items-center gap-2">
-                                    <label
-                                      htmlFor="selectedDate"
-                                      className="form-label mb-0"
+                                  <div
+                                    className="form_input"
+                                    style={{
+                                      border: "1px solid #ccc",
+                                      borderRadius: "6px",
+                                      padding: "10px",
+                                      cursor: "pointer",
+                                      background: "#fff",
+                                      minWidth: "200px",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                      flexWrap: "wrap",
+                                    }}
+                                    onClick={() =>
+                                      setShowCalendar((prev) => !prev)
+                                    }
+                                  >
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px",
+                                      }}
                                     >
-                                      Select Date:
-                                    </label>
-                                    <input
-                                      type="date"
-                                      id="selectedDate"
-                                      className="form-control"
-                                      value={selectedDate}
-                                      min={startDate}
-                                      max={endDate}
-                                      onChange={(e) =>
-                                        setSelectedDate(e.target.value)
-                                      }
-                                    />
+                                      <strong>Date Range:</strong>
+                                      <span>
+                                        {range[0].startDate?.toLocaleDateString()}{" "}
+                                        -{" "}
+                                        {range[0].endDate?.toLocaleDateString()}
+                                      </span>
+                                      {showCalendar && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowCalendar(false);
+                                          }}
+                                          style={{
+                                            border: "none",
+                                            background: "transparent",
+                                            fontSize: "16px",
+                                            cursor: "pointer",
+                                            marginLeft: "15px",
+                                          }}
+                                          title="Close Calendar"
+                                        >
+                                          ❌
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
+
+                                  {showCalendar && (
+                                    <div
+                                      style={{
+                                        position: "relative",
+                                        zIndex: 10,
+                                      }}
+                                    >
+                                      <DateRange
+                                        ranges={range}
+                                        onChange={handleSelect}
+                                        moveRangeOnFirstSelection={false}
+                                        months={1}
+                                        direction="horizontal"
+                                        minDate={threeMonthsAgo}
+                                        maxDate={today}
+                                        showDateDisplay={false}
+                                        showMonthAndYearPickers={true}
+                                        rangeColors={["rgb(250, 122, 78)"]}
+                                      />
+                                    </div>
+                                  )}
                                 </li>
                               </ul>
                             </div>
 
                             <div className="col-12">
                               <div className="row overview_cards">
-                                {[1, 2].map((_, index) => (
+                                {excludedItems.map((item, index) => (
                                   <div
                                     className="col-12 col-sm-6 col-xxl-3"
                                     key={index}
                                   >
                                     <div className="card_box">
                                       <h3 className="font_20 font_300 mb-1">
-                                        Ranking Keywords
+                                        {item.title}
                                       </h3>
                                       <h4 className="font_20 font_500 mb-1">
-                                        1,398
+                                        {item.value}
                                       </h4>
-                                      <p className="font_14 text-success mb-1">
-                                        <i className="bi bi-arrow-up-short"></i>{" "}
-                                        4.8%
+                                      <p
+                                        className={`font_14 ${
+                                          item.isDown
+                                            ? "text-danger"
+                                            : "text-success"
+                                        } mb-1`}
+                                      >
+                                        <i
+                                          className={`bi ${
+                                            item.isDown
+                                              ? "bi-arrow-down-short"
+                                              : "bi-arrow-up-short"
+                                          }`}
+                                        ></i>{" "}
+                                        {item.percent}
                                       </p>
                                     </div>
                                   </div>
@@ -316,68 +489,51 @@ const Reports = () => {
 
                                 <div className="col-12 col-sm-12 col-xxl-6">
                                   <div className="row mx-0 card_box">
-                                    {[
-                                      {
-                                        title: "Impressions",
-                                        value: "386,254",
-                                        percent: "33.9%",
-                                      },
-                                      {
-                                        title: "Clicks",
-                                        value: "7,022",
-                                        percent: "68.4%",
-                                      },
-                                      {
-                                        title: "CTR",
-                                        value: "1.82%",
-                                        percent: "25.8%",
-                                        isDown: true,
-                                      },
-                                      {
-                                        title: "Avg. position",
-                                        value: "30.46",
-                                        percent: "8%",
-                                      },
-                                    ].map((item, index) => (
-                                      <div
-                                        className="col-12 col-sm-6 col-md-3"
-                                        key={index}
-                                      >
-                                        <h3 className="font_16 font_300 mb-1">
-                                          {item.title}
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          {item.value}
-                                        </h4>
-                                        <p
-                                          className={`font_14 ${
-                                            item.isDown
-                                              ? "text-danger"
-                                              : "text-success"
-                                          } mb-1`}
+                                    {displayItems?.map(
+                                      (item: any, index: any) => (
+                                        <div
+                                          className="col-12 col-sm-6 col-md-3"
+                                          key={index}
                                         >
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          {item.percent}
-                                        </p>
-                                      </div>
-                                    ))}
+                                          <h3 className="font_16 font_300 mb-1">
+                                            {item.title}
+                                          </h3>
+                                          <h4 className="font_20 font_600 mb-1">
+                                            {item.value}
+                                          </h4>
+                                          <p
+                                            className={`font_14 ${
+                                              item.isDown
+                                                ? "text-danger"
+                                                : "text-success"
+                                            } mb-1`}
+                                          >
+                                            <i
+                                              className={`bi ${
+                                                item.isDown
+                                                  ? "bi-arrow-down-short"
+                                                  : "bi-arrow-up-short"
+                                              }`}
+                                            ></i>{" "}
+                                            {item.percent}
+                                          </p>
+                                        </div>
+                                      )
+                                    )}
                                   </div>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="col-12">
-                              <div className="card_box click_chart">
-                                <img
-                                  src="https://courses.spatialthoughts.com/images/gee_charts/no2_time_series.png"
-                                  alt="click chart"
-                                  className="img-fluid"
-                                />
-                              </div>
-                            </div>
+                            <LineChartGraph
+                              period1={SearchConsole?.line_plot_data?.period1}
+                              period2={SearchConsole?.line_plot_data?.period2}
+                              selectedMetric={selectedMetric}
+                              setSelectedMetric={setSelectedMetric}
+                            />
 
                             <div className="col-12">
-                              <div className="row gy-3">
+                              {/* <div className="row gy-3">
                                 {[
                                   { title: "Keyword Rankings" },
                                   { title: "Brand vs Non-brand" },
@@ -473,6 +629,90 @@ const Reports = () => {
                                     </div>
                                   </div>
                                 ))}
+                              </div> */}
+                              <div className="row gy-3">
+                                <div className="col-6 ">
+                                  <div className={`card keyword_data_card`}>
+                                    <div className="card-header bg-white border-0">
+                                      <h3 className="font_16 mb-0">
+                                        Keyword Rankings
+                                      </h3>
+                                    </div>
+                                    <div className="card-body">
+                                      <AreaChartGraph
+                                        data={keywordRankingData}
+                                      />
+                                    </div>
+                                    <div className="card-footer">
+                                      <div className="row">
+                                        {RankingKeyword?.bucket_matrix?.map(
+                                          (item: any, index: any) => {
+                                            const isPositive =
+                                              item.delta_abs >= 0;
+                                            const arrowClass = isPositive
+                                              ? "bi-arrow-up-short text-success"
+                                              : "bi-arrow-down-short text-danger";
+                                            const textClass = isPositive
+                                              ? "text-success"
+                                              : "text-danger";
+
+                                            return (
+                                              <div
+                                                className="col-12 col-sm-4"
+                                                key={index}
+                                              >
+                                                <>
+                                                  <p className="font_12 mb-0">
+                                                    {item.rank_bucket}
+                                                  </p>
+                                                  <p className="font_14 my-1">
+                                                    {item.current_count}
+                                                  </p>
+                                                  <p
+                                                    className={`font_12 ${textClass} mb-0`}
+                                                  >
+                                                    <i
+                                                      className={`bi ${arrowClass}`}
+                                                    ></i>
+                                                    {Math.abs(item.delta_pct)}%
+                                                  </p>
+                                                </>
+                                              </div>
+                                            );
+                                          }
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-12">
+                              <div className="row gy-3">
+                                <div className="col-6 ">
+                                  <div className={`card keyword_data_card`}>
+                                    <div className="card-header bg-white border-0">
+                                      <h3 className="font_16 mb-0">
+                                        Device Performance
+                                      </h3>
+                                    </div>
+                                    <div className="card-body">
+                                       <CircleGraph
+                                        data={
+                                          SearchConsole?.device_performance
+                                            ?.device_comparisons
+                                        }
+                                        metric={selectedMetric}
+                                      />
+                                    </div>
+                                    <div className="card-footer">
+                                      <div className="row">
+                                        
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </form>
@@ -496,7 +736,7 @@ const Reports = () => {
                                       id="webType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>Search type: web</option>
+                                      <option value="">Search type: web</option>
                                       <option value="1">Option 1</option>
                                       <option value="2">Option 2</option>
                                       <option value="3">Option 3</option>
@@ -510,7 +750,7 @@ const Reports = () => {
                                       id="countryType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>Country: UK</option>
+                                      <option value="">Country: UK</option>
                                       <option value="1">Option 1</option>
                                       <option value="2">Option 2</option>
                                       <option value="3">Option 3</option>
@@ -524,7 +764,7 @@ const Reports = () => {
                                       id="mobileType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>
+                                      <option value="">
                                         {" "}
                                         Device type: mobile
                                       </option>
@@ -541,7 +781,7 @@ const Reports = () => {
                                       id="monthType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>
+                                      <option value="">
                                         Date: last 3 months
                                       </option>
                                       <option value="1">Option 1</option>
@@ -989,7 +1229,7 @@ const Reports = () => {
                                       id="webType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>Search type: web</option>
+                                      <option value="">Search type: web</option>
                                       <option value="1">Option 1</option>
                                       <option value="2">Option 2</option>
                                       <option value="3">Option 3</option>
@@ -1003,7 +1243,7 @@ const Reports = () => {
                                       id="countryType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>Country: UK</option>
+                                      <option value="">Country: UK</option>
                                       <option value="1">Option 1</option>
                                       <option value="2">Option 2</option>
                                       <option value="3">Option 3</option>
@@ -1017,7 +1257,7 @@ const Reports = () => {
                                       id="mobileType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>
+                                      <option value="">
                                         {" "}
                                         Device type: mobile
                                       </option>
@@ -1034,7 +1274,7 @@ const Reports = () => {
                                       id="monthType"
                                       aria-label="Default select example"
                                     >
-                                      <option selected>
+                                      <option value="">
                                         Date: last 3 months
                                       </option>
                                       <option value="1">Option 1</option>
