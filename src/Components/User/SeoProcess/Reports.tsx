@@ -12,11 +12,15 @@ import Loading from "../../Page/Loading/Loading";
 import SelectSiteModal from "./SelectSiteModal";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { DateRange } from "react-date-range";
 import { subMonths } from "date-fns";
 import LineChartGraph from "./charts/LineChart";
 import AreaChartGraph from "./charts/KeywordRankingChart";
 import CircleGraph from "./charts/CircleGraph";
+import FilterComponent from "./Common/FilterComponent";
+import GenericKeywordsTable from "./Common/GenericKeywordsTable";
+import PieChartGraph from "./charts/PieChartGraph";
+import BrandVsNonBrandChart from "./charts/BrandVsNonBrandChart";
+import BrandedGenericAreaChart from "./charts/BrandedGenericAreaChart";
 
 export interface Site {
   siteUrl: string;
@@ -78,9 +82,7 @@ const Reports = () => {
       key: "selection",
     },
   ]);
-
-  console.log(BrandedWordAnalysis,"BrandedWordAnalysis")
-
+// console.log(selectedMetric,"selectedMetric")
   useEffect(() => {
     fetchWebListDetails();
   }, []);
@@ -139,16 +141,7 @@ const Reports = () => {
     }
   };
 
-  const handleSelect = (ranges: any) => {
-    const { startDate, endDate } = ranges.selection;
-    setRange([
-      {
-        startDate,
-        endDate,
-        key: "selection",
-      },
-    ]);
-  };
+ 
 
   const cardMatrix: CardMatrix | undefined = SearchConsole?.card_matrix;
 
@@ -189,7 +182,6 @@ const Reports = () => {
   // Safe access with default empty array to avoid errors
   const keywordRankingData: any[] = SearchConsole?.keywords_ranking ?? [];
 
- 
   return (
     <>
       {isLoading && <Loading />}
@@ -298,159 +290,21 @@ const Reports = () => {
                         <div className="seo_report_content overview_content">
                           <form className="row">
                             <div className="col-12">
-                              <ul className="oraganic_report_filter list-unstyled">
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="webType"
-                                      aria-label="Search type"
-                                      value={selectedSearchType}
-                                      onChange={(e) =>
-                                        setSelectedSearchType(e.target.value)
-                                      }
-                                    >
-                                      <option value="web">
-                                        Search type: {selectedSearchType}
-                                      </option>
-                                      {FilterData.search_types?.[0]?.map(
-                                        (type: string, idx: number) => (
-                                          <option key={idx} value={type}>
-                                            {type}
-                                          </option>
-                                        )
-                                      )}
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="countryType"
-                                      aria-label="Country"
-                                      value={selectedCountry}
-                                      onChange={(e) =>
-                                        setSelectedCountry(e.target.value)
-                                      }
-                                    >
-                                      <option value="UK">
-                                        Country: {selectedCountry}
-                                      </option>
-                                      {FilterData.countries?.map(
-                                        (country: any, idx: number) => (
-                                          <option
-                                            key={idx}
-                                            value={country.code}
-                                          >
-                                            {country.name}
-                                          </option>
-                                        )
-                                      )}
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="mobileType"
-                                      aria-label="Device type"
-                                      value={selectedDeviceType}
-                                      onChange={(e) =>
-                                        setSelectedDeviceType(e.target.value)
-                                      }
-                                    >
-                                      <option value="mobile">
-                                        Device type: {selectedDeviceType}
-                                      </option>
-                                      {FilterData.device_types?.map(
-                                        (device: string, idx: number) => (
-                                          <option key={idx} value={device}>
-                                            {device}
-                                          </option>
-                                        )
-                                      )}
-                                    </select>
-                                  </div>
-                                </li>
-
-                                <li>
-                                  <div
-                                    className="form_input"
-                                    style={{
-                                      border: "1px solid #ccc",
-                                      borderRadius: "6px",
-                                      padding: "10px",
-                                      cursor: "pointer",
-                                      background: "#fff",
-                                      minWidth: "200px",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "8px",
-                                      flexWrap: "wrap",
-                                    }}
-                                    onClick={() =>
-                                      setShowCalendar((prev) => !prev)
-                                    }
-                                  >
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px",
-                                      }}
-                                    >
-                                      <strong>Date Range:</strong>
-                                      <span>
-                                        {range[0].startDate?.toLocaleDateString()}{" "}
-                                        -{" "}
-                                        {range[0].endDate?.toLocaleDateString()}
-                                      </span>
-                                      {showCalendar && (
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowCalendar(false);
-                                          }}
-                                          style={{
-                                            border: "none",
-                                            background: "transparent",
-                                            fontSize: "16px",
-                                            cursor: "pointer",
-                                            marginLeft: "15px",
-                                          }}
-                                          title="Close Calendar"
-                                        >
-                                          ❌
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {showCalendar && (
-                                    <div
-                                      style={{
-                                        position: "relative",
-                                        zIndex: 10,
-                                      }}
-                                    >
-                                      <DateRange
-                                        ranges={range}
-                                        onChange={handleSelect}
-                                        moveRangeOnFirstSelection={false}
-                                        months={1}
-                                        direction="horizontal"
-                                        minDate={threeMonthsAgo}
-                                        maxDate={today}
-                                        showDateDisplay={false}
-                                        showMonthAndYearPickers={true}
-                                        rangeColors={["rgb(250, 122, 78)"]}
-                                      />
-                                    </div>
-                                  )}
-                                </li>
-                              </ul>
+                              <FilterComponent
+                                FilterData={FilterData}
+                                selectedSearchType={selectedSearchType}
+                                setSelectedSearchType={setSelectedSearchType}
+                                selectedCountry={selectedCountry}
+                                setSelectedCountry={setSelectedCountry}
+                                selectedDeviceType={selectedDeviceType}
+                                setSelectedDeviceType={setSelectedDeviceType}
+                                range={range}
+                                setRange={setRange}
+                                showCalendar={showCalendar}
+                                setShowCalendar={setShowCalendar}
+                                today={today}
+                                threeMonthsAgo={threeMonthsAgo}
+                              />
                             </div>
 
                             <div className="col-12">
@@ -631,7 +485,7 @@ const Reports = () => {
                                 ))}
                               </div> */}
                               <div className="row gy-3">
-                                <div className="col-6 ">
+                                <div className="col-md-6 col-lg-4 ">
                                   <div className={`card keyword_data_card`}>
                                     <div className="card-header bg-white border-0">
                                       <h3 className="font_16 mb-0">
@@ -645,8 +499,12 @@ const Reports = () => {
                                     </div>
                                     <div className="card-footer">
                                       <div className="row">
-                                        {RankingKeyword?.bucket_matrix?.map(
-                                          (item: any, index: any) => {
+                                        {RankingKeyword?.bucket_matrix
+                                          ?.filter(
+                                            (item: any) =>
+                                              item.rank_bucket !== "Pos 21+"
+                                          )
+                                          ?.map((item: any, index: any) => {
                                             const isPositive =
                                               item.delta_abs >= 0;
                                             const arrowClass = isPositive
@@ -679,18 +537,34 @@ const Reports = () => {
                                                 </>
                                               </div>
                                             );
-                                          }
-                                        )}
+                                          })}
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
 
-                            <div className="col-12">
-                              <div className="row gy-3">
-                                <div className="col-6 ">
+                                <div className="col-md-6 col-lg-4  ">
+                                  {/* <div className={`card keyword_data_card`}>
+                                    <div className="card-header bg-white border-0">
+                                      <h3 className="font_16 mb-0">
+                                        Brand vs Non-Brand
+                                      </h3>
+                                      
+
+                                    </div>
+                                    <div className="card-body"></div>
+                                    <div className="card-footer">
+                                      <div className="row"></div>
+                                    </div>
+                                  </div> */}
+                                  <BrandVsNonBrandChart
+                                    title="Brand vs. Non-brand"
+                                    data={BrandedWordAnalysis?.pie_chart_data}
+                                    selectedMetric={selectedMetric}
+                                  />
+                                </div>
+
+                                <div className="col-md-6 col-lg-4  ">
                                   <div className={`card keyword_data_card`}>
                                     <div className="card-header bg-white border-0">
                                       <h3 className="font_16 mb-0">
@@ -698,7 +572,7 @@ const Reports = () => {
                                       </h3>
                                     </div>
                                     <div className="card-body">
-                                       <CircleGraph
+                                      <CircleGraph
                                         data={
                                           SearchConsole?.device_performance
                                             ?.device_comparisons
@@ -707,9 +581,7 @@ const Reports = () => {
                                       />
                                     </div>
                                     <div className="card-footer">
-                                      <div className="row">
-                                        
-                                      </div>
+                                      <div className="row"></div>
                                     </div>
                                   </div>
                                 </div>
@@ -728,104 +600,51 @@ const Reports = () => {
                         <div className="seo_report_content brand_content">
                           <form action="" className="row">
                             <div className="col-12">
-                              <ul className="oraganic_report_filter list-unstyled">
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="webType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">Search type: web</option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="countryType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">Country: UK</option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="mobileType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">
-                                        {" "}
-                                        Device type: mobile
-                                      </option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="monthType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">
-                                        Date: last 3 months
-                                      </option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                              </ul>
+                              <FilterComponent
+                                FilterData={FilterData}
+                                selectedSearchType={selectedSearchType}
+                                setSelectedSearchType={setSelectedSearchType}
+                                selectedCountry={selectedCountry}
+                                setSelectedCountry={setSelectedCountry}
+                                selectedDeviceType={selectedDeviceType}
+                                setSelectedDeviceType={setSelectedDeviceType}
+                                range={range}
+                                setRange={setRange}
+                                showCalendar={showCalendar}
+                                setShowCalendar={setShowCalendar}
+                                today={today}
+                                threeMonthsAgo={threeMonthsAgo}
+                              />
                             </div>
 
                             <div className="col-12">
                               <div className="row">
                                 <div className="col-12 col-lg-3">
-                                  <div className="card_box border-0 mb-3">
-                                    <h3 className="font_16 font_300">Clicks</h3>
-                                    <div className="pie_graph">
-                                      <img
-                                        src="/assets/images/pie_graph.png"
-                                        className="img-fluid pie_chart"
-                                        alt="pie chart"
-                                      />
-                                    </div>
+                                  <div className=" border-0 mb-3">
+                                    <PieChartGraph
+                                      data={
+                                        BrandedWordAnalysis?.click_percentage
+                                      }
+                                      title="Clicks"
+                                    />
                                   </div>
-                                  <div className="card_box border-0">
-                                    <h3 className="font_16 font_300">
-                                      Impressions
-                                    </h3>
-                                    <div className="pie_graph">
-                                      <img
-                                        src="/assets/images/pie_graph.png"
-                                        className="img-fluid pie_chart"
-                                        alt="pie chart"
-                                      />
-                                    </div>
-                                  </div>
+
+                                  <PieChartGraph
+                                    data={
+                                      BrandedWordAnalysis?.impression_percentage
+                                    }
+                                    title="Impressions"
+                                  />
                                 </div>
                                 <div className="col-12 col-lg-9">
                                   <div className="card_box click_chart h-100 border-0">
-                                    <img
-                                      src="https://courses.spatialthoughts.com/images/gee_charts/no2_time_series.png"
-                                      alt="click chart"
-                                      className="img-fluid h-100"
-                                    />
+                                     <BrandedGenericAreaChart
+                                    data={
+                                      BrandedWordAnalysis?.daily_metrics || []
+                                    }
+                                    selectedMetric={selectedMetric}
+                                    setSelectedMetric={setSelectedMetric}
+                                  />
                                   </div>
                                 </div>
                               </div>
@@ -839,135 +658,122 @@ const Reports = () => {
                                       Branded traffic
                                     </h3>
                                     <div className="grid_outer">
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          Impressions
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          186,254
-                                        </h4>
-                                        <p className="font_14 text-success mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          33.9%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          Clicks
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          7,022
-                                        </h4>
-                                        <p className="font_14 text-success mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          68.4%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          No. Keywords
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          51
-                                        </h4>
-                                        <p className="font_14 text-success mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          8.3%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          CTR
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          5.14%
-                                        </h4>
-                                        <p className="font_14 text-danger mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          25.8%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          Avg. position
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          12.93
-                                        </h4>
-                                        <p className="font_14 text-danger mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          -8%
-                                        </p>
-                                      </div>
+                                      {[
+                                        {
+                                          label: "Impressions",
+                                          key: "impressions",
+                                        },
+                                        { label: "Clicks", key: "clicks" },
+                                        {
+                                          label: "No. Keywords",
+                                          key: "no_of_keywords",
+                                        },
+                                        { label: "CTR", key: "ctr" },
+                                        {
+                                          label: "Avg. position",
+                                          key: "avg_position",
+                                        },
+                                      ].map(({ label, key }) => {
+                                        const data =
+                                          BrandedWordAnalysis
+                                            ?.branded_keywords?.[key];
+                                        const actual = data?.Actual ?? 0;
+                                        const fluctuationStr =
+                                          data?.fluctuation ?? "0";
+                                        const fluctuationNum =
+                                          parseFloat(fluctuationStr);
+                                        const isPositive = fluctuationNum >= 0;
+                                        const fluctuationClass = isPositive
+                                          ? "text-success"
+                                          : "text-danger";
+                                        const iconClass = isPositive
+                                          ? "bi-arrow-up-short"
+                                          : "bi-arrow-down-short";
+
+                                        return (
+                                          <div className="grid_part" key={key}>
+                                            <h3 className="font_16 font_300 mb-1">
+                                              {label}
+                                            </h3>
+                                            <h4 className="font_20 font_600 mb-1">
+                                              {actual}
+                                            </h4>
+                                            <p
+                                              className={`font_14 ${fluctuationClass} mb-1`}
+                                            >
+                                              <i
+                                                className={`bi ${iconClass}`}
+                                              ></i>{" "}
+                                              {fluctuationNum > 0
+                                                ? `+${fluctuationStr}`
+                                                : fluctuationStr}
+                                              %
+                                            </p>
+                                          </div>
+                                        );
+                                      })}
                                     </div>
                                   </div>
                                 </div>
+
                                 <div className="col-12 col-xxl-6">
                                   <div className="card_box">
                                     <h3 className="font_20 font_400 mb-2">
                                       Generic traffic
                                     </h3>
                                     <div className="grid_outer">
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          Impressions
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          186,254
-                                        </h4>
-                                        <p className="font_14 text-success mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          33.9%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          Clicks
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          7,022
-                                        </h4>
-                                        <p className="font_14 text-success mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          68.4%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          No. Keywords
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          51
-                                        </h4>
-                                        <p className="font_14 text-success mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          8.3%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          CTR
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          5.14%
-                                        </h4>
-                                        <p className="font_14 text-danger mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          25.8%
-                                        </p>
-                                      </div>
-                                      <div className="grid_part">
-                                        <h3 className="font_16 font_300 mb-1">
-                                          Avg. position
-                                        </h3>
-                                        <h4 className="font_20 font_600 mb-1">
-                                          12.93
-                                        </h4>
-                                        <p className="font_14 text-danger mb-1">
-                                          <i className="bi bi-arrow-up-short"></i>{" "}
-                                          -8%
-                                        </p>
-                                      </div>
+                                      {[
+                                        {
+                                          label: "Impressions",
+                                          key: "impressions",
+                                        },
+                                        { label: "Clicks", key: "clicks" },
+                                        {
+                                          label: "No. Keywords",
+                                          key: "no_of_keywords",
+                                        },
+                                        { label: "CTR", key: "ctr" },
+                                        {
+                                          label: "Avg. position",
+                                          key: "avg_position",
+                                        },
+                                      ].map(({ label, key }) => {
+                                        const data =
+                                          BrandedWordAnalysis
+                                            ?.non_branded_keywords?.[key];
+                                        const actual = data?.Actual ?? 0;
+                                        const fluctuation =
+                                          data?.fluctuation ?? "0";
+                                        const fluctuationNum =
+                                          parseFloat(fluctuation);
+                                        const isPositive = fluctuationNum > 0;
+                                        const fluctuationClass = isPositive
+                                          ? "text-success"
+                                          : "text-danger";
+                                        const icon = isPositive
+                                          ? "bi-arrow-up-short"
+                                          : "bi-arrow-down-short";
+
+                                        return (
+                                          <div className="grid_part" key={key}>
+                                            <h3 className="font_16 font_300 mb-1">
+                                              {label}
+                                            </h3>
+                                            <h4 className="font_20 font_600 mb-1">
+                                              {actual}
+                                            </h4>
+                                            <p
+                                              className={`font_14 ${fluctuationClass} mb-1`}
+                                            >
+                                              <i className={`bi ${icon}`}></i>{" "}
+                                              {fluctuationNum > 0
+                                                ? `+${fluctuation}`
+                                                : fluctuation}
+                                              %
+                                            </p>
+                                          </div>
+                                        );
+                                      })}
                                     </div>
                                   </div>
                                 </div>
@@ -976,236 +782,22 @@ const Reports = () => {
 
                             <div className="col-12">
                               <div className="row gy-2">
-                                <div className="col-12 col-xxl-6">
-                                  <div className="card_box">
-                                    <h3 className="font_20 font_400 ps-1">
-                                      Branded Keywords
-                                    </h3>
-                                    <div className="branded_keywords table-responsive">
-                                      <table className="table">
-                                        <thead>
-                                          <tr>
-                                            <th scope="col">Keywords</th>
-                                            <th scope="col">
-                                              Pos. last 30 days
-                                            </th>
-                                            <th scope="col">Pos. before</th>
-                                            <th scope="col">Change</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>kpi in google</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>
-                                              google optimisation template
-                                            </td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>google ads report</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo agency</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>facebook looker</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best adwords</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-12 col-xxl-6">
-                                  <div className="card_box">
-                                    <h3 className="font_20 font_400 ps-1">
-                                      Generic Keywords
-                                    </h3>
-                                    <div className="branded_keywords table-responsive">
-                                      <table className="table">
-                                        <thead>
-                                          <tr>
-                                            <th scope="col">Keywords</th>
-                                            <th scope="col">
-                                              Pos. last 30 days
-                                            </th>
-                                            <th scope="col">Pos. before</th>
-                                            <th scope="col">Change</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>kpi in google</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>
-                                              google optimisation template
-                                            </td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>google ads report</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo agency</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>facebook looker</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best adwords</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  </div>
-                                </div>
+                                <GenericKeywordsTable
+                                  keywordList={
+                                    BrandedWordAnalysis?.branded_keyword_list?.[
+                                      selectedMetric
+                                    ] ?? []
+                                  }
+                                  message="Branded Keywords"
+                                />
+                                <GenericKeywordsTable
+                                  keywordList={
+                                    BrandedWordAnalysis?.generic_keyword_list?.[
+                                      selectedMetric
+                                    ] ?? []
+                                  }
+                                  message="Generic Keywords"
+                                />
                               </div>
                             </div>
                           </form>
@@ -1221,69 +813,21 @@ const Reports = () => {
                         <div className="seo_report_content brand_content">
                           <form action="" className="row">
                             <div className="col-12">
-                              <ul className="oraganic_report_filter list-unstyled">
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="webType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">Search type: web</option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="countryType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">Country: UK</option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="mobileType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">
-                                        {" "}
-                                        Device type: mobile
-                                      </option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                                <li>
-                                  <div className="form_input">
-                                    <select
-                                      className="form-select"
-                                      id="monthType"
-                                      aria-label="Default select example"
-                                    >
-                                      <option value="">
-                                        Date: last 3 months
-                                      </option>
-                                      <option value="1">Option 1</option>
-                                      <option value="2">Option 2</option>
-                                      <option value="3">Option 3</option>
-                                    </select>
-                                  </div>
-                                </li>
-                              </ul>
+                              <FilterComponent
+                                FilterData={FilterData}
+                                selectedSearchType={selectedSearchType}
+                                setSelectedSearchType={setSelectedSearchType}
+                                selectedCountry={selectedCountry}
+                                setSelectedCountry={setSelectedCountry}
+                                selectedDeviceType={selectedDeviceType}
+                                setSelectedDeviceType={setSelectedDeviceType}
+                                range={range}
+                                setRange={setRange}
+                                showCalendar={showCalendar}
+                                setShowCalendar={setShowCalendar}
+                                today={today}
+                                threeMonthsAgo={threeMonthsAgo}
+                              />
                             </div>
 
                             <div className="col-12">

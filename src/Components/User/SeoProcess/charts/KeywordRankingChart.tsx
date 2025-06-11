@@ -32,14 +32,48 @@ const AreaChartGraph: React.FC<Props> = ({ data }) => {
 
   return (
     <ResponsiveContainer width="100%" height={250}>
-      <AreaChart data={formattedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+      <AreaChart
+        data={formattedData}
+        margin={{ top: 10, right: 30, left: 0, bottom: 0 }} // give more top margin
+      >
         <XAxis dataKey="date" />
         <YAxis />
         <Tooltip />
-        <Legend />
-        <Area type="monotone" dataKey="Top 3" stackId="1" stroke="#8884d8" fill="#8884d8" />
-        <Area type="monotone" dataKey="Top 10" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-        <Area type="monotone" dataKey="Top 20+" stackId="1" stroke="#ffc658" fill="#ffc658" />
+        <Legend
+          layout="horizontal"
+          verticalAlign="top"
+          align="center"
+          wrapperStyle={{
+            paddingBottom: 20,
+            fontSize: 10,
+            marginLeft: 25,
+            textTransform: "capitalize",
+            color: "#333",
+            fontWeight: 500,
+            lineHeight: "20px",
+          }}
+        />
+        <Area
+          type="monotone"
+          dataKey="Top 3"
+          stackId="1"
+          stroke="#8884d8"
+          fill="#8884d8"
+        />
+        <Area
+          type="monotone"
+          dataKey="Top 10"
+          stackId="1"
+          stroke="#82ca9d"
+          fill="#82ca9d"
+        />
+        <Area
+          type="monotone"
+          dataKey="Top 20+"
+          stackId="1"
+          stroke="#ffc658"
+          fill="#ffc658"
+        />
       </AreaChart>
     </ResponsiveContainer>
   );

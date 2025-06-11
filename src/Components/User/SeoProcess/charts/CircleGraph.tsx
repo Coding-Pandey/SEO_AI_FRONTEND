@@ -32,7 +32,7 @@ const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
       value: metrics[metric]?.Current || 0,
     }))
     .filter((entry) => entry.value > 0); // Filter out 0 values
-console.log(data,"data")
+// console.log(data,"data")
   if (chartData.length === 0) {
     return <p className="text-center">No data available for {metric}</p>;
   }
