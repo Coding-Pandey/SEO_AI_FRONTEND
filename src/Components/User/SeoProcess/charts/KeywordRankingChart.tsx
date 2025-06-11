@@ -20,7 +20,7 @@ interface Props {
   data: RankingData[];
 }
 
-const AreaChartGraph: React.FC<Props> = ({ data }) => {
+const KeywordRankingChart: React.FC<Props> = ({ data }) => {
   // Format date for X-axis labels
   const formattedData = data.map((item) => ({
     ...item,
@@ -54,29 +54,33 @@ const AreaChartGraph: React.FC<Props> = ({ data }) => {
           }}
         />
         <Area
-          type="monotone"
-          dataKey="Top 3"
-          stackId="1"
-          stroke="#8884d8"
-          fill="#8884d8"
-        />
-        <Area
-          type="monotone"
-          dataKey="Top 10"
-          stackId="1"
-          stroke="#82ca9d"
-          fill="#82ca9d"
-        />
-        <Area
-          type="monotone"
-          dataKey="Top 20+"
-          stackId="1"
-          stroke="#ffc658"
-          fill="#ffc658"
-        />
+  type="monotone"
+  dataKey="Top 3"
+  stackId="1"
+  strokeWidth={1}
+  stroke="#1E88E5"
+  fill="#1E88E5"
+/>
+<Area
+  type="monotone"
+  dataKey="Top 10"
+  stackId="1"
+   strokeWidth={1}
+  stroke="#90CAF9"
+  fill="#90CAF9"
+/>
+<Area
+  type="monotone"
+  dataKey="Top 20+"
+  stackId="1"
+   strokeWidth={1}
+  stroke="#BBDEFB"
+  fill="#BBDEFB"
+/>
+
       </AreaChart>
     </ResponsiveContainer>
   );
 };
 
-export default AreaChartGraph;
+export default KeywordRankingChart;

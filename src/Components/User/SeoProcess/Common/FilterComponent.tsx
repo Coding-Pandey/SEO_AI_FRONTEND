@@ -1,5 +1,4 @@
- 
-import React from "react";
+import React, { useState } from "react";
 import { DateRange } from "react-date-range";
 
 interface FilterProps {
@@ -33,15 +32,27 @@ const FilterComponent: React.FC<FilterProps> = ({
   today,
   threeMonthsAgo,
 }) => {
+  const [tempRange, setTempRange] = useState<any>(range);
+
   const handleSelect = (ranges: any) => {
     const { startDate, endDate } = ranges.selection;
-    setRange([
+    setTempRange([
       {
         startDate,
         endDate,
         key: "selection",
       },
     ]);
+  };
+
+  const handleApply = () => {
+    setRange(tempRange);
+    setShowCalendar(false);
+  };
+
+  const handleCancel = () => {
+    setTempRange(range);
+    setShowCalendar(false);
   };
 
   return (
@@ -94,57 +105,24 @@ const FilterComponent: React.FC<FilterProps> = ({
           </select>
         </div>
       </li>
-      <li>
+      <li className="date_selector">
         <div
           className="form_input"
-          style={{
-            border: "1px solid #ccc",
-            borderRadius: "6px",
-            padding: "10px",
-            cursor: "pointer",
-            background: "#fff",
-            minWidth: "200px",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            flexWrap: "wrap",
-          }}
           onClick={() => setShowCalendar((prev) => !prev)}
         >
-          <strong>Date Range:</strong>
-          <span>
-            {range[0].startDate?.toLocaleDateString()} -{" "}
-            {range[0].endDate?.toLocaleDateString()}
-          </span>
-          {showCalendar && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowCalendar(false);
-              }}
-              style={{
-                border: "none",
-                background: "transparent",
-                fontSize: "16px",
-                cursor: "pointer",
-                marginLeft: "15px",
-              }}
-              title="Close Calendar"
-            >
-              ❌
-            </button>
-          )}
+          <div className="form-control">
+            Date Range:
+            <span className="ms-1">
+              {range[0].startDate?.toLocaleDateString()} -{" "}
+              {range[0].endDate?.toLocaleDateString()}
+            </span>
+          </div>
         </div>
 
         {showCalendar && (
-          <div
-            style={{
-              position: "relative",
-              zIndex: 10,
-            }}
-          >
+          <div className="calendar_box">
             <DateRange
-              ranges={range}
+              ranges={tempRange}
               onChange={handleSelect}
               moveRangeOnFirstSelection={false}
               months={1}
@@ -153,8 +131,54 @@ const FilterComponent: React.FC<FilterProps> = ({
               maxDate={today}
               showDateDisplay={false}
               showMonthAndYearPickers={true}
-              rangeColors={["rgb(250, 122, 78)"]}
+              rangeColors={["#1E88E5"]}
             />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                marginTop: 5,
+                padding: "0 10px",
+              }}
+            >
+              <button
+                onClick={handleCancel}
+                  style={{
+                  border: "1px solid #1E88E5",
+                  color: "#1E88E5",
+                  backgroundColor: "transparent",
+                }}
+                className="btn"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApply}
+                className="btn"
+                style={{
+                  border: "1px solid #1E88E5",
+                  color: "#1E88E5",
+                  backgroundColor: "transparent",
+                  cursor:
+                    tempRange[0].startDate.toDateString() ===
+                    tempRange[0].endDate.toDateString()
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    tempRange[0].startDate.toDateString() ===
+                    tempRange[0].endDate.toDateString()
+                      ? 0.6
+                      : 1,
+                }}
+                disabled={
+                  tempRange[0].startDate.toDateString() ===
+                  tempRange[0].endDate.toDateString()
+                }
+              >
+                Apply
+              </button>
+            </div>
           </div>
         )}
       </li>

@@ -14,13 +14,15 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { subMonths } from "date-fns";
 import LineChartGraph from "./charts/LineChart";
-import AreaChartGraph from "./charts/KeywordRankingChart";
 import CircleGraph from "./charts/CircleGraph";
 import FilterComponent from "./Common/FilterComponent";
 import GenericKeywordsTable from "./Common/GenericKeywordsTable";
 import PieChartGraph from "./charts/PieChartGraph";
 import BrandVsNonBrandChart from "./charts/BrandVsNonBrandChart";
 import BrandedGenericAreaChart from "./charts/BrandedGenericAreaChart";
+import ImprovedAndDeclinedTable from "./Common/ImprovedAndDeclinedTable";
+import RankingAreaChart from "./charts/RankingAreaChart";
+import KeywordRankingChart from "./charts/KeywordRankingChart";
 
 export interface Site {
   siteUrl: string;
@@ -56,6 +58,25 @@ function formatDateToYYYYMMDD(date: any) {
   return `${year}-${month}-${day}`;
 }
 
+const getTitle = (rankBucket: string) => {
+  switch (rankBucket) {
+    case "Top 3":
+      return "Top 3 (#1-3)";
+    case "Top 4-10":
+      return "Top 10 (#4-10)";
+    case "Top 11-20":
+      return "Top 20 (#11-20)";
+    case "Pos 21+":
+      return "Position 21+";
+    default:
+      return rankBucket;
+  }
+};
+
+export const capitalizeFirstLetter = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
+
+
 const Reports = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -82,7 +103,7 @@ const Reports = () => {
       key: "selection",
     },
   ]);
-// console.log(selectedMetric,"selectedMetric")
+  // console.log(selectedMetric,"selectedMetric")
   useEffect(() => {
     fetchWebListDetails();
   }, []);
@@ -140,8 +161,6 @@ const Reports = () => {
       setIsLoading(false);
     }
   };
-
- 
 
   const cardMatrix: CardMatrix | undefined = SearchConsole?.card_matrix;
 
@@ -493,7 +512,7 @@ const Reports = () => {
                                       </h3>
                                     </div>
                                     <div className="card-body">
-                                      <AreaChartGraph
+                                      <KeywordRankingChart
                                         data={keywordRankingData}
                                       />
                                     </div>
@@ -638,13 +657,13 @@ const Reports = () => {
                                 </div>
                                 <div className="col-12 col-lg-9">
                                   <div className="card_box click_chart h-100 border-0">
-                                     <BrandedGenericAreaChart
-                                    data={
-                                      BrandedWordAnalysis?.daily_metrics || []
-                                    }
-                                    selectedMetric={selectedMetric}
-                                    setSelectedMetric={setSelectedMetric}
-                                  />
+                                    <BrandedGenericAreaChart
+                                      data={
+                                        BrandedWordAnalysis?.daily_metrics || []
+                                      }
+                                      selectedMetric={selectedMetric}
+                                      setSelectedMetric={setSelectedMetric}
+                                    />
                                   </div>
                                 </div>
                               </div>
@@ -789,6 +808,8 @@ const Reports = () => {
                                     ] ?? []
                                   }
                                   message="Branded Keywords"
+                                  selectedMetric={selectedMetric}
+
                                 />
                                 <GenericKeywordsTable
                                   keywordList={
@@ -797,6 +818,7 @@ const Reports = () => {
                                     ] ?? []
                                   }
                                   message="Generic Keywords"
+                                  selectedMetric={selectedMetric}
                                 />
                               </div>
                             </div>
@@ -834,62 +856,52 @@ const Reports = () => {
                               <div className="row">
                                 <div className="col-12 col-lg-3">
                                   <div className="ranking_left_cards">
-                                    <div className="card_box border-0">
-                                      <p className="font_14 font_300 mb-1">
-                                        Top 3 (# 1-3)
-                                      </p>
-                                      <h4 className="font_20 font_500 mb-1">
-                                        328
-                                      </h4>
-                                      <p className="font_14 text-success mb-0">
-                                        <i className="bi bi-arrow-up-short"></i>{" "}
-                                        171
-                                      </p>
-                                    </div>
-                                    <div className="card_box border-0">
-                                      <p className="font_14 font_300 mb-1">
-                                        Top 10 (# 4-10)
-                                      </p>
-                                      <h4 className="font_20 font_500 mb-1">
-                                        1730
-                                      </h4>
-                                      <p className="font_14 text-success mb-0">
-                                        <i className="bi bi-arrow-up-short"></i>{" "}
-                                        57
-                                      </p>
-                                    </div>
-                                    <div className="card_box border-0">
-                                      <p className="font_14 font_300 mb-1">
-                                        Top 20 (# 11-20)
-                                      </p>
-                                      <h4 className="font_20 font_500 mb-1">
-                                        328
-                                      </h4>
-                                      <p className="font_14 text-success mb-0">
-                                        <i className="bi bi-arrow-up-short"></i>{" "}
-                                        276
-                                      </p>
-                                    </div>
-                                    <div className="card_box border-0">
-                                      <p className="font_14 font_300 mb-1">
-                                        Top 10 (# 21+)
-                                      </p>
-                                      <h4 className="font_20 font_600 mb-1">
-                                        1730
-                                      </h4>
-                                      <p className="font_14 text-danger mb-0">
-                                        <i className="bi bi-arrow-down-short"></i>{" "}
-                                        846
-                                      </p>
-                                    </div>
+                                    {RankingKeyword?.bucket_matrix?.map(
+                                      (item: any, index: any) => {
+                                        const isPositive = item.delta_abs >= 0;
+
+                                        return (
+                                          <div
+                                            className="card_box border-0"
+                                            key={index}
+                                          >
+                                            <p className="font_14 font_300 mb-1">
+                                              {getTitle(item.rank_bucket)}
+                                            </p>
+                                            <h4 className="font_20 font_500 mb-1">
+                                              {item.current_count}
+                                            </h4>
+                                            <p
+                                              className={`font_14 mb-0 ${
+                                                isPositive
+                                                  ? "text-success"
+                                                  : "text-danger"
+                                              }`}
+                                            >
+                                              <i
+                                                className={`bi ${
+                                                  isPositive
+                                                    ? "bi-arrow-up-short"
+                                                    : "bi-arrow-down-short"
+                                                }`}
+                                              ></i>{" "}
+                                              {Math.abs(item.delta_abs)}
+                                            </p>
+                                          </div>
+                                        );
+                                      }
+                                    )}
                                   </div>
                                 </div>
                                 <div className="col-12 col-lg-9">
                                   <div className="card_box click_chart h-100 border-0">
-                                    <img
-                                      src="https://courses.spatialthoughts.com/images/gee_charts/no2_time_series.png"
-                                      alt="click chart"
-                                      className="img-fluid h-100"
+                                    <RankingAreaChart
+                                      data={
+                                        RankingKeyword?.daily_time_series || []
+                                      }
+                                      selectedMetric={selectedMetric}
+                                      setSelectedMetric={setSelectedMetric}
+                                      
                                     />
                                   </div>
                                 </div>
@@ -901,115 +913,16 @@ const Reports = () => {
                                 <div className="col-12 col-xxl-6">
                                   <div className="card_box">
                                     <h3 className="font_20 font_400 ps-1">
-                                      Improved Keywords
+                                      Improved Keywords{" "}
+                                      <span className="font_12 gray_clr ps-1">
+                                        {capitalizeFirstLetter(selectedMetric)}
+                                      </span>
                                     </h3>
                                     <div className="branded_keywords table-responsive">
-                                      <table className="table">
-                                        <thead>
-                                          <tr>
-                                            <th scope="col">Keywords</th>
-                                            <th scope="col">
-                                              Pos. last 30 days
-                                            </th>
-                                            <th scope="col">Pos. before</th>
-                                            <th scope="col">Change</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>kpi in google</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>
-                                              google optimisation template
-                                            </td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>google ads report</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo agency</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>facebook looker</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best adwords</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
+                                      <ImprovedAndDeclinedTable
+                                        data={RankingKeyword?.improved_keywords}
+                                        selectedMetric={selectedMetric}
+                                      />
                                     </div>
                                   </div>
                                 </div>
@@ -1018,116 +931,14 @@ const Reports = () => {
                                     <h3 className="font_20 font_400 ps-1">
                                       Declined Keywords{" "}
                                       <span className="font_12 gray_clr ps-1">
-                                        clicks
+                                        {capitalizeFirstLetter(selectedMetric)}
                                       </span>
                                     </h3>
                                     <div className="branded_keywords table-responsive">
-                                      <table className="table">
-                                        <thead>
-                                          <tr>
-                                            <th scope="col">Keywords</th>
-                                            <th scope="col">
-                                              Pos. last 30 days
-                                            </th>
-                                            <th scope="col">Pos. before</th>
-                                            <th scope="col">Change</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>kpi in google</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>
-                                              google optimisation template
-                                            </td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>google ads report</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo agency</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>facebook looker</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>best adwords</td>
-                                            <td>15</td>
-                                            <td>19</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              65
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>seo looker studio</td>
-                                            <td>19</td>
-                                            <td>33</td>
-                                            <td>
-                                              <i className="bi bi-arrow-up-short"></i>{" "}
-                                              17
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
+                                      <ImprovedAndDeclinedTable
+                                        data={RankingKeyword?.declined_keywords}
+                                        selectedMetric={selectedMetric}
+                                      />
                                     </div>
                                   </div>
                                 </div>

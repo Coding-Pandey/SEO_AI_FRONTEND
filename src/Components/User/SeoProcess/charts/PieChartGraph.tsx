@@ -51,7 +51,7 @@ const PieChartGraph: React.FC<Props> = ({ data, title }) => {
           padding: 20,
           borderRadius: 10,
           background: "#fff",
-          maxWidth: 300,
+          // maxWidth: 300,
         }}
       >
         <h3
@@ -85,7 +85,7 @@ const PieChartGraph: React.FC<Props> = ({ data, title }) => {
         padding: 20,
         borderRadius: 10,
         background: "#fff",
-        maxWidth: 300,
+        // maxWidth: 300,
       }}
     >
       <div className="graph_outer">

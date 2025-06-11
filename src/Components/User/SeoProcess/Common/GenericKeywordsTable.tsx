@@ -1,3 +1,5 @@
+import { capitalizeFirstLetter } from "../Reports";
+
 interface KeywordData {
   keyword: string;
   pos_last_30_days: number;
@@ -8,13 +10,20 @@ interface KeywordData {
 interface Props {
   keywordList: KeywordData[];
   message: string;
+  selectedMetric:string
 }
 
-const GenericKeywordsTable: React.FC<Props> = ({ keywordList, message }) => {
+const GenericKeywordsTable: React.FC<Props> = ({ keywordList, message,selectedMetric}) => {
   return (
     <div className="col-12 col-xxl-6">
       <div className="card_box">
-        <h3 className="font_20 font_400 ps-1">{message}</h3>
+        <h3 className="font_20 font_400 ps-1">
+          {message}
+          <span className="font_12 gray_clr ps-2">
+            {capitalizeFirstLetter(selectedMetric)}
+          </span>
+        </h3>
+
         <div className="branded_keywords table-responsive">
           <table className="table">
             <thead>

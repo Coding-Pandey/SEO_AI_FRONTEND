@@ -7,7 +7,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
+import ChartFilter from "../Common/ChartFilter";
 
 interface RawEntry {
   row_number: number;
@@ -43,19 +45,19 @@ const CustomTooltip = ({ active, payload, selectedMetric }: any) => {
         }}
       >
         <p style={{ marginBottom: 0 }}>
-          <span style={{ color: "#e74c3c" }}>●</span> Date:{" "}
+          <span style={{ color: "#90CAF9" }}>●</span> Date:{" "}
           {data.date2 || "N/A"}
         </p>
         <p style={{ marginBottom: 0 }}>
-          <span style={{ color: "#2ecc71" }}>●</span> Date:{" "}
+          <span style={{ color: "#1E88E5" }}>●</span> Date:{" "}
           {data.date1 || "N/A"}
         </p>
         <p style={{ marginBottom: 0 }}>
-          <span style={{ color: "#e74c3c" }}>●</span> {metricLabel}:{" "}
+          <span style={{ color: "#90CAF9" }}>●</span> {metricLabel}:{" "}
           {data.period2}
         </p>
         <p style={{ marginBottom: 0 }}>
-          <span style={{ color: "#2ecc71" }}>●</span> {metricLabel}:{" "}
+          <span style={{ color: "#1E88E5" }}>●</span> {metricLabel}:{" "}
           {data.period1}
         </p>
       </div>
@@ -65,8 +67,12 @@ const CustomTooltip = ({ active, payload, selectedMetric }: any) => {
   return null;
 };
 
-const LineChartGraph: React.FC<Props> = ({ period1, period2,  selectedMetric,
-  setSelectedMetric, }) => {
+const LineChartGraph: React.FC<Props> = ({
+  period1,
+  period2,
+  selectedMetric,
+  setSelectedMetric,
+}) => {
   // const [selectedMetric, setSelectedMetric] = useState<
   //   "clicks" | "impressions" | "ctr" | "position"
   // >("clicks");
@@ -92,75 +98,20 @@ const LineChartGraph: React.FC<Props> = ({ period1, period2,  selectedMetric,
     <div className="col-12">
       <div
         className="card_box click_chart"
-        style={{ height: 400, padding: 20, position: "relative" }}
+        style={{
+          height: 400,
+          minHeight: 400,
+          padding: 20,
+          position: "relative",
+        }}
       >
         {/* Filter Icon */}
-        <div
-          style={{
-            position: "absolute",
-            top: 5,
-            right: 10,
-            zIndex: 2,
-            fontWeight: "bold",
-          }}
-        >
-          <i
-            className="bi bi-filter"
-            style={{ fontSize: 20, cursor: "pointer" }}
-            onClick={() => setShowDropdown((prev) => !prev)}
-          ></i>
-
-          {showDropdown && (
-            <div
-              style={{
-                marginTop: 8,
-                background: "white",
-                border: "1px solid #ccc",
-                borderRadius: 6,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                padding: 10,
-                position: "absolute",
-                right: 0,
-                width: 160,
-              }}
-            >
-              {[
-                { key: "clicks", label: "Clicks" },
-                { key: "impressions", label: "Impressions" },
-                { key: "ctr", label: "CTR" },
-                { key: "position", label: "Avg. Position" },
-              ].map(({ key, label }) => (
-                <label
-                  key={key}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: 8,
-                    fontSize: 14,
-                    cursor: "pointer",
-                    color: "#333",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedMetric === key}
-                    onChange={() => {
-                      setSelectedMetric(key as any);
-                      setShowDropdown(false);
-                    }}
-                    style={{
-                      accentColor: "rgb(72, 114, 183)",
-                      marginRight: 8,
-                      width: 16,
-                      height: 16,
-                    }}
-                  />
-                  {label}
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
+        <ChartFilter
+          selectedMetric={selectedMetric}
+          setSelectedMetric={setSelectedMetric}
+          showDropdown={showDropdown}
+          setShowDropdown={setShowDropdown}
+        />
 
         {/* Chart */}
         <ResponsiveContainer width="100%" height="100%">
@@ -189,19 +140,33 @@ const LineChartGraph: React.FC<Props> = ({ period1, period2,  selectedMetric,
             <Tooltip
               content={<CustomTooltip selectedMetric={selectedMetric} />}
             />
-            <Line
-              type="monotone"
-              dataKey="period1"
-              stroke="#2ecc71"
-              dot={false}
-              name="Period 1"
+            <Legend
+              layout="horizontal"
+              verticalAlign="top"
+              wrapperStyle={{
+                paddingBottom: 20,
+                fontSize: 13,
+                textTransform: "capitalize",
+                color: "#333",
+                fontWeight: 500,
+                lineHeight: "20px",
+              }}
             />
             <Line
               type="monotone"
               dataKey="period2"
-              stroke="#e74c3c"
+              strokeWidth={2}
+              stroke="#90CAF9"
               dot={false}
-              name="Period 2"
+              name={`${selectedMetric}`}
+            />
+            <Line
+              type="monotone"
+              dataKey="period1"
+              stroke="#1E88E5"
+              strokeWidth={2}
+              dot={false}
+              name={`${selectedMetric} (previous Old days)`}
             />
           </LineChart>
         </ResponsiveContainer>

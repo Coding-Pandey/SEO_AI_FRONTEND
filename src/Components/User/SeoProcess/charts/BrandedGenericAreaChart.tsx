@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import ChartFilter from "../Common/ChartFilter";
 
 const metricsMap = {
   clicks: ["branded_clicks", "generic_clicks"],
@@ -33,88 +34,36 @@ const BrandedGenericAreaChart = ({
 
   return (
     <div
-      style={{ position: "relative", width: "100%", height: "400px" }}
-      className="card_box click_chart border-0"
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "400px",
+        minHeight: "400px",
+      }}
+      className="click_chart border-0"
     >
       {/* Filter Icon & Dropdown */}
-      <div
-        style={{
-          position: "absolute",
-          top: 5,
-          right: 10,
-          zIndex: 2,
-          fontWeight: "bold",
-        }}
-      >
-        <i
-          className="bi bi-filter"
-          style={{ fontSize: 20, cursor: "pointer" }}
-          onClick={() => setShowDropdown((prev) => !prev)}
-        ></i>
 
-       
-        {showDropdown && (
-            <div
-              style={{
-                marginTop: 8,
-                background: "white",
-                border: "1px solid #ccc",
-                borderRadius: 6,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                padding: 10,
-                position: "absolute",
-                right: 0,
-                width: 160,
-              }}
-            >
-              {[
-                { key: "clicks", label: "Clicks" },
-                { key: "impressions", label: "Impressions" },
-                { key: "ctr", label: "CTR" },
-                { key: "position", label: "Avg. Position" },
-              ].map(({ key, label }) => (
-                <label
-                  key={key}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: 8,
-                    fontSize: 14,
-                    cursor: "pointer",
-                    color: "#333",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedMetric === key}
-                    onChange={() => {
-                      setSelectedMetric(key as MetricType);
-                      setShowDropdown(false);
-                    }}
-                    style={{
-                      accentColor: "rgb(72, 114, 183)",
-                      marginRight: 8,
-                      width: 16,
-                      height: 16,
-                    }}
-                  />
-                  {label}
-                </label>
-              ))}
-            </div>
-          )}
-      </div>
+      <ChartFilter
+        selectedMetric={selectedMetric}
+        setSelectedMetric={setSelectedMetric}
+        showDropdown={showDropdown}
+        setShowDropdown={setShowDropdown}
+      />
 
-      <ResponsiveContainer>
+      <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data}>
           <defs>
+            {/* Brand Keywords (dark blue) */}
             <linearGradient id="brandedColor" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#007bff" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#007bff" stopOpacity={0} />
+              <stop offset="5%" stopColor="#4872b7" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#4872b7" stopOpacity={0} />
             </linearGradient>
+
+            {/* Generic Keywords (light blue) */}
             <linearGradient id="genericColor" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#00c49f" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#00c49f" stopOpacity={0} />
+              <stop offset="5%" stopColor="#9ec8f7" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#9ec8f7" stopOpacity={0} />
             </linearGradient>
           </defs>
 
@@ -122,22 +71,35 @@ const BrandedGenericAreaChart = ({
           <YAxis />
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
-          <Legend />
+          <Legend
+            layout="horizontal"
+            verticalAlign="top"
+            wrapperStyle={{
+              paddingBottom: 20,
+              fontSize: 13,
+              textTransform: "capitalize",
+              color: "#333",
+              fontWeight: 500,
+              lineHeight: "20px",
+            }}
+          />
 
           <Area
             type="monotone"
             dataKey={brandedKey}
-            name={`Branded ${selectedMetric}`}
-            stroke="#007bff"
+            name={`Brand Keywords`}
+            stroke="#1E88E5"
             fillOpacity={1}
+            strokeWidth={2}
             fill="url(#brandedColor)"
           />
           <Area
             type="monotone"
             dataKey={genericKey}
-            name={`Generic ${selectedMetric}`}
-            stroke="#00c49f"
+            name={`Generic Keywords`}
+            stroke="#90CAF9"
             fillOpacity={1}
+            strokeWidth={2}
             fill="url(#genericColor)"
           />
         </AreaChart>

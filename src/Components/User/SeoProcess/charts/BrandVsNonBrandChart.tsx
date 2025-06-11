@@ -62,6 +62,31 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
       percentage: metricData.generic_percentage,
     },
   ];
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          style={{
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            padding: 5,
+            borderRadius: 4,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          }}
+        >
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color, marginBottom: 4 }}>
+              <span style={{ color: entry.color }}>●</span> {entry.name}:{" "}
+              {typeof entry.value === "number"
+                ? `${entry.value.toFixed(1)}%`
+                : entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="card keyword_data_card">
@@ -96,12 +121,7 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
                   style={{ fill: "#333", fontSize: 8, fontWeight: 600 }}
                 />
               </Pie>
-              <Tooltip
-                formatter={(value: number, name: string) => [
-                  `${value.toFixed(1)}%`,
-                  name,
-                ]}
-              />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         </div>

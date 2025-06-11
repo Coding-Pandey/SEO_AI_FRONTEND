@@ -38,6 +38,7 @@ const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
   }
 
   return (
+    <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
@@ -59,6 +60,7 @@ const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
         <Legend />
       </PieChart>
     </ResponsiveContainer>
+    </div>
   );
 };
 
