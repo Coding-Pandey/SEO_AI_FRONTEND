@@ -1,15 +1,11 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
-import {
-  deleteSocialMediaData,
-  GeneratePostService,
-  GetSocialMediaData,
-} from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
+import { GeneratePostService ,deleteSocialMediaData ,GetSocialMediaData} from "./SocialMediaServices";
 
 const GeneratePost = () => {
   const [loading, setLoading] = useState<boolean>(false);

@@ -118,7 +118,7 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
                   dataKey="percentage"
                   position="inside"
                   formatter={(value: any) => `${value}%`}
-                  style={{ fill: "#333", fontSize: 8, fontWeight: 600 }}
+                  style={{ fill: "#fff", fontSize:10, fontWeight: 600 }}
                 />
               </Pie>
               <Tooltip content={<CustomTooltip />} />

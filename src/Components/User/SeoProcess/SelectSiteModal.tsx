@@ -8,7 +8,7 @@ export interface Site {
 
 interface SelectSiteModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  // onClose: () => void;
   sites: Site[];
   onSelect: (site: Site) => void;
   selectedSite: Site | null;
@@ -16,7 +16,7 @@ interface SelectSiteModalProps {
 
 const SelectSiteModal: React.FC<SelectSiteModalProps> = ({
   isOpen,
-  onClose,
+  // onClose,
   sites,
   onSelect,
   selectedSite,
@@ -42,13 +42,13 @@ const SelectSiteModal: React.FC<SelectSiteModalProps> = ({
           ))}
         </ul>
 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button
+        {/* <button
           className="modal-button"
           onClick={onClose}
           disabled={!selectedSite}
         >
           Continue
-        </button>
+        </button> */}
         </div>
       </div>
    

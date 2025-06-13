@@ -3,7 +3,8 @@ import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { SEOClusterUploadFile } from "../Services/Services";
+import { SEOClusterUploadFile } from "./SeoServices";
+ 
 
 const KeywordsSuggestionsResult = () => {
   const location = useLocation();

@@ -3,6 +3,9 @@ import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
 import Loading from "../../Page/Loading/Loading";
+import { toast } from "react-toastify";
+import ReactMarkdown from "react-markdown";
+import ScheduleModal from "./ScheduleModal";
 import {
   AddScheduleSocialMedia,
   deleteSocialMediaData,
@@ -10,10 +13,7 @@ import {
   GetGeneratedPostById,
   UpdateFileNameSocialMedia,
   UpdateImageSocialMedia,
-} from "../Services/Services";
-import { toast } from "react-toastify";
-import ReactMarkdown from "react-markdown";
-import ScheduleModal from "./ScheduleModal";
+} from "./SocialMediaServices";
 
 const GeneratedPostResult = () => {
   const { id } = useParams();
@@ -342,27 +342,27 @@ const GeneratedPostResult = () => {
     setUUIDS("");
   };
 
-    const handleDelete = async (uuid: string) => {
-      try {
-        const isConfirmed = window.confirm(
-          "Are you sure you want to delete this set?"
-        );
-        if (!isConfirmed) {
-          return;
-        }
-        const formData = { uuid };
-        const response = await deleteSocialMediaData(formData);
-        if (response.status === 200) {
-          navigate("/social/GeneratePost")
-          toast.success("File successfully deleted!", {
-            position: "top-right",
-            autoClose: 2000,
-          });
-        }
-      } catch (error: any) {
-        console.log("Failed to delete file.");
+  const handleDelete = async (uuid: string) => {
+    try {
+      const isConfirmed = window.confirm(
+        "Are you sure you want to delete this set?"
+      );
+      if (!isConfirmed) {
+        return;
       }
-    };
+      const formData = { uuid };
+      const response = await deleteSocialMediaData(formData);
+      if (response.status === 200) {
+        navigate("/social/GeneratePost");
+        toast.success("File successfully deleted!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
+    } catch (error: any) {
+      console.log("Failed to delete file.");
+    }
+  };
 
   return (
     <>
@@ -377,10 +377,11 @@ const GeneratedPostResult = () => {
                 <i className="bi bi-people-fill me-1 text_blue"></i> Post
                 Generator
                 <span className="text_blue">
-                  /{generatedPostDetails?.fileName
-                  ? generatedPostDetails.fileName.charAt(0).toUpperCase() +
-                    generatedPostDetails.fileName.slice(1)
-                  : ""}
+                  /
+                  {generatedPostDetails?.fileName
+                    ? generatedPostDetails.fileName.charAt(0).toUpperCase() +
+                      generatedPostDetails.fileName.slice(1)
+                    : ""}
                 </span>
                 <span
                   className="heading_edit"
@@ -536,10 +537,15 @@ const GeneratedPostResult = () => {
                   </div>
                 </div>
               </div>
-            ) : 
-              (<div className="multi_post_wrapper">
+            ) : (
+              <div className="multi_post_wrapper">
                 <div className="download_media mb-3">
-                  <button className="btn primary_btn" onClick={() => handleDelete(generatedPostDetails?.id)} >Delete the set</button>
+                  <button
+                    className="btn primary_btn"
+                    onClick={() => handleDelete(generatedPostDetails?.id)}
+                  >
+                    Delete the set
+                  </button>
                   <button
                     className="btn primary_btn ms-2"
                     onClick={() => navigate("/social/GeneratePost")}
@@ -1160,8 +1166,8 @@ const GeneratedPostResult = () => {
                     </div>
                   </div>
                 )}
-              </div>)
-             }
+              </div>
+            )}
 
             <ScheduleModal
               show={showModal}

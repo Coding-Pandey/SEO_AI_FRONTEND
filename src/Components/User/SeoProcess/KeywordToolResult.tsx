@@ -4,12 +4,9 @@ import SideBar from "../SideBar/SideBar";
 import { KeyboardEvent, useEffect, useState } from "react";
 import Select from "react-select";
 import { language_options, location_options } from "../../Page/store";
-import {
-  SEOClusterKeywordService,
-  SEOGenerateKeyword,
-} from "../Services/Services";
 import { toast } from "react-toastify";
 import Loading from "../../Page/Loading/Loading";
+import { SEOClusterKeywordService, SEOGenerateKeyword } from "./SeoServices";
 
 const KeywordToolResult = () => {
   const location = useLocation();

@@ -25,8 +25,8 @@ const Planner = lazy(() => import("./Components/User/SocialMedia/Planner"));
 const ContentGenerationResult = lazy(() => import("./Components/User/Content/ContentGenerationResult")); 
 const ContentSuggestionResult = lazy(() => import("./Components/User/Content/ContentSuggestionResult")); 
 const ContentPreviousList = lazy(() => import("./Components/User/Content/ContentPreviousList")); 
-const ProfileSetting = lazy(() => import("./Components/User/Pages/ProfileSetting")); 
-const ProfileSettingSuccess = lazy(() => import("./Components/User/Pages/ProfileSettingSuccess")); 
+const ProfileSetting = lazy(() => import("./Components/User/Setting/ProfileSetting")); 
+const ProfileSettingSuccess = lazy(() => import("./Components/User/Setting/ProfileSettingSuccess")); 
 const Reports = lazy(() => import("./Components/User/SeoProcess/Reports")); 
 
 function App() {

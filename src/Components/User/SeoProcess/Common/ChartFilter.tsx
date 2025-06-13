@@ -17,13 +17,14 @@ const ChartFilter: React.FC<ChartFilterProps> = ({
 }) => {
   return (
     <div
-      style={{
-        position: 'absolute',
-        top: 8,
-        right: 12,
-        zIndex: 3,
-        cursor: 'pointer',
-      }}
+    className='filter_item'
+      // style={{
+      //   position: 'absolute',
+      //   top: 8,
+      //   right: 12,
+      //   zIndex: 3,
+      //   cursor: 'pointer',
+      // }}
     >
       <i
         className="bi bi-filter"
@@ -42,6 +43,7 @@ const ChartFilter: React.FC<ChartFilterProps> = ({
             position: 'absolute',
             right: 0,
             width: 140,
+            zIndex:3
           }}
         >
           {(['clicks', 'impressions', 'ctr', 'position'] as MetricType[]).map((key) => (

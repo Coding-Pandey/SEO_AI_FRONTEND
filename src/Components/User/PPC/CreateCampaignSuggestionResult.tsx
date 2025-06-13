@@ -3,7 +3,7 @@ import Header from "../Header/Header"
 import SideBar from "../SideBar/SideBar"
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { PPclusterUploadFile } from "../Services/Services";
+import { PPclusterUploadFile } from "./PpcServices";
 
 
 const CreateCampaignSuggestionResult = () => {

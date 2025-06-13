@@ -1825,6 +1825,7 @@ form .row {
     width: 100%;
     font-size: 16px;
     line-height: 22px;
+    text-align: left;
 }
 
 .settings_tabs_wrapper .nav-pills {
@@ -2022,11 +2023,11 @@ header .dropdown-menu a:is(.active, :hover) i {
 }
 
 .seo_report_content .oraganic_report_filter li{
-    width: 21%;
+    width: 17%;
 }
 
 .seo_report_content .oraganic_report_filter li.date_selector{
-    width: 33%;
+    width: 25%;
      position: relative;
      cursor: pointer;
 }
@@ -2259,6 +2260,20 @@ font-weight: 500;
     cursor: not-allowed;
 }
 
+.click_chart .filter_item {
+    position: absolute;
+    right: 15px;
+
+}
+.filter_item {
+    cursor: pointer;
+    z-index: 3;
+}
+.filter_icon_wrapper {
+    font-size: 30px;
+}
+
+
 /* .recharts-responsive-container {
     width: 100% !important ;
     min-width: 0px;
@@ -2291,6 +2306,12 @@ font-weight: 500;
 
     .post_list_content table img {
         width: 300px;
+    }
+    .seo_report_content .oraganic_report_filter li {
+        width: 20%;
+    }
+    .seo_report_content .oraganic_report_filter li.date_selector {
+        width: 30%;
     }
 }
 
@@ -2325,6 +2346,14 @@ font-weight: 500;
     .branded_keywords table tr th:first-child,
     .branded_keywords table tr td:first-child {
         width: 50%;
+    }
+     .seo_report_content .oraganic_report_filter li {
+        /* width: 30%; */
+        width: 21%;
+    }
+    .seo_report_content .oraganic_report_filter li.date_selector {
+        /* width: 50%; */
+        width: 33%;
     }
 }
 

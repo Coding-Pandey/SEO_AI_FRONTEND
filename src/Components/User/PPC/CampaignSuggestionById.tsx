@@ -3,8 +3,8 @@ import Header from "../Header/Header"
 import SideBar from "../SideBar/SideBar"
 import {useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { deleteKeywordDataPpc, deletePageDataPpc, GetPpcClusterDataById, UpdatetitlePpc } from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
+import { UpdatetitlePpc,deleteKeywordDataPpc,deletePageDataPpc,GetPpcClusterDataById } from "./PpcServices";
 
 
 const CampaignSuggestionById = () => {

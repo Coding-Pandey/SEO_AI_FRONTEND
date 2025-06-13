@@ -23,6 +23,7 @@ import BrandedGenericAreaChart from "./charts/BrandedGenericAreaChart";
 import ImprovedAndDeclinedTable from "./Common/ImprovedAndDeclinedTable";
 import RankingAreaChart from "./charts/RankingAreaChart";
 import KeywordRankingChart from "./charts/KeywordRankingChart";
+import ChartFilter from "./Common/ChartFilter";
 
 export interface Site {
   siteUrl: string;
@@ -76,7 +77,6 @@ const getTitle = (rankBucket: string) => {
 export const capitalizeFirstLetter = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
-
 const Reports = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -90,7 +90,9 @@ const Reports = () => {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [SearchConsole, setSearchConsole] = useState<any>({});
   const [RankingKeyword, setRankingKeyword] = useState<any>({});
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [BrandedWordAnalysis, setBrandedWordAnalysis] = useState<any>({});
+  // const [BrandTerms, setBrandTerms] = useState<string>("");
   const [selectedMetric, setSelectedMetric] = useState<
     "clicks" | "impressions" | "ctr" | "position"
   >("clicks");
@@ -123,6 +125,12 @@ const Reports = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+  if (selectedSite) {
+    handleCloseModal();  
+  }
+}, [selectedSearchType, selectedCountry, selectedDeviceType, range, selectedSite]);
 
   const handleCloseModal = async () => {
     try {
@@ -223,7 +231,7 @@ const Reports = () => {
               <>
                 <SelectSiteModal
                   isOpen={isModalOpen}
-                  onClose={handleCloseModal}
+                  // onClose={handleCloseModal}
                   sites={webList}
                   onSelect={(site) => {
                     setSelectedSite(site);
@@ -586,9 +594,10 @@ const Reports = () => {
                                 <div className="col-md-6 col-lg-4  ">
                                   <div className={`card keyword_data_card`}>
                                     <div className="card-header bg-white border-0">
-                                      <h3 className="font_16 mb-0">
+                                      <h3 className="font_16 mb-2">
                                         Device Performance
                                       </h3>
+                                      <p style={{ color: "#aeb4bf", fontSize: "12px" }}>{selectedMetric}</p>
                                     </div>
                                     <div className="card-body">
                                       <CircleGraph
@@ -799,6 +808,15 @@ const Reports = () => {
                               </div>
                             </div>
 
+                            <div className="col-12 text-end">
+                              <ChartFilter
+                                selectedMetric={selectedMetric}
+                                setSelectedMetric={setSelectedMetric}
+                                showDropdown={showDropdown}
+                                setShowDropdown={setShowDropdown}
+                              />
+                            </div>
+
                             <div className="col-12">
                               <div className="row gy-2">
                                 <GenericKeywordsTable
@@ -809,7 +827,6 @@ const Reports = () => {
                                   }
                                   message="Branded Keywords"
                                   selectedMetric={selectedMetric}
-
                                 />
                                 <GenericKeywordsTable
                                   keywordList={
@@ -901,11 +918,19 @@ const Reports = () => {
                                       }
                                       selectedMetric={selectedMetric}
                                       setSelectedMetric={setSelectedMetric}
-                                      
                                     />
                                   </div>
                                 </div>
                               </div>
+                            </div>
+
+                            <div className="col-12 text-end">
+                              <ChartFilter
+                                selectedMetric={selectedMetric}
+                                setSelectedMetric={setSelectedMetric}
+                                showDropdown={showDropdown}
+                                setShowDropdown={setShowDropdown}
+                              />
                             </div>
 
                             <div className="col-12">

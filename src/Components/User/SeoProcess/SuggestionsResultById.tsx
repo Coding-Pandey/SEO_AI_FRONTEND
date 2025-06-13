@@ -3,13 +3,8 @@ import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {
-  deleteKeywordData,
-  deletePageData,
-  GetSeoClusterDataById,
-  UpdateSEOtitle,
-} from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
+import { deleteKeywordData, deletePageData, GetSeoClusterDataById, UpdateSEOtitle } from "./SeoServices";
 
 interface Keyword {
   Keyword_id: string;

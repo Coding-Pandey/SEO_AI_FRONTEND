@@ -80,7 +80,7 @@ const FilterComponent: React.FC<FilterProps> = ({
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
           >
-            <option value="UK">Country: {selectedCountry}</option>
+            <option value="USA">Country: {selectedCountry}</option>
             {FilterData.countries?.map((country: any, idx: number) => (
               <option key={idx} value={country.code}>
                 {country.name}
@@ -89,7 +89,7 @@ const FilterComponent: React.FC<FilterProps> = ({
           </select>
         </div>
       </li>
-      <li>
+      <li >
         <div className="form_input">
           <select
             className="form-select"
@@ -144,7 +144,7 @@ const FilterComponent: React.FC<FilterProps> = ({
             >
               <button
                 onClick={handleCancel}
-                  style={{
+                style={{
                   border: "1px solid #1E88E5",
                   color: "#1E88E5",
                   backgroundColor: "transparent",
@@ -182,6 +182,18 @@ const FilterComponent: React.FC<FilterProps> = ({
           </div>
         )}
       </li>
+      {/* <li className="brand_terms">
+        <div className="form_input">
+          <select
+            className="form-select"
+            // value={selectedDeviceType}
+            // onChange={(e) => setSelectedDeviceType(e.target.value)}
+          >
+            <option value="mobile">Brand terms</option>
+            
+          </select>
+        </div>
+      </li> */}
     </ul>
   );
 };

@@ -104,7 +104,7 @@ const PieChartGraph: React.FC<Props> = ({ data, title }) => {
                   cx="50%"
                   cy="50%"
                   innerRadius={30}
-                  outerRadius={50}
+                  outerRadius={65}
                   paddingAngle={3}
                   dataKey="value"
                   stroke="none"
@@ -115,7 +115,7 @@ const PieChartGraph: React.FC<Props> = ({ data, title }) => {
                   <LabelList
                     dataKey="percentage"
                     position="inside"
-                    style={{ fill: "#333", fontSize: 5, fontWeight: 600 }}
+                    style={{ fill: "#fff", fontSize:9, fontWeight:500 }}
                     formatter={(value: any) => `${value}%`}
                   />
                 </Pie>

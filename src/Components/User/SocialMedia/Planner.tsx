@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
-import {
-  deletePlannerSocialMediaData,
-  GetPlannerSocialMediaData,
-  UpdateScheduleSocialMediaPlanner,
-} from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import ScheduleModal from "./ScheduleModal";
+import { deletePlannerSocialMediaData,GetPlannerSocialMediaData,UpdateScheduleSocialMediaPlanner } from "./SocialMediaServices";
 
 const platforms = [
   "linkedin_posts",
