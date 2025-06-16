@@ -1,3 +1,4 @@
+// import axios from "axios";
 import axiosInstance from "../../../Interceptor/Interceptor";
 import {
   SEOClusterKeywordDataPayload,
@@ -6,6 +7,19 @@ import {
 } from "../UserInterface/UserInterface";
 
 //Report
+// const userDataJson = localStorage.getItem('user_Data');
+// const userData = userDataJson ? JSON.parse(userDataJson) : null;
+// const token = userData?.access_token;
+
+export const GetFilterData = async () => {
+  try {
+    const response = await axiosInstance.get(`/api/report_filter`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const GetWebListDetails = async () => {
   try {
@@ -16,14 +30,80 @@ export const GetWebListDetails = async () => {
   }
 };
 
-export const GetFilterData = async () => {
-  try {
-    const response = await axiosInstance.get(`/api/report_filter`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+
+// Function to refresh the token
+// const refreshToken = async () => {
+//   try {
+//     const response = await axios.get(
+//       `${import.meta.env.VITE_API_URL}/api/refresh_token/google_search_console`, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,  
+//           Accept: 'application/json'
+//         }
+//       }
+//     );
+
+//     const newAccessToken = response.data?.access_token;
+
+//     if (newAccessToken) {
+//       // Update the localStorage with new token
+//       const userDataJson = localStorage.getItem("user_Data");
+//       const userData = userDataJson ? JSON.parse(userDataJson) : {};
+//       userData.access_token = newAccessToken;
+//       localStorage.setItem("user_Data", JSON.stringify(userData));
+//     }
+
+//     return newAccessToken;
+//   } catch (error) {
+//     console.error("Failed to refresh token:", error);
+//     throw error;
+//   }
+// };
+
+
+// export const GetWebListDetails = async () => {
+//   try {
+
+
+//     const response = await axios.get(
+//       `${import.meta.env.VITE_API_URL}/api/search_console/sites`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,  
+//           Accept: 'application/json'
+//         }
+//       }
+//     );
+
+//     return response;
+//   } catch (error:any) {
+//         if (error.response?.status === 401) {
+//       try {
+//         // Try to refresh the token
+//         const newToken = await refreshToken();  
+
+//         // Retry the original request with new token
+//         const response = await axios.get(
+//           `${import.meta.env.VITE_API_URL}/api/search_console/sites`,
+//           {
+//             headers: {
+//               Authorization: `Bearer ${newToken}`,
+//               Accept: "application/json",
+//             },
+//           }
+//         );
+
+//         return response;
+//       } catch (refreshError) {
+//         console.error("Token refresh failed. Logging out...");
+//         throw refreshError;
+//       }
+//     } else {
+//       throw error;
+//     }
+//   }
+// }
+ 
 
 export const AddSearchConsole = async (formData: any) => {
   try {

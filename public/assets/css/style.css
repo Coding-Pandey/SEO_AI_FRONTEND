@@ -2198,6 +2198,52 @@ font-weight: 500;
 
 
 
+.custom-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;     
+  height: 100%;
+  background: rgba(0, 0, 0, 0); 
+  z-index: 1040;
+  pointer-events: none;      
+  transition: background 0.4s ease-in-out;
+}
+
+.custom-sidebar-overlay.open {
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.custom-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80%;
+  max-width: 300px;
+  height: 100%;
+  background: #fff;
+  z-index: 1050;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out 0.3s; 
+}
+
+
+.custom-sidebar-overlay.open .custom-sidebar {
+  transform: translateX(0);
+}
+
+
+.custom-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+
+
 /* components/Modal/SelectSiteModal.css */
 
 
@@ -2510,6 +2556,7 @@ font-weight: 500;
         width: 100%;
         top: 0px;
         height: 94%;
+        overflow-y: auto;
     }
 
 
@@ -2748,6 +2795,14 @@ font-weight: 500;
         font-size: 12px;
         line-height: 16px;
     }
+
+    .edit_post_wrapper {
+    width: 100%;
+   }
+
+   .suggest_card_outer {
+    column-count: 1;
+   }
 
      .seo_report_content .oraganic_report_filter li, .seo_report_content .oraganic_report_filter li.date_selector {
         width: 100%;
