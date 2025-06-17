@@ -33,30 +33,30 @@ const SelectSiteModal: React.FC<SelectSiteModalProps> = ({
 
   return (
     <>
-      {webListAllData === "" ||
-        (webListAllData === null && (
-          <div className="modal-container">
-            <h2 className="modal-title">🔗 Select a Site</h2>
+      {(webListAllData === "" || webListAllData === null) && (
+  <div className="modal-container">
+    <h2 className="modal-title">🔗 Select a Site</h2>
 
-            <ul className="site-list">
-              {sites.map((site, index) => (
-                <li
-                  key={index}
-                  className={`site-item ${
-                    selectedSite?.siteUrl === site.siteUrl ? "selected" : ""
-                  }`}
-                  onClick={() => {
-                    if (webListAllData === "") {
-                      onSelect(site);
-                    }
-                  }}
-                >
-                  {site.siteUrl}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+    <ul className="site-list">
+      {sites.map((site, index) => (
+        <li
+          key={index}
+          className={`site-item ${
+            selectedSite?.siteUrl === site.siteUrl ? "selected" : ""
+          }`}
+          onClick={() => {
+            if (webListAllData === "" || webListAllData === null) {
+              onSelect(site);
+            }
+          }}
+        >
+          {site.siteUrl}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
     </>
   );
 };
