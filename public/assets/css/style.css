@@ -2058,7 +2058,55 @@ color: #000;
 font-weight: 500;
 }
 
+
+.brand_select{
+    position: relative;
+}
+.brand_select .form-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.brand_select  .brand_content_box {
+    position: absolute;
+    right: 0px;
+    background-color: #fff;
+    z-index: 9;
+    width: 630px;
+    border: 2px solid #e7e7e7;
+    padding: 12px;
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 15px;
+    border-radius: 6px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
  
+.brand_select .box_wrapper {
+    width: calc(100% - 75px);
+    display: flex;
+    column-gap: 10px;
+}
+.brand_select .brand_tag_wrapper {
+    border: 2px solid #e7e7e7;
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+}
+
+.brand_select .brand_tag_wrapper .brang_tag {
+    border: 2px solid #efefef;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
 
 
 .seo_report_content .overview_impressions {
@@ -2105,6 +2153,10 @@ font-weight: 500;
     color: #fff;
     padding: 3px 6px;
     border-radius: 5px;
+}
+
+.graph-body {
+    flex-direction: row;
 }
 
 .device_perfomance .card-footer .row>* {
@@ -2346,6 +2398,10 @@ font-weight: 500;
 
 /* Responsive css */
 @media only screen and (max-width:1599px) {
+    .brand_select  .brand_content_box {
+        left: 0px;
+        right: auto;
+    }
     .post_list_content table th {
         width: 300px;
     }
@@ -2400,6 +2456,12 @@ font-weight: 500;
     .seo_report_content .oraganic_report_filter li.date_selector {
         /* width: 50%; */
         width: 33%;
+    }
+    .brand_select  .brand_content_box {
+        width: 38vw;
+    }
+    .graph-body {
+        flex-direction: column;
     }
 }
 
@@ -2485,6 +2547,9 @@ font-weight: 500;
     }
     .seo_report_content .oraganic_report_filter li, .seo_report_content .oraganic_report_filter li.date_selector {
         width: 48%;
+    }
+    .brand_select  .brand_content_box {
+        width: 50vw;
     }
 }
 
@@ -2672,6 +2737,9 @@ font-weight: 500;
     .branded_keywords .table {
         min-width: 500px;
     }
+    .brand_select  .brand_content_box {
+        width: 80vw;
+    }
 }
 
 @media only screen and (max-width:576px) {
@@ -2805,6 +2873,9 @@ font-weight: 500;
    }
 
      .seo_report_content .oraganic_report_filter li, .seo_report_content .oraganic_report_filter li.date_selector {
+        width: 100%;
+    }
+    .brand_select  .brand_content_box {
         width: 100%;
     }
 }

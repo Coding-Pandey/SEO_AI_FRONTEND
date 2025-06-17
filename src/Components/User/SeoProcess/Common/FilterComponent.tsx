@@ -15,6 +15,8 @@ interface FilterProps {
   setShowCalendar: React.Dispatch<React.SetStateAction<boolean>>;
   today: Date;
   threeMonthsAgo: Date;
+  onSaveBrandTags: (tags: string[]) => void;
+  activeTab: string;
 }
 
 const FilterComponent: React.FC<FilterProps> = ({
@@ -31,8 +33,34 @@ const FilterComponent: React.FC<FilterProps> = ({
   setShowCalendar,
   today,
   threeMonthsAgo,
+  onSaveBrandTags,
+  activeTab,
 }) => {
   const [tempRange, setTempRange] = useState<any>(range);
+  const [showInputBox, setShowInputBox] = useState<boolean>(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState("");
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if ((e.key === "Enter" || e.key === ",") && inputValue.trim() !== "") {
+      e.preventDefault();
+      if (!tags.includes(inputValue.trim())) {
+        setTags([...tags, inputValue.trim()]);
+      }
+      setInputValue("");
+    }
+  };
+
+  const handleRemoveTag = (index: number) => {
+    setTags(tags.filter((_, i) => i !== index));
+  };
+
+  const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    onSaveBrandTags(tags);
+    setTags([]);
+    setShowInputBox(false);
+  };
 
   const handleSelect = (ranges: any) => {
     const { startDate, endDate } = ranges.selection;
@@ -54,6 +82,7 @@ const FilterComponent: React.FC<FilterProps> = ({
     setTempRange(range);
     setShowCalendar(false);
   };
+  // console.log(FilterData,"FilterData")
 
   return (
     <ul className="oraganic_report_filter list-unstyled">
@@ -65,7 +94,8 @@ const FilterComponent: React.FC<FilterProps> = ({
             onChange={(e) => setSelectedSearchType(e.target.value)}
           >
             <option value="web">Search type: {selectedSearchType}</option>
-            {FilterData.search_types?.[0]?.map((type: string, idx: number) => (
+            {/* {FilterData?.search_types?.[0]?.map((type: string, idx: number) => (*/}
+             {FilterData?.search_types?.map((type: string, idx: number) => (
               <option key={idx} value={type}>
                 {type}
               </option>
@@ -89,7 +119,7 @@ const FilterComponent: React.FC<FilterProps> = ({
           </select>
         </div>
       </li>
-      <li >
+      <li>
         <div className="form_input">
           <select
             className="form-select"
@@ -182,18 +212,80 @@ const FilterComponent: React.FC<FilterProps> = ({
           </div>
         )}
       </li>
-      {/* <li className="brand_terms">
-        <div className="form_input">
-          <select
-            className="form-select"
-            // value={selectedDeviceType}
-            // onChange={(e) => setSelectedDeviceType(e.target.value)}
+      {activeTab === "brand" && (
+        <li className="brand_select">
+          <div
+            className="form_input"
+            onClick={() => setShowInputBox((prev) => !prev)}
           >
-            <option value="mobile">Brand terms</option>
-            
-          </select>
-        </div>
-      </li> */}
+            <div className="form-control">
+              Brand terms{" "}
+              <span>
+                <i className="bi bi-chevron-down"></i>
+              </span>
+            </div>
+          </div>
+          {showInputBox && (
+            <div className="brand_content_box">
+              <div className="box_wrapper">
+                <label>contains:</label>
+                <div className="brand_tag_wrapper">
+                  {tags.map((tag, index) => (
+                    <div key={index} className="brang_tag">
+                      {tag}
+                      <span
+                        onClick={() => handleRemoveTag(index)}
+                        style={{
+                          marginLeft: "6px",
+                          cursor: "pointer",
+                          color: "#007bff",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        ×
+                      </span>
+                    </div>
+                  ))}
+
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type and press Enter"
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      flex: 1,
+                      minWidth: "120px",
+                      padding: "4px",
+                      fontSize: "14px",
+                      background: "transparent",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleSave}
+                style={{
+                  marginLeft: "10px",
+                  padding: "8px 14px",
+                  backgroundColor: "#fff",
+                  border: "1px solid #007bff",
+                  color: "#007bff",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  height: "40px",
+                }}
+              >
+                Save
+              </button>
+            </div>
+          )}
+        </li>
+      )}
     </ul>
   );
 };

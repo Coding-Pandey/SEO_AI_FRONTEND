@@ -95,8 +95,8 @@ const PieChartGraph: React.FC<Props> = ({ data, title }) => {
         >
           {title}
         </h3>
-        <div className="d-flex flex-column align-items-center">
-          <div style={{ position: "relative", width: 180, height: 140 }}>
+        <div className="graph-body  d-flex justify-content-center align-items-center">
+          <div style={{ position: "relative", width: 180, height: 150 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -104,7 +104,7 @@ const PieChartGraph: React.FC<Props> = ({ data, title }) => {
                   cx="50%"
                   cy="50%"
                   innerRadius={30}
-                  outerRadius={65}
+                  outerRadius={70}
                   paddingAngle={3}
                   dataKey="value"
                   stroke="none"

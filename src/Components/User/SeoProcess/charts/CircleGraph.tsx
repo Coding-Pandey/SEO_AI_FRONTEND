@@ -12,7 +12,7 @@ interface CircleGraphProps {
   metric: "clicks" | "impressions" | "ctr" | "position";
 }
 
-const COLORS = ["#90CAF9", "#1E88E5"]; // Light Blue, Dark Blue
+const COLORS = ["#90CAF9", "#007bba"];  
 
 
 const metricKeyMap: { [key: string]: string } = {
@@ -80,7 +80,8 @@ const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
   };
 
   return (
-    <div style={{ width: 250, height: 200 }}>
+ <div  className="graph-body  d-flex justify-content-center align-items-center">
+    <div style={{ width: 250, height: 200 }}  >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -89,7 +90,7 @@ const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
             nameKey="name"
             stroke="none"
             innerRadius={45}
-            outerRadius={80}
+            outerRadius={90}
             label={renderCustomizedLabel}
             labelLine={false}
           >
@@ -103,23 +104,24 @@ const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
           <Tooltip />
         </PieChart>
       </ResponsiveContainer>
-      <div className="ml-3 d-flex justify-content-center align-items-center flex-column">
-        {chartData.map((entry, index) => (
-          <div key={index} className="d-flex align-items-center mb-2">
-            <div
-              style={{
-                width: 10,
-                height: 10,
-                backgroundColor: COLORS[index],
-                borderRadius: "50%",
-                marginRight: 8,
-              }}
-            ></div>
-            <span style={{ fontSize: 13 }}>{entry.name}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+    </div> 
+    <div className="ml-3">
+          {chartData.map((entry, index) => (
+            <div key={index} className="d-flex align-items-center mb-2">
+              <div
+                style={{
+                  width: 10,
+                  height: 10,
+                  backgroundColor: COLORS[index],
+                  borderRadius: "50%",
+                  marginRight: 8,
+                }}
+              ></div>
+              <span style={{ fontSize: 13 }}>{entry.name}</span>
+            </div>
+          ))}
+        </div>
+   </div>
   );
 };
 

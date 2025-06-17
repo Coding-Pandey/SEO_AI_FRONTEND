@@ -1,4 +1,4 @@
-// import axios from "axios";
+import axios from "axios";
 import axiosInstance from "../../../Interceptor/Interceptor";
 import {
   SEOClusterKeywordDataPayload,
@@ -7,9 +7,9 @@ import {
 } from "../UserInterface/UserInterface";
 
 //Report
-// const userDataJson = localStorage.getItem('user_Data');
-// const userData = userDataJson ? JSON.parse(userDataJson) : null;
-// const token = userData?.access_token;
+const userDataJson = localStorage.getItem('user_Data');
+const userData = userDataJson ? JSON.parse(userDataJson) : null;
+const token = userData?.access_token;
 
 export const GetFilterData = async () => {
   try {
@@ -20,90 +20,52 @@ export const GetFilterData = async () => {
   }
 };
 
-
-export const GetWebListDetails = async () => {
-  try {
-    const response = await axiosInstance.get(`/api/search_console/sites`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-
-// Function to refresh the token
-// const refreshToken = async () => {
+// export const GetWebListDetails = async () => {
 //   try {
-//     const response = await axios.get(
-//       `${import.meta.env.VITE_API_URL}/api/refresh_token/google_search_console`, {
-//         headers: {
-//           Authorization: `Bearer ${token}`,  
-//           Accept: 'application/json'
-//         }
-//       }
-//     );
-
-//     const newAccessToken = response.data?.access_token;
-
-//     if (newAccessToken) {
-//       // Update the localStorage with new token
-//       const userDataJson = localStorage.getItem("user_Data");
-//       const userData = userDataJson ? JSON.parse(userDataJson) : {};
-//       userData.access_token = newAccessToken;
-//       localStorage.setItem("user_Data", JSON.stringify(userData));
-//     }
-
-//     return newAccessToken;
+//     const response = await axiosInstance.get(`/api/search_console/sites`);
+//     return response;
 //   } catch (error) {
-//     console.error("Failed to refresh token:", error);
 //     throw error;
 //   }
 // };
 
-
-// export const GetWebListDetails = async () => {
-//   try {
-
-
-//     const response = await axios.get(
-//       `${import.meta.env.VITE_API_URL}/api/search_console/sites`,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,  
-//           Accept: 'application/json'
-//         }
-//       }
-//     );
-
-//     return response;
-//   } catch (error:any) {
-//         if (error.response?.status === 401) {
-//       try {
-//         // Try to refresh the token
-//         const newToken = await refreshToken();  
-
-//         // Retry the original request with new token
-//         const response = await axios.get(
-//           `${import.meta.env.VITE_API_URL}/api/search_console/sites`,
-//           {
-//             headers: {
-//               Authorization: `Bearer ${newToken}`,
-//               Accept: "application/json",
-//             },
-//           }
-//         );
-
-//         return response;
-//       } catch (refreshError) {
-//         console.error("Token refresh failed. Logging out...");
-//         throw refreshError;
-//       }
-//     } else {
-//       throw error;
-//     }
-//   }
-// }
  
+const refreshToken = async () => {
+  try {
+    const response = await axiosInstance.get(`/api/refresh_token/google_search_console`);
+    const isSuccess = response.status === 200 || response.status === 201;
+    return isSuccess;
+  } catch (error) {
+    console.error("Failed to refresh token:", error);
+    return false;
+  }
+};
+
+export const GetWebListDetails = async (): Promise<any> => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/search_console/sites`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json'
+        }
+      }
+    );
+    return response;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      const refreshed = await refreshToken();
+      if (refreshed) {
+        return await GetWebListDetails(); 
+      } else {
+        throw new Error("Token refresh failed.");
+      }
+    } else {
+      throw error;
+    }
+  }
+};
 
 export const AddSearchConsole = async (formData: any) => {
   try {

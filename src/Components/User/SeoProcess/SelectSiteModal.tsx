@@ -1,5 +1,4 @@
-import React from 'react';
- 
+import React, { useEffect } from "react";
 
 export interface Site {
   siteUrl: string;
@@ -8,51 +7,59 @@ export interface Site {
 
 interface SelectSiteModalProps {
   isOpen: boolean;
-  // onClose: () => void;
   sites: Site[];
   onSelect: (site: Site) => void;
   selectedSite: Site | null;
+  webListAllData: string | null;
 }
 
 const SelectSiteModal: React.FC<SelectSiteModalProps> = ({
   isOpen,
-  // onClose,
   sites,
   onSelect,
   selectedSite,
+  webListAllData,
 }) => {
-  if (!isOpen) return null;
+ 
+  useEffect(() => {
+    if (isOpen && webListAllData !== null) {
+      const matchedSite = sites.find((site) => site.siteUrl === webListAllData);
+      if (matchedSite) {
+        onSelect(matchedSite);
+      }
+    }
+  }, [isOpen, webListAllData, sites, onSelect]);
+ 
 
   return (
- 
-      <div className="modal-container">
-        <h2 className="modal-title">🔗 Select a Site</h2>
+    <>
+      {webListAllData === "" ||
+        (webListAllData === null && (
+          <div className="modal-container">
+            <h2 className="modal-title">🔗 Select a Site</h2>
 
-        <ul className="site-list">
-          {sites.map((site, index) => (
-            <li
-              key={index}
-              className={`site-item ${
-                selectedSite?.siteUrl === site.siteUrl ? 'selected' : ''
-              }`}
-              onClick={() => onSelect(site)}
-            >
-              {site.siteUrl}
-            </li>
-          ))}
-        </ul>
-<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        {/* <button
-          className="modal-button"
-          onClick={onClose}
-          disabled={!selectedSite}
-        >
-          Continue
-        </button> */}
-        </div>
-      </div>
-   
+            <ul className="site-list">
+              {sites.map((site, index) => (
+                <li
+                  key={index}
+                  className={`site-item ${
+                    selectedSite?.siteUrl === site.siteUrl ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    if (webListAllData === "") {
+                      onSelect(site);
+                    }
+                  }}
+                >
+                  {site.siteUrl}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+    </>
   );
 };
 
 export default SelectSiteModal;
+ 

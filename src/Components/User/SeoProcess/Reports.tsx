@@ -81,6 +81,7 @@ const Reports = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [webList, setWebList] = useState<Site[]>([]);
+  const [webListAllData, setWebListAllData] = useState<string | null>(null);
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [FilterData, setFilterData] = useState<any>({});
   const [selectedDeviceType, setSelectedDeviceType] =
@@ -92,7 +93,8 @@ const Reports = () => {
   const [RankingKeyword, setRankingKeyword] = useState<any>({});
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [BrandedWordAnalysis, setBrandedWordAnalysis] = useState<any>({});
-  // const [BrandTerms, setBrandTerms] = useState<string>("");
+  const [BrandTags, setBrandTags] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("overview");
   const [selectedMetric, setSelectedMetric] = useState<
     "clicks" | "impressions" | "ctr" | "position"
   >("clicks");
@@ -105,7 +107,7 @@ const Reports = () => {
       key: "selection",
     },
   ]);
-  // console.log(selectedMetric,"selectedMetric")
+
   useEffect(() => {
     fetchWebListDetails();
   }, []);
@@ -115,8 +117,9 @@ const Reports = () => {
       setIsLoading(true);
       const response = await GetWebListDetails();
       const responseFilterData = await GetFilterData();
-      if (response.status === 200 || response.status === 201) {
+      if (response?.status === 200 || response?.status === 201) {
         setWebList(response?.data?.sites || []);
+        setWebListAllData(response?.data?.selected_site);
         setFilterData(responseFilterData.data);
       }
     } catch (error: any) {
@@ -127,12 +130,22 @@ const Reports = () => {
   };
 
   useEffect(() => {
-  if (selectedSite) {
-    handleCloseModal();  
-  }
-}, [selectedSearchType, selectedCountry, selectedDeviceType, range, selectedSite]);
+    if (selectedSite) {
+      handleCloseModal(BrandTags);
+    }
+  }, [
+    selectedSearchType,
+    selectedCountry,
+    selectedDeviceType,
+    range,
+    selectedSite,
+  ]);
 
-  const handleCloseModal = async () => {
+  const setBrandTagsAndFetch = (tags: string[]) => {
+    handleCloseModal(tags);
+  };
+
+  const handleCloseModal = async (BrandTags: any) => {
     try {
       setIsLoading(true);
       const payload = {
@@ -143,24 +156,36 @@ const Reports = () => {
         start_date: formatDateToYYYYMMDD(range[0]?.startDate),
         end_date: formatDateToYYYYMMDD(range[0]?.endDate),
       };
+      const payloadNewBranch = {
+        site_url: selectedSite?.siteUrl,
+        search_type: selectedSearchType,
+        country: selectedCountry,
+        device_type: selectedDeviceType,
+        start_date: formatDateToYYYYMMDD(range[0]?.startDate),
+        end_date: formatDateToYYYYMMDD(range[0]?.endDate),
+        branded_words: BrandTags,
+      };
 
       const responseSearchConsole = await AddSearchConsole(payload);
       const responseRankingKeyword = await AddRankingKeyword(payload);
-      const responseBrandedWordanalysis = await AddBrandedWordanalysis(payload);
+      const responseBrandedWordanalysis = await AddBrandedWordanalysis(
+        payloadNewBranch
+      );
       if (
         responseSearchConsole.status === 200 ||
         responseRankingKeyword.status === 200 ||
         responseBrandedWordanalysis.status === 200
       ) {
+        setBrandTags([]);
         setSearchConsole(responseSearchConsole?.data);
         setRankingKeyword(responseRankingKeyword?.data);
         setBrandedWordAnalysis(responseBrandedWordanalysis?.data);
-        console.log(responseSearchConsole.data, "responseSearchConsole");
-        console.log(responseRankingKeyword.data, "responseRankingKeyword");
-        console.log(
-          responseBrandedWordanalysis.data,
-          "responseBrandedWordanalysis"
-        );
+        // console.log(responseSearchConsole.data, "responseSearchConsole");
+        // console.log(responseRankingKeyword.data, "responseRankingKeyword");
+        // console.log(
+        //   responseBrandedWordanalysis.data,
+        //   "responseBrandedWordanalysis"
+        // );
         setIsModalOpen(false);
       }
     } catch (error: any) {
@@ -217,7 +242,14 @@ const Reports = () => {
         <SideBar />
         <div className="inner_content ">
           <div className="keyword_tool_content  generate_post create_content">
-            <div className="content_header mb-4">
+            <div
+              className="content_header mb-4"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <h2 className="font_25 font_600 mb-2">
                 <img
                   src="/assets/images/seo_report_icon.png"
@@ -226,6 +258,27 @@ const Reports = () => {
                 />
                 Organic reports <span className="text_blue">/ Overview</span>
               </h2>
+              {webList?.length > 0 && (
+                <select
+                  className="form-select"
+                  style={{ width: "auto" }}
+                  value={selectedSite?.siteUrl || ""}
+                  onChange={(e) => {
+                    const selected = webList.find(
+                      (site) => site.siteUrl === e.target.value
+                    );
+                    if (selected) {
+                      setSelectedSite(selected);
+                    }
+                  }}
+                >
+                  {webList.map((item, index) => (
+                    <option key={index} value={item.siteUrl}>
+                      {item.siteUrl}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
             {isModalOpen ? (
               <>
@@ -237,6 +290,7 @@ const Reports = () => {
                     setSelectedSite(site);
                   }}
                   selectedSite={selectedSite}
+                  webListAllData={webListAllData}
                 />
               </>
             ) : (
@@ -251,7 +305,11 @@ const Reports = () => {
                       >
                         <li className="nav-item" role="presentation">
                           <button
-                            className="nav-link active"
+                            // className="nav-link active"
+                            className={`nav-link ${
+                              activeTab === "overview" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("overview")}
                             id="pills-overview-tab"
                             data-bs-toggle="pill"
                             data-bs-target="#pills-overview"
@@ -268,7 +326,11 @@ const Reports = () => {
                         </li>
                         <li className="nav-item" role="presentation">
                           <button
-                            className="nav-link"
+                            // className="nav-link"
+                            className={`nav-link ${
+                              activeTab === "brand" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("brand")}
                             id="pills-brand-tab"
                             data-bs-toggle="pill"
                             data-bs-target="#pills-brand"
@@ -285,7 +347,11 @@ const Reports = () => {
                         </li>
                         <li className="nav-item" role="presentation">
                           <button
-                            className="nav-link"
+                            // className="nav-link"
+                            className={`nav-link ${
+                              activeTab === "rankings" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("rankings")}
                             id="pills-rankings-tab"
                             data-bs-toggle="pill"
                             data-bs-target="#pills-rankings"
@@ -331,12 +397,14 @@ const Reports = () => {
                                 setShowCalendar={setShowCalendar}
                                 today={today}
                                 threeMonthsAgo={threeMonthsAgo}
+                                onSaveBrandTags={setBrandTagsAndFetch}
+                                activeTab={activeTab}
                               />
                             </div>
 
                             <div className="col-12">
                               <div className="row overview_cards">
-                                {excludedItems.map((item, index) => (
+                                {excludedItems?.map((item, index) => (
                                   <div
                                     className="col-12 col-sm-6 col-xxl-3"
                                     key={index}
@@ -597,7 +665,14 @@ const Reports = () => {
                                       <h3 className="font_16 mb-2">
                                         Device Performance
                                       </h3>
-                                      <p style={{ color: "#aeb4bf", fontSize: "12px" }}>{selectedMetric}</p>
+                                      <p
+                                        style={{
+                                          color: "#aeb4bf",
+                                          fontSize: "12px",
+                                        }}
+                                      >
+                                        {selectedMetric}
+                                      </p>
                                     </div>
                                     <div className="card-body">
                                       <CircleGraph
@@ -642,6 +717,8 @@ const Reports = () => {
                                 setShowCalendar={setShowCalendar}
                                 today={today}
                                 threeMonthsAgo={threeMonthsAgo}
+                                onSaveBrandTags={setBrandTagsAndFetch}
+                                activeTab={activeTab}
                               />
                             </div>
 
@@ -866,6 +943,8 @@ const Reports = () => {
                                 setShowCalendar={setShowCalendar}
                                 today={today}
                                 threeMonthsAgo={threeMonthsAgo}
+                                onSaveBrandTags={setBrandTagsAndFetch}
+                                activeTab={activeTab}
                               />
                             </div>
 

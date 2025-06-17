@@ -62,6 +62,7 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
       percentage: metricData.generic_percentage,
     },
   ];
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -74,14 +75,21 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
             boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           }}
         >
-          {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color, marginBottom: 4 }}>
-              <span style={{ color: entry.color }}>●</span> {entry.name}:{" "}
-              {typeof entry.value === "number"
-                ? `${entry.value.toFixed(1)}%`
-                : entry.value}
-            </p>
-          ))}
+          {payload.map((entry: any) => {
+            const index = chartData.findIndex(
+              (item) => item.name === entry.name
+            );
+            const color = COLORS[index];
+
+            return (
+              <p key={entry.name} style={{ marginBottom: 4 }}>
+                <span style={{ color }}>●</span> {entry.name}:{" "}
+                {typeof entry.value === "number"
+                  ? `${entry.value.toFixed(1)}%`
+                  : entry.value}
+              </p>
+            );
+          })}
         </div>
       );
     }
@@ -94,10 +102,7 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
         <h3 className="font_16 mb-0">{title}</h3>
       </div>
       <p style={{ color: "#aeb4bf", fontSize: "12px" }}>{selectedMetric}</p>
-      <div
-        className="card-body d-flex justify-content-center align-items-center"
-        style={{ flexDirection: "column" }}
-      >
+      <div className="card-body graph-body d-flex justify-content-center align-items-center">
         <div style={{ width: 250, height: 200 }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -106,7 +111,7 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
                 cx="50%"
                 cy="50%"
                 innerRadius={45}
-                outerRadius={80}
+                outerRadius={90}
                 dataKey="percentage"
                 paddingAngle={3}
                 stroke="none"
@@ -118,7 +123,7 @@ const BrandVsNonBrandChart: React.FC<Props> = ({
                   dataKey="percentage"
                   position="inside"
                   formatter={(value: any) => `${value}%`}
-                  style={{ fill: "#fff", fontSize:10, fontWeight: 600 }}
+                  style={{ fill: "#fff", fontSize: 10, fontWeight: 600 }}
                 />
               </Pie>
               <Tooltip content={<CustomTooltip />} />

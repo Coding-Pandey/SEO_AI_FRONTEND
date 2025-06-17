@@ -6,6 +6,7 @@ const Header = () => {
   const [userDetails, setUserDetails] = useState<any>({});
   const location = useLocation(); 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  
 
   useEffect(() => {
     fetchUserDetails();
@@ -75,11 +76,15 @@ const Header = () => {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <img
+             {userDetails?.image_url ? <img
+                  src={userDetails?.image_url}
+                  className="img-fluid profile-icon"
+                  alt="profile-icon"
+                /> :  <img
                   src="/assets/images/profile-pic1.jpg"
                   className="img-fluid profile-icon"
                   alt="profile-icon"
-                />
+                />}
                 {userDetails?.username &&
                   userDetails?.username.charAt(0).toUpperCase() +
                     userDetails?.username.slice(1)}
