@@ -57,9 +57,28 @@ const FilterComponent: React.FC<FilterProps> = ({
 
   const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    onSaveBrandTags(tags);
+      const trimmed = inputValue.trim();
+
+  // If there's unprocessed input, add it first
+  if (trimmed && !tags.includes(trimmed)) {
+    setTags((prev) => [...prev, trimmed]);
+  }
+
+  // Final list to save (including pending input)
+  const finalTags = [...tags];
+  console.log(finalTags,"finalTagsfinalTags")
+  if (trimmed && !tags.includes(trimmed)) {
+    finalTags.push(trimmed);
+  }
+
+  if (finalTags.length === 0) {
+    alert("Please add at least one brand term before saving.");
+    return;
+  }
+    onSaveBrandTags(finalTags);
     setTags([]);
     setShowInputBox(false);
+    setInputValue("");
   };
 
   const handleSelect = (ranges: any) => {
@@ -252,7 +271,7 @@ const FilterComponent: React.FC<FilterProps> = ({
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type and press Enter"
+                    placeholder="Type and press Enter Or Camma"
                     style={{
                       border: "none",
                       outline: "none",

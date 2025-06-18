@@ -258,7 +258,8 @@ const Reports = () => {
                 />
                 Organic reports <span className="text_blue">/ Overview</span>
               </h2>
-              {webList?.length > 0 && (
+        
+              {webList?.length > 0 && !isModalOpen && (
                 <select
                   className="form-select"
                   style={{ width: "auto" }}
