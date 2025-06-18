@@ -5,7 +5,12 @@ import Loading from "../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
-import { GeneratePostService ,deleteSocialMediaData ,GetSocialMediaData} from "./SocialMediaServices";
+import {
+  GeneratePostService,
+  deleteSocialMediaData,
+  GetSocialMediaData,
+  GetUploadedSourcefiles,
+} from "./SocialMediaServices";
 
 const GeneratePost = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -17,19 +22,23 @@ const GeneratePost = () => {
   const [audience, setAudience] = useState<string[]>([]);
   const [additional, setAdditional] = useState<string[]>([]);
   const [generatedPostData, setGeneratedPostData] = useState<any[]>([]);
-
+  const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchPPCClusterData();
   }, []);
 
+  
+
   const fetchPPCClusterData = async () => {
     try {
       setLoading(true);
       const response = await GetSocialMediaData();
+      const responseSourcefiles = await GetUploadedSourcefiles();
       if (response.status === 200 || response.status === 201) {
         setGeneratedPostData(response.data);
+        setUploadedSourcefiles(responseSourcefiles.data);
       }
     } catch (error: any) {
       setLoading(false);
@@ -76,7 +85,7 @@ const GeneratePost = () => {
     } else if (!file && !description) {
       toast.warning("Please upload file or fill description.");
       return;
-    } else if (platforms.length <= 0) {
+    } else if (platforms?.length <= 0) {
       toast.warning("Please select the platforms.");
       return;
     }
@@ -315,37 +324,41 @@ const GeneratePost = () => {
                           Define Post Objective
                         </h3>
                         <div className="row mb-2">
-                          {[
-                            "Drive Traffic",
-                            "Boost Engagement",
-                            "Announce Product",
-                            "Brand Awareness",
-                            "Personal Post",
-                            "Promote Event",
-                          ].map((objective, i) => (
-                            <div className="col-12 col-lg-6 col-xxl-6" key={i}>
-                              <input
-                                type="checkbox"
-                                id={`objective_${i}`}
-                                value={objective
-                                  .toLowerCase()
-                                  .replace(/\s/g, "")}
-                                onChange={() =>
-                                  handleCheckbox(
-                                    objective.toLowerCase().replace(/\s/g, ""),
-                                    objectives,
-                                    setObjectives
-                                  )
-                                }
-                              />
-                              <label
-                                htmlFor={`objective_${i}`}
-                                className="font_16 ms-1"
-                              >
-                                {objective}
-                              </label>
+                          {UploadedSourcefiles?.define_objective?.length > 0 ? (
+                            UploadedSourcefiles?.define_objective.map(
+                              (item: any, i: any) => (
+                                <div
+                                  className="col-12 col-lg-6 col-xxl-6"
+                                  key={item.uuid_id}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    id={`persona_${i}`}
+                                    value={item.uuid_id}
+                                    onChange={() =>
+                                      handleCheckbox(
+                                        item.uuid_id,
+                                        objectives,
+                                        setObjectives
+                                      )
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`persona_${i}`}
+                                    className="font_16 ms-1"
+                                  >
+                                    {item.category} - {item.file_name}
+                                  </label>
+                                </div>
+                              )
+                            )
+                          ) : (
+                            <div className="col-12">
+                              <p className="text-muted">
+                                No Post Objective uploaded.
+                              </p>
                             </div>
-                          ))}
+                          )}
                         </div>
                       </div>
 
@@ -353,31 +366,40 @@ const GeneratePost = () => {
                       <div className="form_input">
                         <h3 className="font_20 font_500 mb-3">Audience</h3>
                         <div className="row mb-2">
-                          {[
-                            "Buyer Persona 1 - First Last Name",
-                            "Buyer Persona 2 - First Last Name",
-                            "Buyer Persona 3 - First Last Name",
-                            "General Industry Audience",
-                          ].map((persona, i) => (
-                            <div className="col-12" key={i}>
-                              <input
-                                type="checkbox"
-                                id={`persona_${i}`}
-                                value={persona}
-                                onChange={() =>
-                                  handleCheckbox(persona, audience, setAudience)
-                                }
-                              />
-                              <label
-                                htmlFor={`persona_${i}`}
-                                className="font_16 ms-1"
-                              >
-                                {persona}
-                              </label>
+                          {UploadedSourcefiles?.Target_audience?.length > 0 ? (
+                            UploadedSourcefiles?.Target_audience.map(
+                              (item: any, i: any) => (
+                                <div
+                                  className="col-12 col-lg-6 col-xxl-6"
+                                  key={item.uuid_id}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    name="audience"
+                                    id={`persona1_${i}`}
+                                    value={item.uuid_id}
+                                    checked={audience[0] === item.uuid_id}
+                                    onChange={() => setAudience([item.uuid_id])}
+                                  />
+                                  <label
+                                    htmlFor={`persona1_${i}`}
+                                    className="font_16 ms-1"
+                                  >
+                                    {item.category} - {item.file_name}
+                                  </label>
+                                </div>
+                              )
+                            )
+                          ) : (
+                            <div className="col-12">
+                              <p className="text-muted">
+                                No Audience uploaded.
+                              </p>
                             </div>
-                          ))}
+                          )}
                         </div>
                       </div>
+                      
                       {/* Additional */}
                       <div className="form_input">
                         <h3 className="font_20 font_500 mb-3">Additional</h3>

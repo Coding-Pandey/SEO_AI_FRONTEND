@@ -25,6 +25,7 @@ interface ContentFormProps {
   handleAddButtonClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   handleRemoveLink: (index: number) => void;
   handleGenerateSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  UploadedSourcefiles: any;
 }
 
 const ContentForm: React.FC<ContentFormProps> = ({
@@ -51,6 +52,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
   handleAddButtonClick,
   handleRemoveLink,
   handleGenerateSubmit,
+  UploadedSourcefiles,
 }) => {
   return (
     <form onSubmit={handleGenerateSubmit}>
@@ -125,36 +127,37 @@ const ContentForm: React.FC<ContentFormProps> = ({
                     Define Post Objective
                   </h3>
                   <div className="row mb-2">
-                    {[
-                      "Educate the Audience",
-                      "Facilitate Next Steps",
-                      "Establish Credibility",
-                      "Guide Decision-Making",
-                      "Compare & Contrast",
-                      "Support Brand Voice & Tone",
-                      "Drive Engagement",
-                      "Demonstrate Authority",
-                    ].map((label, index) => {
-                      const value = label.toLowerCase().replace(/\s+/g, "_");
-                      return (
-                        <div className="col-12 col-lg-6" key={index}>
-                          <input
-                            type="checkbox"
-                            id={`objective${index}`}
-                            name={`objective${index}`}
-                            value={value}
-                            checked={PostObjectives.includes(value)}
-                            onChange={handleObjectiveChange}
-                          />
-                          <label
-                            htmlFor={`objective${index}`}
-                            className="font_16 ms-1"
+                    {UploadedSourcefiles?.define_objective?.length > 0 ? (
+                      UploadedSourcefiles?.define_objective.map(
+                        (item: any, i: any) => (
+                          <div
+                            className="col-12 col-lg-6 col-xxl-6"
+                            key={item.uuid_id}
                           >
-                            {label}
-                          </label>
-                        </div>
-                      );
-                    })}
+                            <input
+                              type="checkbox"
+                              id={`persona_${i}`}
+                              name={`objective${i}`}
+                              checked={PostObjectives.includes(item.uuid_id)}
+                              value={item.uuid_id}
+                              onChange={handleObjectiveChange}
+                            />
+                            <label
+                              htmlFor={`persona_${i}`}
+                              className="font_16 ms-1"
+                            >
+                              {item.category} - {item.file_name}
+                            </label>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <div className="col-12">
+                        <p className="text-muted">
+                          No Post Objective uploaded.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -162,29 +165,32 @@ const ContentForm: React.FC<ContentFormProps> = ({
                 <div className="form_input">
                   <h3 className="font_20 font_500 mb-3">Target Audience</h3>
                   <div className="row mb-2">
-                    {[
-                      "Buyer Persona 1 - First Last Name",
-                      "Buyer Persona 2 - First Last Name",
-                      "Buyer Persona 3 - First Last Name",
-                      "General Industry Audience",
-                    ].map((label, index) => (
-                      <div className="col-12" key={index}>
-                        <input
-                          type="checkbox"
-                          id={`persona${index}`}
-                          name={`persona${index}`}
-                          value={label}
-                          checked={TargetAudience.includes(label)}
-                          onChange={handleTargetAudience}
-                        />
-                        <label
-                          htmlFor={`persona${index}`}
-                          className="font_16 ms-1"
-                        >
-                          {label}
-                        </label>
+                    {UploadedSourcefiles?.Target_audience?.length > 0 ? (
+                      UploadedSourcefiles?.Target_audience.map(
+                        (item: any, i: any) => (
+                          <div className="col-12" key={item.uuid_id}>
+                            <input
+                              type="checkbox"
+                              name="audience"
+                              id={`persona1_${i}`}
+                              value={item.uuid_id}
+                              checked={TargetAudience[0] === item.uuid_id}
+                              onChange={handleTargetAudience}
+                            />
+                            <label
+                              htmlFor={`persona1_${i}`}
+                              className="font_16 ms-1"
+                            >
+                              {item.category} - {item.file_name}
+                            </label>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <div className="col-12">
+                        <p className="text-muted">No Audience uploaded.</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>

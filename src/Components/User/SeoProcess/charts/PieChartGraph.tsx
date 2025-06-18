@@ -42,6 +42,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const PieChartGraph: React.FC<Props> = ({ data, title }) => {
+ 
   const total = data.branded + data.generic;
    if (!total) {
     return (

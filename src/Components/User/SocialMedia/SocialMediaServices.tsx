@@ -22,6 +22,15 @@ export const GetSocialMediaData = async () => {
   }
 };
 
+export const GetUploadedSourcefiles = async () => {
+  try {
+    const response = await axiosInstance.get("/api/uploaded_sourcefiles");
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const deleteSocialMediaData = async (formData: { uuid: string }) => {
   try {
     const response = await axiosInstance.delete(

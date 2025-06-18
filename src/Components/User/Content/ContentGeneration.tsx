@@ -19,6 +19,7 @@ import {
   GetFormDetails,
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
+import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
 
 interface contentData {
   uuid: string;
@@ -40,20 +41,24 @@ const ContentGeneration = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
+  const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
 
   useEffect(() => {
     fetchGenerateData();
   }, []);
+
+ 
 
   const fetchGenerateData = async () => {
     try {
       setLoadingData(true);
       const response = await GetContentPreviousList();
       const responseForm = await GetFormDetails();
+      const responseSourcefiles = await GetUploadedSourcefiles();
       // console.log(responseForm.data, "responseForm");
       if (response.status === 200 || response.status === 201) {
         setContentData(response.data);
-        // console.log(responseForm,"responseForm")
+        setUploadedSourcefiles(responseSourcefiles.data);
         setFormDynamictData(responseForm.data);
       }
     } catch (error: any) {
@@ -112,16 +117,23 @@ const ContentGeneration = () => {
     });
   };
 
+  // const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { value, checked } = e.target;
+  //   setTargetAudience((prev) => {
+  //     let updatedObjectives;
+  //     if (checked) {
+  //       updatedObjectives = [...prev, value];
+  //     } else {
+  //       updatedObjectives = prev.filter((item) => item !== value);
+  //     }
+  //     return updatedObjectives;
+  //   });
+  // };
+
   const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
-    setTargetAudience((prev) => {
-      let updatedObjectives;
-      if (checked) {
-        updatedObjectives = [...prev, value];
-      } else {
-        updatedObjectives = prev.filter((item) => item !== value);
-      }
-      return updatedObjectives;
+    setTargetAudience(() => {
+      return checked ? [value] : [];
     });
   };
 
@@ -316,6 +328,7 @@ const ContentGeneration = () => {
                     handleAddButtonClick={handleAddButtonClick}
                     handleRemoveLink={handleRemoveLink}
                     handleGenerateSubmit={handleGenerateSubmit}
+                    UploadedSourcefiles={UploadedSourcefiles}
                   />
                 </div>
               </div>

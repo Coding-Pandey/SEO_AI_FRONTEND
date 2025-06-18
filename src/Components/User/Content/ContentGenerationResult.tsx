@@ -19,6 +19,7 @@ import {
   MoreGenerateSuggestion,
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
+import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
 
 const ContentGenerationResult = () => {
   const location = useLocation();
@@ -44,7 +45,8 @@ const ContentGenerationResult = () => {
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
   const [EditFormOpen, setEditFormOpen] = useState<boolean>(false);
-  console.log(generateKeywordDetails, "generateKeywordDetails");
+  const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
+  // console.log(generateKeywordDetails, "generateKeywordDetails");
 
   useEffect(() => {
     fetchGenerateData();
@@ -53,9 +55,11 @@ const ContentGenerationResult = () => {
   const fetchGenerateData = async () => {
     try {
       setloadingData(true);
+       const responseSourcefiles = await GetUploadedSourcefiles();
       const responseForm = await GetFormDetails();
       if (responseForm.status === 200 || responseForm.status === 201) {
         setFormDynamictData(responseForm.data);
+        setUploadedSourcefiles(responseSourcefiles.data);
       }
     } catch (error: any) {
       console.error("Error fetchPPCClusterData:", error);
@@ -575,6 +579,7 @@ const ContentGenerationResult = () => {
                     handleAddButtonClick={handleAddButtonClick}
                     handleRemoveLink={handleRemoveLink}
                     handleGenerateSubmit={handleGenerateSubmit}
+                    UploadedSourcefiles={UploadedSourcefiles}
                   />
                 </div>
               </div>

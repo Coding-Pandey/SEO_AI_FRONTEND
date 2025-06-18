@@ -107,7 +107,7 @@ const Reports = () => {
       key: "selection",
     },
   ]);
-console.log(setBrandTags,"setBrandTags")
+ 
   useEffect(() => {
     fetchWebListDetails();
   }, []);
@@ -142,6 +142,7 @@ console.log(setBrandTags,"setBrandTags")
   ]);
 
   const setBrandTagsAndFetch = (tags: string[]) => {
+    console.log(setBrandTags,"setBrandTags")
     handleCloseModal(tags);
   };
 
@@ -176,16 +177,15 @@ console.log(setBrandTags,"setBrandTags")
         responseRankingKeyword.status === 200 ||
         responseBrandedWordanalysis.status === 200
       ) {
-        // setBrandTags([]);
         setSearchConsole(responseSearchConsole?.data);
         setRankingKeyword(responseRankingKeyword?.data);
         setBrandedWordAnalysis(responseBrandedWordanalysis?.data);
-        // console.log(responseSearchConsole.data, "responseSearchConsole");
-        // console.log(responseRankingKeyword.data, "responseRankingKeyword");
-        // console.log(
-        //   responseBrandedWordanalysis.data,
-        //   "responseBrandedWordanalysis"
-        // );
+        console.log(responseSearchConsole.data, "responseSearchConsole");
+        console.log(responseRankingKeyword.data, "responseRankingKeyword");
+        console.log(
+          responseBrandedWordanalysis.data,
+          "responseBrandedWordanalysis"
+        );
         setIsModalOpen(false);
       }
     } catch (error: any) {
@@ -285,13 +285,13 @@ console.log(setBrandTags,"setBrandTags")
               <>
                 <SelectSiteModal
                   isOpen={isModalOpen}
-                  // onClose={handleCloseModal}
                   sites={webList}
                   onSelect={(site) => {
                     setSelectedSite(site);
                   }}
                   selectedSite={selectedSite}
                   webListAllData={webListAllData}
+                  isLoading={isLoading}
                 />
               </>
             ) : (
@@ -756,11 +756,12 @@ console.log(setBrandTags,"setBrandTags")
                               </div>
                             </div>
 
-                            <div className="col-12">
+                               <div className="col-12">
                               <div className="row">
                                 <div className="col-12 col-xxl-6">
                                   <div className="card_box">
                                     <h3 className="font_20 font_400 mb-2">
+                                      
                                       Branded traffic
                                     </h3>
                                     <div className="grid_outer">
@@ -811,7 +812,7 @@ console.log(setBrandTags,"setBrandTags")
                                                 className={`bi ${iconClass}`}
                                               ></i>{" "}
                                               {fluctuationNum > 0
-                                                ? `+${fluctuationStr}`
+                                                ? `${fluctuationStr}`
                                                 : fluctuationStr}
                                               %
                                             </p>
@@ -822,9 +823,14 @@ console.log(setBrandTags,"setBrandTags")
                                   </div>
                                 </div>
 
-                                <div className="col-12 col-xxl-6">
+                                
+                              </div>
+                            </div>
+
+                            <div className="col-12 col-xxl-6">
                                   <div className="card_box">
                                     <h3 className="font_20 font_400 mb-2">
+                                      
                                       Generic traffic
                                     </h3>
                                     <div className="grid_outer">
@@ -873,7 +879,7 @@ console.log(setBrandTags,"setBrandTags")
                                             >
                                               <i className={`bi ${icon}`}></i>{" "}
                                               {fluctuationNum > 0
-                                                ? `+${fluctuation}`
+                                                ? `${fluctuation}`
                                                 : fluctuation}
                                               %
                                             </p>
@@ -883,8 +889,8 @@ console.log(setBrandTags,"setBrandTags")
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
+
+                         
 
                             <div className="col-12 text-end">
                               <ChartFilter

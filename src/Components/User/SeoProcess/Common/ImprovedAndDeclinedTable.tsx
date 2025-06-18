@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 type MetricType = "clicks" | "impressions" | "ctr" | "position";
 
@@ -24,6 +24,8 @@ interface Props {
 }
 
 const ImprovedAndDeclinedTable: React.FC<Props> = ({ data, selectedMetric }) => {
+  const [visibleCount, setVisibleCount] = useState(50);
+
   const getMetricValues = (item: KeywordItem) => {
     switch (selectedMetric) {
       case "clicks":
@@ -54,49 +56,77 @@ const ImprovedAndDeclinedTable: React.FC<Props> = ({ data, selectedMetric }) => 
     }
   };
 
-  return (
-    <table className="table">
-      <thead>
-        <tr>
-          <th>Keyword</th>
-          <th>Pos. last 30 days</th>
-          <th>Pos. before</th>
-          <th>Change</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data && data.length > 0 ? (
-          data.map((item, index) => {
-            const { last30, before30, change } = getMetricValues(item);
-            const isPositive =
-              selectedMetric === "position" ? change < 0 : change > 0;
+ 
 
-            return (
-              <tr key={index}>
-                <td>{item.keyword}</td>
-                <td>{last30}</td>
-                <td>{before30}</td>
-                <td className={isPositive ? "text-success" : "text-danger"}>
-                  <i
-                    className={`bi ${
-                      isPositive ? "bi-arrow-up-short" : "bi-arrow-down-short"
-                    }`}
-                  ></i>{" "}
-                  {Math.abs(change)}
-                </td>
-              </tr>
-            );
-          })
-        ) : (
+    const handleShowMore = (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      setVisibleCount((prev) => prev + 50);
+    };
+
+  const visibleData = data.slice(0, visibleCount);
+
+  return (
+    <>
+      <table className="table">
+        <thead>
           <tr>
-            <td colSpan={4} className="text-center text-muted py-3">
-              No {selectedMetric} data found
-            </td>
+            <th>Keyword</th>
+            <th>Pos. last 30 days</th>
+            <th>Pos. before</th>
+            <th>Change</th>
           </tr>
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {visibleData && visibleData.length > 0 ? (
+            visibleData.map((item, index) => {
+              const { last30, before30, change } = getMetricValues(item);
+              const isPositive =
+                selectedMetric === "position" ? change <= 0 : change >= 0;
+
+              return (
+                <tr key={index}>
+                  <td>{item.keyword}</td>
+                  <td>{last30}</td>
+                  <td>{before30}</td>
+                  <td className={isPositive ? "text-success" : "text-danger"}>
+                    <i
+                      className={`bi ${
+                        isPositive ? "bi-arrow-up-short" : "bi-arrow-down-short"
+                      }`}
+                    ></i>{" "}
+                    {Math.abs(change)}
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={4} className="text-center text-muted py-3">
+                No {selectedMetric} data found
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      {/* Show More Button */}
+      {visibleCount < data.length && (
+        <div className="text-center mt-3">
+          <button
+            type="button"
+            className="show-more-button"
+            onClick={handleShowMore}
+          >
+            Show More
+          </button>
+        </div>
+      )}
+    </>
   );
 };
 
 export default ImprovedAndDeclinedTable;
+
+
+
+ 

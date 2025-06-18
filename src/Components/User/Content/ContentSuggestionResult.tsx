@@ -17,7 +17,7 @@ const ContentSuggestionResult = () => {
   const [Message, setMessage] = useState<string>("");
   const [loadingData, setloadingData] = useState<boolean>(false);
 
-  console.log(GenerateSuggestionDetails, "GenerateSuggestionDetails");
+  // console.log(GenerateSuggestionDetails, "GenerateSuggestionDetails");
 
   useEffect(() => {
     if (location.state) {
@@ -75,13 +75,19 @@ const ContentSuggestionResult = () => {
     try {
       setloadingData(true);
       const uuid = GenerateSuggestionDetails?.id;
-      const response = await SaveGenerateSuggestion(uuid,GenerateSuggestionDetails);
+      const response = await SaveGenerateSuggestion(
+        uuid,
+        GenerateSuggestionDetails
+      );
       if (response.status === 200 || response.status === 201) {
         console.log(response.data, "handleSaveGenerateSuggestion");
         toast.success("Saved file successfully");
-        const newData={...GenerateSuggestionDetails,id:response.data.uuid}
+        const newData = {
+          ...GenerateSuggestionDetails,
+          id: response.data.uuid,
+        };
         localStorage.setItem("ClusterData", JSON.stringify(newData));
-        setGenerateSuggestionDetails(newData)
+        setGenerateSuggestionDetails(newData);
       }
     } catch (error) {
       console.log("Error during AddGenerate", error);

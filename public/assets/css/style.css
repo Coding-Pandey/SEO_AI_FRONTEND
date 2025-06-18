@@ -2372,27 +2372,23 @@ font-weight: 500;
 }
 
 
-/* .recharts-responsive-container {
-    width: 100% !important ;
-    min-width: 0px;
+.show-more-button {
+  background-color: #4872b7;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
 }
 
-.graph_outer{
-    position: relative;
+.show-more-button:hover {
+  background-color: #375a96;
 }
 
-.graph_outer .graph_bullets {
-    position: absolute;
-    right: 0px;
-    top: 45%;
-    transform: translateY(-50%);
-}
-
-.graph_outer .graph_bullets .graph_points_text {
-    font-size: 12px;
-    line-height: 20px;
-} */
- 
 
 
 

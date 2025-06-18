@@ -52,29 +52,31 @@ const FilterComponent: React.FC<FilterProps> = ({
   };
 
   const handleRemoveTag = (index: number) => {
-    setTags(tags.filter((_, i) => i !== index));
+    const updatedTags = tags.filter((_, i) => i !== index);
+    setTags(updatedTags);
+    // onSaveBrandTags(updatedTags);
   };
 
   const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-      const trimmed = inputValue.trim();
+    const trimmed = inputValue.trim();
 
-  // If there's unprocessed input, add it first
-  if (trimmed && !tags.includes(trimmed)) {
-    setTags((prev) => [...prev, trimmed]);
-  }
+    // If there's unprocessed input, add it first
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags((prev) => [...prev, trimmed]);
+    }
 
-  // Final list to save (including pending input)
-  const finalTags = [...tags];
-  console.log(finalTags,"finalTagsfinalTags")
-  if (trimmed && !tags.includes(trimmed)) {
-    finalTags.push(trimmed);
-  }
+    // Final list to save (including pending input)
+    const finalTags = [...tags];
+    console.log(finalTags, "finalTagsfinalTags");
+    if (trimmed && !tags.includes(trimmed)) {
+      finalTags.push(trimmed);
+    }
 
-  if (finalTags.length === 0) {
-    alert("Please add at least one brand term before saving.");
-    return;
-  }
+    // if (finalTags.length === 0) {
+    //   alert("Please add at least one brand term before saving.");
+    //   return;
+    // }
     onSaveBrandTags(finalTags);
     // setTags([]);
     setShowInputBox(false);
@@ -114,7 +116,7 @@ const FilterComponent: React.FC<FilterProps> = ({
           >
             <option value="web">Search type: {selectedSearchType}</option>
             {/* {FilterData?.search_types?.[0]?.map((type: string, idx: number) => (*/}
-             {FilterData?.search_types?.map((type: string, idx: number) => (
+            {FilterData?.search_types?.map((type: string, idx: number) => (
               <option key={idx} value={type}>
                 {type}
               </option>

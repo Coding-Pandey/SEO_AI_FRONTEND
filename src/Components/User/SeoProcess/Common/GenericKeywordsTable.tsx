@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { capitalizeFirstLetter } from "../Reports";
 
 interface KeywordData {
@@ -10,10 +11,23 @@ interface KeywordData {
 interface Props {
   keywordList: KeywordData[];
   message: string;
-  selectedMetric:string
+  selectedMetric: string;
 }
 
-const GenericKeywordsTable: React.FC<Props> = ({ keywordList, message,selectedMetric}) => {
+const GenericKeywordsTable: React.FC<Props> = ({
+  keywordList,
+  message,
+  selectedMetric,
+}) => {
+  const [visibleCount, setVisibleCount] = useState(50);
+
+  const handleShowMore = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setVisibleCount((prev) => prev + 50);
+  };
+
+  const visibleKeywords = keywordList.slice(0, visibleCount);
+
   return (
     <div className="col-12 col-xxl-6">
       <div className="card_box">
@@ -35,8 +49,8 @@ const GenericKeywordsTable: React.FC<Props> = ({ keywordList, message,selectedMe
               </tr>
             </thead>
             <tbody>
-              {keywordList && keywordList.length > 0 ? (
-                keywordList.map((item, index) => {
+              {visibleKeywords.length > 0 ? (
+                visibleKeywords.map((item, index) => {
                   const isPositive = item.change >= 0;
                   return (
                     <tr key={index}>
@@ -67,6 +81,18 @@ const GenericKeywordsTable: React.FC<Props> = ({ keywordList, message,selectedMe
               )}
             </tbody>
           </table>
+
+          {visibleCount < keywordList.length && (
+            <div className="text-center">
+              <button
+                type="button"
+                className="show-more-button"
+                onClick={handleShowMore}
+              >
+                Show More
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
