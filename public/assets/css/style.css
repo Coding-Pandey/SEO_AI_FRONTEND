@@ -2389,7 +2389,11 @@ font-weight: 500;
   background-color: #375a96;
 }
 
-
+.objective_box {
+    display: flex;
+    align-items: baseline;
+    column-gap: 5px;
+}
 
 
 /* Responsive css */

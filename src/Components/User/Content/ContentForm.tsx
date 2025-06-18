@@ -134,20 +134,22 @@ const ContentForm: React.FC<ContentFormProps> = ({
                             className="col-12 col-lg-6 col-xxl-6"
                             key={item.uuid_id}
                           >
-                            <input
-                              type="checkbox"
-                              id={`persona_${i}`}
-                              name={`objective${i}`}
-                              checked={PostObjectives.includes(item.uuid_id)}
-                              value={item.uuid_id}
-                              onChange={handleObjectiveChange}
-                            />
-                            <label
-                              htmlFor={`persona_${i}`}
-                              className="font_16 ms-1"
-                            >
-                              {item.category} - {item.file_name}
-                            </label>
+                            <div className="objective_box">
+                              <input
+                                type="checkbox"
+                                id={`persona_${i}`}
+                                name={`objective${i}`}
+                                checked={PostObjectives.includes(item.uuid_id)}
+                                value={item.uuid_id}
+                                onChange={handleObjectiveChange}
+                              />
+                              <label
+                                htmlFor={`persona_${i}`}
+                                className="font_16 ms-1"
+                              >
+                                {item.category} - {item.file_name}
+                              </label>
+                            </div>
                           </div>
                         )
                       )

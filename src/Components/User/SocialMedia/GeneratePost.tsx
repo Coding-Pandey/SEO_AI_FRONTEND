@@ -331,6 +331,7 @@ const GeneratePost = () => {
                                   className="col-12 col-lg-6 col-xxl-6"
                                   key={item.uuid_id}
                                 >
+                                   <div className="objective_box">
                                   <input
                                     type="checkbox"
                                     id={`persona_${i}`}
@@ -350,6 +351,7 @@ const GeneratePost = () => {
                                     {item.category} - {item.file_name}
                                   </label>
                                 </div>
+                                 </div>
                               )
                             )
                           ) : (
@@ -370,9 +372,10 @@ const GeneratePost = () => {
                             UploadedSourcefiles?.Target_audience.map(
                               (item: any, i: any) => (
                                 <div
-                                  className="col-12 col-lg-6 col-xxl-6"
+                                  className="col-12  "
                                   key={item.uuid_id}
                                 >
+                                  <div className="objective_box">
                                   <input
                                     type="checkbox"
                                     name="audience"
@@ -387,6 +390,7 @@ const GeneratePost = () => {
                                   >
                                     {item.category} - {item.file_name}
                                   </label>
+                                </div>
                                 </div>
                               )
                             )
