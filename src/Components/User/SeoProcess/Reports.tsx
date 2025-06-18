@@ -107,7 +107,7 @@ const Reports = () => {
       key: "selection",
     },
   ]);
-
+console.log(setBrandTags,"setBrandTags")
   useEffect(() => {
     fetchWebListDetails();
   }, []);
