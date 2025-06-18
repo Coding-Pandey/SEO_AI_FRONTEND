@@ -176,7 +176,7 @@ const Reports = () => {
         responseRankingKeyword.status === 200 ||
         responseBrandedWordanalysis.status === 200
       ) {
-        setBrandTags([]);
+        // setBrandTags([]);
         setSearchConsole(responseSearchConsole?.data);
         setRankingKeyword(responseRankingKeyword?.data);
         setBrandedWordAnalysis(responseBrandedWordanalysis?.data);

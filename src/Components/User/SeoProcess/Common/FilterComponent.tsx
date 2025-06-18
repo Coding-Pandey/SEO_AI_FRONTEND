@@ -76,7 +76,7 @@ const FilterComponent: React.FC<FilterProps> = ({
     return;
   }
     onSaveBrandTags(finalTags);
-    setTags([]);
+    // setTags([]);
     setShowInputBox(false);
     setInputValue("");
   };
