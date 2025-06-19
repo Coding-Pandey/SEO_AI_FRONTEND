@@ -8,7 +8,6 @@ const Logout: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // localStorage.removeItem("user_Data");
     localStorage.clear();
     setUsers(null);
     navigate("/");

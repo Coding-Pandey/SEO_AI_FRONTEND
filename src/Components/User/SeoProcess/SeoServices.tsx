@@ -7,7 +7,7 @@ import {
 } from "../UserInterface/UserInterface";
 
 //Report
-const userDataJson = localStorage.getItem('user_Data');
+const userDataJson = localStorage.getItem("user_Data");
 const userData = userDataJson ? JSON.parse(userDataJson) : null;
 const token = userData?.access_token;
 
@@ -29,10 +29,11 @@ export const GetFilterData = async () => {
 //   }
 // };
 
- 
 const refreshToken = async () => {
   try {
-    const response = await axiosInstance.get(`/api/refresh_token/google_search_console`);
+    const response = await axiosInstance.get(
+      `/api/refresh_token/google_search_console`
+    );
     const isSuccess = response.status === 200 || response.status === 201;
     return isSuccess;
   } catch (error) {
@@ -48,8 +49,8 @@ export const GetWebListDetails = async (): Promise<any> => {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: 'application/json'
-        }
+          Accept: "application/json",
+        },
       }
     );
     return response;
@@ -57,7 +58,7 @@ export const GetWebListDetails = async (): Promise<any> => {
     if (error.response?.status === 401) {
       const refreshed = await refreshToken();
       if (refreshed) {
-        return await GetWebListDetails(); 
+        return await GetWebListDetails();
       } else {
         throw new Error("Token refresh failed.");
       }
@@ -123,6 +124,21 @@ export const SEOClusterKeywordService = async (
     const response = await axiosInstance.post(
       "/api/seo_keyword_clustering",
       filteredData
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const UpdateSEOFileName = async (
+  uuid: string,
+  formData: { file_name: string }
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/seofile_name/${uuid}`,
+      formData
     );
     return response;
   } catch (error) {

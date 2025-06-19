@@ -13,6 +13,21 @@ export const GetPpcClusterData = async () => {
   }
 };
 
+export const UpdatePpcFileName = async (
+  uuid: string,
+  formData: { file_name: string }
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/ppcfile_name/${uuid}`,
+      formData
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const deletePpcClusterData = async (formData: { uuid: string }) => {
   try {
     const response = await axiosInstance.delete(

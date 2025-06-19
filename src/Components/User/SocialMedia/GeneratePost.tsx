@@ -372,7 +372,7 @@ const GeneratePost = () => {
                             UploadedSourcefiles?.Target_audience.map(
                               (item: any, i: any) => (
                                 <div
-                                  className="col-12  "
+                                  className="col-12"
                                   key={item.uuid_id}
                                 >
                                   <div className="objective_box">

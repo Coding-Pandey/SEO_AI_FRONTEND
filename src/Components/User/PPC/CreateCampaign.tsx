@@ -24,6 +24,7 @@ const CreateCampaign = () => {
   const [language, setLanguage] = useState<string | null>(null);
   const [ppcClusterData, setPpcClusterData] = useState<PpcCluster[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
+   const [fileName, setFileName] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -87,8 +88,9 @@ const CreateCampaign = () => {
         SEOGenerateResponse.status === 201 ||
         SEOGenerateResponse.status === 200
       ) {
-        console.log(SEOGenerateResponse.data);
         const resultData = SEOGenerateResponse.data;
+        const fileNameData = { fileName };
+        localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
         navigate("/ppc/CreateCampaignKeywordResult", { state: resultData });
         setLoading(false);
@@ -159,9 +161,14 @@ const CreateCampaign = () => {
                 /> 
                 <div className="col-12 col-xl-7">
                   <form>
-                    <h2 className="font_25 font_500 mb-3">
-                      Generate New Posts
-                    </h2>
+                    <h2 className="font_25 font_500 mb-3">Start  new research</h2>
+                    <input
+                      type="text"
+                      className="form-control mb-2"
+                      placeholder="Name your research"
+                      value={fileName}
+                      onChange={(e) => setFileName(e.target.value)}  
+                    />
                     {keywords.length > 10 && (
                       <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
                         Error: Limit Reached. Please enter no more than 10

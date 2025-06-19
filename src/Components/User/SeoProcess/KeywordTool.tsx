@@ -24,9 +24,10 @@ const KeywordTool = () => {
   const [language, setLanguage] = useState<string | null>(null);
   const [seoClusterData, setSeoClusterData] = useState<SeoCluster[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>("");
   const navigate = useNavigate();
 
-
+ 
 
   useEffect(() => {
     fetchSeoClusterData()
@@ -87,6 +88,8 @@ const KeywordTool = () => {
       ) {
         console.log(SEOGenerateResponse.data);
         const resultData = SEOGenerateResponse.data;
+        const fileNameData = { fileName };
+        localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
         navigate("/seo/KeywordToolResult", { state: resultData });
         setLoading(false);
@@ -106,6 +109,7 @@ const KeywordTool = () => {
 
   const handleDelete = async (uuid: string) => {
     try {
+ 
       const isConfirmed = window.confirm("Are you sure you want to delete this file?");
       if (!isConfirmed) {
         return;
@@ -123,7 +127,7 @@ const KeywordTool = () => {
 
     const handleNavigate = (id: string) => {
     navigate(`/seo/SuggestionsResultById/${id}`);
-  };
+   };
 
   return (
     <>
@@ -148,7 +152,14 @@ const KeywordTool = () => {
                 /> 
                 <div className="col-12 col-xl-7">
                   <form>
-                    <h2 className="font_25 font_500 mb-3">Generate New Posts</h2>
+                    <h2 className="font_25 font_500 mb-3">Start  new research</h2>
+                    <input
+                      type="text"
+                      className="form-control mb-2"
+                      placeholder="Name your research"
+                      value={fileName}
+                      onChange={(e) => setFileName(e.target.value)}  
+                    />
                     {keywords.length > 10 && (
                       <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
                         Error: Limit Reached. Please enter no more than 10
@@ -249,7 +260,7 @@ const KeywordTool = () => {
                             (keywords.length === 0 && input.trim() === "") ||
                             keywords.length > 10 ||
                             country.length === 0 ||
-                            !language
+                            !language || fileName.trim() === ""
                           }
                         >
                           {loading ? "Please wait..." : "Start"}

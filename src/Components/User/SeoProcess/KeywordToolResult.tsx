@@ -7,6 +7,8 @@ import { language_options, location_options } from "../../Page/store";
 import { toast } from "react-toastify";
 import Loading from "../../Page/Loading/Loading";
 import { SEOClusterKeywordService, SEOGenerateKeyword } from "./SeoServices";
+import { capitalizeFirstLetter } from "./Reports";
+import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
 
 const KeywordToolResult = () => {
   const location = useLocation();
@@ -26,7 +28,9 @@ const KeywordToolResult = () => {
   const [brandedWords, setBrandedWords] = useState<boolean>(false);
   const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
   const [includeInput, setIncludeInput] = useState<string>("");
-
+  const [FileNameData, setFileNameData] = useState<any>({});
+  const [content, setContent] = useState<string>("");
+  const [ShowFileModal, setShowFileModal] = useState<boolean>(false);
   const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
@@ -44,8 +48,10 @@ const KeywordToolResult = () => {
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("keywordToolResult");
-      if (storedData) {
+      const fileNameData = localStorage.getItem("fileNameData");
+      if (storedData && fileNameData) {
         setGenerateKeywordDetails(JSON.parse(storedData));
+        setFileNameData(JSON.parse(fileNameData));
       }
     }
   }, [location.state]);
@@ -128,7 +134,7 @@ const KeywordToolResult = () => {
         closeModal();
       }
     } catch (error: any) {
-      console.log("error fetching handleSubmit",error)
+      console.log("error fetching handleSubmit", error);
     } finally {
       setLoading(false);
     }
@@ -151,8 +157,9 @@ const KeywordToolResult = () => {
         : includeInput.trim() !== ""
         ? [includeInput.trim()]
         : [];
- 
+
     const newData = {
+      file_name:FileNameData?.fileName,
       keywords: limitedData,
       delete_word: {
         branded_words: brandedWords,
@@ -166,17 +173,41 @@ const KeywordToolResult = () => {
         SEOClusterResponse.status === 201 ||
         SEOClusterResponse.status === 200
       ) {
-        const ClusterData = SEOClusterResponse.data;
-        console.log(ClusterData, "ClusterData");
-        localStorage.setItem("ClusterData", JSON.stringify(ClusterData));
-        navigate("/seo/KeywordsSuggestionsResult", { state: ClusterData });
-        setLoadingSuggestion(false);
+        const id = SEOClusterResponse.data.uuid;
+        navigate(`/seo/SuggestionsResultById/${id}`);
+        //  const ClusterData = SEOClusterResponse.data;
+        // localStorage.setItem("ClusterData", JSON.stringify(ClusterData));
+        // navigate("/seo/KeywordsSuggestionsResult", { state: ClusterData });
+        // setLoadingSuggestion(false);
       }
     } catch (error: any) {
-       console.log("error fetching handleSuggestPages",error)
+      console.log("error fetching handleSuggestPages", error);
     } finally {
       setLoadingSuggestion(false);
     }
+  };
+
+  const handleChangeFilename = async () => {
+    if (!content.trim()) {
+      toast.warning("Please enter a Filename");
+      return;
+    }
+    try {
+      const updatedFileNameData = { fileName: content };
+      localStorage.setItem("fileNameData", JSON.stringify(updatedFileNameData));
+      setFileNameData(updatedFileNameData);
+      setShowFileModal(false);
+      toast.success("Filename updated successfully!", {
+        position: "top-right",
+        autoClose: 1500,
+      });
+    } catch (error: any) {
+      console.error("Error updating title:", error);
+    }
+  };
+
+  const handleCloseFileModel = () => {
+    setShowFileModal(false);
   };
 
   return (
@@ -190,10 +221,32 @@ const KeywordToolResult = () => {
             <div className="content_header mb-4">
               <h2 className="font_25 font_600 mb-2">
                 <i className="bi bi-search me-1 font_20 text-primary"></i>{" "}
-                Keyword Manager -{" "}
-                <span style={{ fontSize: "18px", fontWeight: 600 }}>
-                  Search Results
+                Keyword Manager /{" "}
+                <span style={{ fontSize: "18px", fontWeight: 600,color:"rgb(72, 114, 183)" }}>
+                  {FileNameData?.fileName
+                    ? capitalizeFirstLetter(FileNameData.fileName)
+                    : ""}
                 </span>
+                <span
+                  className="heading_edit"
+                  onClick={() => {
+                    setShowFileModal(true);
+                    setContent(FileNameData.fileName);
+                  }}
+                >
+                  <i
+                    className="bi bi-pencil-fill"
+                    style={{ cursor: "pointer" }}
+                  ></i>
+                </span>
+                {ShowFileModal && (
+                  <FileNameUpdateModal
+                    content={content}
+                    setContent={setContent}
+                    handleClose={handleCloseFileModel}
+                    handleSave={handleChangeFilename}
+                  />
+                )}
               </h2>
             </div>
             <div className="keyword_search_results">
