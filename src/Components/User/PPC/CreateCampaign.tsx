@@ -268,7 +268,7 @@ const CreateCampaign = () => {
                             (keywords.length === 0 && input.trim() === "") ||
                             keywords.length > 10 ||
                             country.length === 0 ||
-                            !language
+                            !language || fileName.trim() === ""
                           }
                         >
                           {loading ? "Please wait..." : "Start"}
