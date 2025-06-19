@@ -179,6 +179,13 @@ const GeneratePost = () => {
     navigate(`/social/GeneratedPostResult/${id}`);
   };
 
+    const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setAudience(() => {
+      return checked ? [value] : [];
+    });
+  };
+
   return (
     <>
       {loading && <Loading />}
@@ -382,7 +389,7 @@ const GeneratePost = () => {
                                     id={`persona1_${i}`}
                                     value={item.uuid_id}
                                     checked={audience[0] === item.uuid_id}
-                                    onChange={() => setAudience([item.uuid_id])}
+                                    onChange={handleTargetAudience}
                                   />
                                   <label
                                     htmlFor={`persona1_${i}`}

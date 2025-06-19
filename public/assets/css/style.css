@@ -2394,7 +2394,29 @@ font-weight: 500;
     align-items: baseline;
     column-gap: 5px;
 }
+.upload_download_btns {
+    display: flex;
+    align-items: center;
+    column-gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    row-gap: 15px;
+}
 
+.upload_download_btns .btn {
+    display: flex;
+    align-items: center;
+    column-gap: 15px;
+}
+
+.upload_download_btns .btn i{
+    width: 30px;
+}
+
+.upload_download_btns .btn p{
+    width: calc(100% - 30px);
+    margin-bottom: 0px;
+}
 
 /* Responsive css */
 @media only screen and (max-width:1599px) {

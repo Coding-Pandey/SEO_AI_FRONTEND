@@ -438,6 +438,20 @@ const CampaignSuggestionById = () => {
             </div>
           </div>
         </div>
+        <div className="upload_download_btns">
+          <button className="btn primary_btn">
+            <p>
+              Upload to Google Ads 
+            </p>
+              <i className="bi bi-upload"></i>
+          </button>
+          <button className="btn primary_btn">
+             <p>
+              Download
+             </p>
+             <i className="bi bi-download"></i>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -506,7 +520,7 @@ const CampaignSuggestionById = () => {
                     <SuggestCard key={index} group={group} />
                   )
                 )}
-                {/* Modal JSX */}
+            
                 {showModal && (
                   <div className="modal-overlays">
                     <div
