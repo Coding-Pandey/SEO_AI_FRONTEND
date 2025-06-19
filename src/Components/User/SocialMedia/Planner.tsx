@@ -53,7 +53,7 @@ const Planner = () => {
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [fileData, setFileData] = useState<any>(null);
   const [LoadingApi, setLoadingApi] = useState<boolean>(false);
-  // console.log(plannerData,"plannerData")
+  console.log(plannerData,"plannerData")
 
   useEffect(() => {
     fetchPlannerData();

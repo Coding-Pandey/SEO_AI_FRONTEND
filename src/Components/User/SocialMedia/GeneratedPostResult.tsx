@@ -60,7 +60,7 @@ const GeneratedPostResult = () => {
       setLoading(true);
       const response = await GetGeneratedPostById(clusterId);
       if (response.status === 200 || response.status === 201) {
-        console.log(response.data, "data");
+        // console.log(response.data, "data");
         setGeneratedPostDetails(response.data);
       }
     } catch (error: any) {

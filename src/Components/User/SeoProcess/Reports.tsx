@@ -98,16 +98,18 @@ const Reports = () => {
   const [selectedMetric, setSelectedMetric] = useState<
     "clicks" | "impressions" | "ctr" | "position"
   >("clicks");
+
   const today = new Date();
+  const sixMonthsAgo = subMonths(today, 6);
   const threeMonthsAgo = subMonths(today, 3);
   const [range, setRange] = useState([
     {
-      startDate: subMonths(new Date(), 3),
-      endDate: new Date(),
+      startDate: threeMonthsAgo,
+      endDate: today,
       key: "selection",
     },
   ]);
- 
+
   useEffect(() => {
     fetchWebListDetails();
   }, []);
@@ -142,7 +144,7 @@ const Reports = () => {
   ]);
 
   const setBrandTagsAndFetch = (tags: string[]) => {
-    console.log(setBrandTags,"setBrandTags")
+    console.log(setBrandTags, "setBrandTags");
     handleCloseModal(tags);
   };
 
@@ -258,7 +260,7 @@ const Reports = () => {
                 />
                 Organic reports <span className="text_blue">/ Overview</span>
               </h2>
-        
+
               {webList?.length > 0 && !isModalOpen && (
                 <select
                   className="form-select"
@@ -397,9 +399,9 @@ const Reports = () => {
                                 showCalendar={showCalendar}
                                 setShowCalendar={setShowCalendar}
                                 today={today}
-                                threeMonthsAgo={threeMonthsAgo}
                                 onSaveBrandTags={setBrandTagsAndFetch}
                                 activeTab={activeTab}
+                                minDate={sixMonthsAgo}
                               />
                             </div>
 
@@ -717,9 +719,9 @@ const Reports = () => {
                                 showCalendar={showCalendar}
                                 setShowCalendar={setShowCalendar}
                                 today={today}
-                                threeMonthsAgo={threeMonthsAgo}
                                 onSaveBrandTags={setBrandTagsAndFetch}
                                 activeTab={activeTab}
+                                minDate={sixMonthsAgo}
                               />
                             </div>
 
@@ -756,12 +758,11 @@ const Reports = () => {
                               </div>
                             </div>
 
-                               <div className="col-12">
+                            <div className="col-12">
                               <div className="row">
                                 <div className="col-12 col-xxl-6">
                                   <div className="card_box">
                                     <h3 className="font_20 font_400 mb-2">
-                                      
                                       Branded traffic
                                     </h3>
                                     <div className="grid_outer">
@@ -822,75 +823,70 @@ const Reports = () => {
                                     </div>
                                   </div>
                                 </div>
-
-                                
                               </div>
                             </div>
 
                             <div className="col-12 col-xxl-6">
-                                  <div className="card_box">
-                                    <h3 className="font_20 font_400 mb-2">
-                                      
-                                      Generic traffic
-                                    </h3>
-                                    <div className="grid_outer">
-                                      {[
-                                        {
-                                          label: "Impressions",
-                                          key: "impressions",
-                                        },
-                                        { label: "Clicks", key: "clicks" },
-                                        {
-                                          label: "No. Keywords",
-                                          key: "no_of_keywords",
-                                        },
-                                        { label: "CTR", key: "ctr" },
-                                        {
-                                          label: "Avg. position",
-                                          key: "avg_position",
-                                        },
-                                      ].map(({ label, key }) => {
-                                        const data =
-                                          BrandedWordAnalysis
-                                            ?.non_branded_keywords?.[key];
-                                        const actual = data?.Actual ?? 0;
-                                        const fluctuation =
-                                          data?.fluctuation ?? "0";
-                                        const fluctuationNum =
-                                          parseFloat(fluctuation);
-                                        const isPositive = fluctuationNum > 0;
-                                        const fluctuationClass = isPositive
-                                          ? "text-success"
-                                          : "text-danger";
-                                        const icon = isPositive
-                                          ? "bi-arrow-up-short"
-                                          : "bi-arrow-down-short";
+                              <div className="card_box">
+                                <h3 className="font_20 font_400 mb-2">
+                                  Generic traffic
+                                </h3>
+                                <div className="grid_outer">
+                                  {[
+                                    {
+                                      label: "Impressions",
+                                      key: "impressions",
+                                    },
+                                    { label: "Clicks", key: "clicks" },
+                                    {
+                                      label: "No. Keywords",
+                                      key: "no_of_keywords",
+                                    },
+                                    { label: "CTR", key: "ctr" },
+                                    {
+                                      label: "Avg. position",
+                                      key: "avg_position",
+                                    },
+                                  ].map(({ label, key }) => {
+                                    const data =
+                                      BrandedWordAnalysis
+                                        ?.non_branded_keywords?.[key];
+                                    const actual = data?.Actual ?? 0;
+                                    const fluctuation =
+                                      data?.fluctuation ?? "0";
+                                    const fluctuationNum =
+                                      parseFloat(fluctuation);
+                                    const isPositive = fluctuationNum > 0;
+                                    const fluctuationClass = isPositive
+                                      ? "text-success"
+                                      : "text-danger";
+                                    const icon = isPositive
+                                      ? "bi-arrow-up-short"
+                                      : "bi-arrow-down-short";
 
-                                        return (
-                                          <div className="grid_part" key={key}>
-                                            <h3 className="font_16 font_300 mb-1">
-                                              {label}
-                                            </h3>
-                                            <h4 className="font_20 font_600 mb-1">
-                                              {actual}
-                                            </h4>
-                                            <p
-                                              className={`font_14 ${fluctuationClass} mb-1`}
-                                            >
-                                              <i className={`bi ${icon}`}></i>{" "}
-                                              {fluctuationNum > 0
-                                                ? `${fluctuation}`
-                                                : fluctuation}
-                                              %
-                                            </p>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
+                                    return (
+                                      <div className="grid_part" key={key}>
+                                        <h3 className="font_16 font_300 mb-1">
+                                          {label}
+                                        </h3>
+                                        <h4 className="font_20 font_600 mb-1">
+                                          {actual}
+                                        </h4>
+                                        <p
+                                          className={`font_14 ${fluctuationClass} mb-1`}
+                                        >
+                                          <i className={`bi ${icon}`}></i>{" "}
+                                          {fluctuationNum > 0
+                                            ? `${fluctuation}`
+                                            : fluctuation}
+                                          %
+                                        </p>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
-
-                         
+                              </div>
+                            </div>
 
                             <div className="col-12 text-end">
                               <ChartFilter
@@ -949,9 +945,9 @@ const Reports = () => {
                                 showCalendar={showCalendar}
                                 setShowCalendar={setShowCalendar}
                                 today={today}
-                                threeMonthsAgo={threeMonthsAgo}
                                 onSaveBrandTags={setBrandTagsAndFetch}
                                 activeTab={activeTab}
+                                minDate={sixMonthsAgo}
                               />
                             </div>
 

@@ -14,9 +14,9 @@ interface FilterProps {
   showCalendar: boolean;
   setShowCalendar: React.Dispatch<React.SetStateAction<boolean>>;
   today: Date;
-  threeMonthsAgo: Date;
   onSaveBrandTags: (tags: string[]) => void;
   activeTab: string;
+  minDate: Date;
 }
 
 const FilterComponent: React.FC<FilterProps> = ({
@@ -32,9 +32,9 @@ const FilterComponent: React.FC<FilterProps> = ({
   showCalendar,
   setShowCalendar,
   today,
-  threeMonthsAgo,
   onSaveBrandTags,
   activeTab,
+  minDate,
 }) => {
   const [tempRange, setTempRange] = useState<any>(range);
   const [showInputBox, setShowInputBox] = useState<boolean>(false);
@@ -178,7 +178,7 @@ const FilterComponent: React.FC<FilterProps> = ({
               moveRangeOnFirstSelection={false}
               months={1}
               direction="horizontal"
-              minDate={threeMonthsAgo}
+              minDate={minDate}
               maxDate={today}
               showDateDisplay={false}
               showMonthAndYearPickers={true}
