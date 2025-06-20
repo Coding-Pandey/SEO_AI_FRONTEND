@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { toast } from "react-toastify";
 import Header from "../Header/Header";
@@ -10,6 +10,7 @@ import { SaveGenerateSuggestion } from "./ContentServices";
 
 const ContentSuggestionResult = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [GenerateSuggestionDetails, setGenerateSuggestionDetails] =
     useState<any>({});
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -88,6 +89,7 @@ const ContentSuggestionResult = () => {
         };
         localStorage.setItem("ClusterData", JSON.stringify(newData));
         setGenerateSuggestionDetails(newData);
+        navigate("/content/ContentGeneration");
       }
     } catch (error) {
       console.log("Error during AddGenerate", error);

@@ -8,6 +8,7 @@ import Logout from "./Components/Page/Logout";
  
  
  
+ 
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
@@ -22,6 +23,7 @@ const CampaignSuggestionById = lazy(() => import("./Components/User/PPC/Campaign
 const Planner = lazy(() => import("./Components/User/SocialMedia/Planner")); 
 const ContentGenerationResult = lazy(() => import("./Components/User/Content/ContentGenerationResult")); 
 const ContentSuggestionResult = lazy(() => import("./Components/User/Content/ContentSuggestionResult")); 
+const ContentGeneratBySeo = lazy(() => import("./Components/User/Content/ContentGeneratBySeo")); 
 const ContentPreviousList = lazy(() => import("./Components/User/Content/ContentPreviousList")); 
 const ProfileSetting = lazy(() => import("./Components/User/Setting/ProfileSetting")); 
 const ProfileSettingSuccess = lazy(() => import("./Components/User/Setting/ProfileSettingSuccess")); 
@@ -57,6 +59,7 @@ function App() {
             <Route path="/content/ContentGeneration" element={<ContentGeneration />} />
             <Route path="/content/ContentGenerationResult" element={<ContentGenerationResult />} />
             <Route path="/content/ContentSuggestionResult" element={<ContentSuggestionResult />} />
+            <Route path="/content/ContentGeneratBySeo" element={<ContentGeneratBySeo />} />
             <Route path="/content/ContentPreviousList/:id" element={<ContentPreviousList />} />
           
            <Route path="/ProfileSetting" element={<ProfileSetting />} />

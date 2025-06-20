@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { useEffect, useState } from "react";
@@ -35,7 +35,7 @@ interface SuggestionKeywordDetailsType {
 
 const SuggestionsResultById = () => {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [SuggestionKeywordDetails, setSuggestionKeywordDetails] =
     useState<SuggestionKeywordDetailsType | null>(null);
@@ -164,7 +164,7 @@ const SuggestionsResultById = () => {
       return;
     }
     try {
-      setLoading(true)
+      setLoading(true);
       const formData = { file_name: content };
       const res = await UpdateSEOFileName(UUID, formData);
       if (res.status === 200 || res.status === 201) {
@@ -179,14 +179,23 @@ const SuggestionsResultById = () => {
       }
     } catch (error: any) {
       console.error("Error updating title:", error);
-    } finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
       setShowFileModal(false);
     }
   };
 
   const handleCloseFileModel = () => {
     setShowFileModal(false);
+  };
+
+  const HandleGenerateContent = (items: any) => {
+    const dataGenerate = {
+      items,
+      id,
+    };
+    localStorage.removeItem("FormDataDetails");
+    navigate("/content/ContentGeneratBySeo", { state: dataGenerate });
   };
 
   return (
@@ -208,7 +217,13 @@ const SuggestionsResultById = () => {
               <div>
                 <h2 className="font_25 font_600 mb-2">
                   Keyword Manager /{" "}
-                  <span style={{ fontSize: "18px", fontWeight: 600 ,color:"rgb(72, 114, 183)" }}>
+                  <span
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: 600,
+                      color: "rgb(72, 114, 183)",
+                    }}
+                  >
                     {SuggestionKeywordDetails?.fileName
                       ? SuggestionKeywordDetails?.fileName
                           .charAt(0)
@@ -319,7 +334,10 @@ const SuggestionsResultById = () => {
                             </div>
                           ))}
                         </div>
-                        <button className="btn primary_btn mt-3">
+                        <button
+                          className="btn primary_btn mt-3"
+                          onClick={() => HandleGenerateContent(item)}
+                        >
                           Generate
                         </button>
                       </div>

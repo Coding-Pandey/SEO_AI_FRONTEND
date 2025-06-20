@@ -14,14 +14,14 @@ import { toast } from "react-toastify";
 import TitleOrFileUpdateModal from "../../Page/TitleOrFileUpdateModal";
 import Loading from "../../Page/Loading/Loading";
 import {
-  EditGenerateContent,
+    AddGenerateContent,
   GetFormDetails,
   MoreGenerateSuggestion,
 } from "./ContentServices";
-import ContentForm from "./ContentForm";
 import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
+import ContentFormForSeo from "./ContentFormForSeo";
 
-const ContentGenerationResult = () => {
+const ContentGeneratBySeo = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [generateKeywordDetails, setGenerateKeywordDetails] = useState<any>({});
@@ -44,10 +44,13 @@ const ContentGenerationResult = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
-  const [EditFormOpen, setEditFormOpen] = useState<boolean>(false);
+  const [EditFormOpen, setEditFormOpen] = useState<boolean>(true);
   const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
+  const [id, userid] = useState<string>("");
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keywordInput, setKeywordInput] = useState<string>("");
   // console.log(generateKeywordDetails, "generateKeywordDetails");
-
+  
   useEffect(() => {
     fetchGenerateData();
   }, []);
@@ -55,7 +58,7 @@ const ContentGenerationResult = () => {
   const fetchGenerateData = async () => {
     try {
       setloadingData(true);
-       const responseSourcefiles = await GetUploadedSourcefiles();
+      const responseSourcefiles = await GetUploadedSourcefiles();
       const responseForm = await GetFormDetails();
       if (responseForm.status === 200 || responseForm.status === 201) {
         setFormDynamictData(responseForm.data);
@@ -70,37 +73,12 @@ const ContentGenerationResult = () => {
 
   useEffect(() => {
     if (location.state) {
-      const storedData = localStorage.getItem("keywordToolResult");
-
-      const formDataDetail = localStorage.getItem("FormDataDetails");
-
-      if (formDataDetail) {
-        const parsedFormData = JSON.parse(formDataDetail);
-        setFormPreDetails(parsedFormData);
-        setFileName(parsedFormData?.FileName || "");
-        setContentType(parsedFormData?.contentType || "");
-        setPostObjectives(parsedFormData?.PostObjectives || []);
-        setTargetAudience(parsedFormData?.TargetAudience || []);
-        setAddInstructions(parsedFormData?.AddInstructions || "");
-        setLinks(parsedFormData?.links || []);
-        if (parsedFormData?.temp_file_path?.length > 0) {
-          setFileUrl([parsedFormData?.temp_file_path]);
-        }
-      }
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-
-        const updatedData = {
-          ...parsedData,
-          data: {
-            ...parsedData.data,
-            id: "12",
-          },
-        };
-        localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
-        setGenerateKeywordDetails(updatedData);
-        setSections(updatedData?.data?.Sections);
-      }
+   const newData=location.state
+   console.log(location.state,"location.state")
+   setFileName(newData?.items?.Page_Title);
+   userid(newData?.id)
+   const extractedKeywords =  newData?.items?.Keywords.map((k:any) => k.Keyword);
+   setKeywords(extractedKeywords);
     }
   }, [location.state]);
 
@@ -117,6 +95,8 @@ const ContentGenerationResult = () => {
     updateLocalStorage(updatedSections);
     toast.success("Suggestion Deleted successfully");
   };
+
+ 
 
   const handleSaveEdit = () => {
     if (Message === "Add More") {
@@ -165,12 +145,7 @@ const ContentGenerationResult = () => {
     });
   };
 
-  const handleOpenModal = async (data: string) => {
-    setShowModal(true);
-    console.log(data, "data");
-    setModalTitleValue(data);
-    setMessage("Update FileName");
-  };
+ 
 
   const handleOpenTitleModal = async (data: string) => {
     setShowModal(true);
@@ -253,6 +228,7 @@ const ContentGenerationResult = () => {
 
   const handleAddSection = async () => {
     try {
+    
       const Instructions = FormPreDetails?.AddInstructions;
       const preUploadFile = FormPreDetails?.temp_file_path;
       const formData = new FormData();
@@ -430,9 +406,23 @@ const ContentGenerationResult = () => {
         toast.error("Please enter information page name");
         return;
       }
+      if(!contentType){
+        toast.error("Please select contentType");
+        return;
+      }
 
       if (PostObjectives.length > 10) {
-        toast.error("Please select a maximum of 10 post keywords");
+        toast.error("Please select a maximum of 10 post Objectives");
+        return;
+      }
+
+      if (keywords.length > 10) {
+        toast.error("Please select a maximum of 10  keywords");
+        return;
+      }
+
+      if (keywords.length <= 0) {
+        toast.error("Please enter at least one keyword.");
         return;
       }
 
@@ -466,6 +456,7 @@ const ContentGenerationResult = () => {
       // }
       formData.append("temp_file_path", generateKeywordDetails?.temp_file_path);
       formData.append("links", JSON.stringify(links));
+      formData.append("keywords", JSON.stringify(keywords));
       const newFormData = {
         FileName,
         contentType,
@@ -474,11 +465,11 @@ const ContentGenerationResult = () => {
         AddInstructions,
         uploadedFiles: newFileUpload,
         links,
+        keywords
       };
-      const response = await EditGenerateContent(formData);
+      const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
         const dataResult = response.data;
-        console.log(dataResult, "dataResult");
         const tempfile = {
           ...newFormData,
           temp_file_path: dataResult?.temp_file_path,
@@ -494,7 +485,7 @@ const ContentGenerationResult = () => {
           "keywordToolResult",
           JSON.stringify(updatedNewData)
         );
-        localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
+        setFormPreDetails(tempfile);
         setFileUrl([dataResult?.temp_file_path]);
         setGenerateKeywordDetails(updatedNewData);
         setSections(updatedNewData?.data?.Sections);
@@ -526,20 +517,11 @@ const ContentGenerationResult = () => {
               Content Generator{" "}
               <span className="text_blue">
                 /
-                {generateKeywordDetails?.filename
-                  ? generateKeywordDetails.filename.charAt(0).toUpperCase() +
-                    generateKeywordDetails.filename.slice(1)
+                {FileName
+                  ? FileName.charAt(0).toUpperCase() +
+                    FileName.slice(1)
                   : ""}
               </span>
-              <button
-                className="btn font_16 pe-0"
-                aria-label="edit_icon"
-                onClick={() =>
-                  handleOpenModal(generateKeywordDetails?.filename)
-                }
-              >
-                <i className="bi bi-pencil-fill"></i>
-              </button>
             </h2>
           </div>
           {EditFormOpen ? (
@@ -550,14 +532,13 @@ const ContentGenerationResult = () => {
                     <button
                       className="btn text_orange font_20 close_btn"
                       aria-label="remove_icon"
-                      onClick={() => setEditFormOpen(false)}
+                      onClick={() =>  navigate(`/seo/SuggestionsResultById/${id}`)}
                     >
                       <i className="bi bi-x"></i>
                     </button>
                   </div>
-                  <ContentForm
+                  <ContentFormForSeo
                     contentType={String(contentType)}
-                    FileName={FileName}
                     PostObjectives={PostObjectives}
                     TargetAudience={TargetAudience}
                     AddInstructions={AddInstructions}
@@ -569,7 +550,6 @@ const ContentGenerationResult = () => {
                     handleSelectChange={handleSelectChange}
                     handleObjectiveChange={handleObjectiveChange}
                     handleTargetAudience={handleTargetAudience}
-                    setFileName={setFileName}
                     setAddInstructions={setAddInstructions}
                     fileInputRef={fileInputRef}
                     handleFileChange={handleFileChange}
@@ -580,6 +560,10 @@ const ContentGenerationResult = () => {
                     handleRemoveLink={handleRemoveLink}
                     handleGenerateSubmit={handleGenerateSubmit}
                     UploadedSourcefiles={UploadedSourcefiles}
+                    keywords={keywords}
+                    setKeywords={setKeywords}
+                    keywordInput={keywordInput}
+                    setKeywordInput={setKeywordInput}
                   />
                 </div>
               </div>
@@ -808,4 +792,4 @@ const ContentGenerationResult = () => {
   );
 };
 
-export default ContentGenerationResult;
+export default ContentGeneratBySeo;
