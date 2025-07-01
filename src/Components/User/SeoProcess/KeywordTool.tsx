@@ -89,6 +89,7 @@ const KeywordTool = () => {
         console.log(SEOGenerateResponse.data);
         const resultData = SEOGenerateResponse.data;
         const fileNameData = { fileName };
+        localStorage.removeItem("includeKeywords");
         localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
         navigate("/seo/KeywordToolResult", { state: resultData });

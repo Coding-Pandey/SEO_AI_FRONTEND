@@ -4,7 +4,11 @@ import SideBar from "../SideBar/SideBar";
 import Loading from "../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import ScheduleModal from "./ScheduleModal";
-import { deletePlannerSocialMediaData,GetPlannerSocialMediaData,UpdateScheduleSocialMediaPlanner } from "./SocialMediaServices";
+import {
+  deletePlannerSocialMediaData,
+  GetPlannerSocialMediaData,
+  UpdateScheduleSocialMediaPlanner,
+} from "./SocialMediaServices";
 
 const platforms = [
   "linkedin_posts",
@@ -53,7 +57,7 @@ const Planner = () => {
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [fileData, setFileData] = useState<any>(null);
   const [LoadingApi, setLoadingApi] = useState<boolean>(false);
-  console.log(plannerData,"plannerData")
+  console.log(plannerData, "plannerData");
 
   useEffect(() => {
     fetchPlannerData();
@@ -183,7 +187,7 @@ const Planner = () => {
     setREScheduleDateAndTime("");
   };
 
-  const handleSchedule = async (scheduledDate: string,timeZone:any) => {
+  const handleSchedule = async (scheduledDate: string, timeZone: any) => {
     setREScheduleDateAndTime(scheduledDate);
     let formData = new FormData();
     formData.append("id", PlatformId);

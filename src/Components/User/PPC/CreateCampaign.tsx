@@ -90,6 +90,7 @@ const CreateCampaign = () => {
       ) {
         const resultData = SEOGenerateResponse.data;
         const fileNameData = { fileName };
+        localStorage.removeItem("includeKeywords");
         localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
         navigate("/ppc/CreateCampaignKeywordResult", { state: resultData });

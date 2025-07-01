@@ -9,6 +9,7 @@ import Loading from "../../Page/Loading/Loading";
 import { SEOClusterKeywordService, SEOGenerateKeyword } from "./SeoServices";
 import { capitalizeFirstLetter } from "./Reports";
 import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
+import IncludeKeywordBox from "../../Page/IncludeKeywordBox";
 
 const KeywordToolResult = () => {
   const location = useLocation();
@@ -31,6 +32,7 @@ const KeywordToolResult = () => {
   const [FileNameData, setFileNameData] = useState<any>({});
   const [content, setContent] = useState<string>("");
   const [ShowFileModal, setShowFileModal] = useState<boolean>(false);
+  const [showInputBox, setShowInputBox] = useState<boolean>(false);
   const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
@@ -42,19 +44,28 @@ const KeywordToolResult = () => {
     }
   };
 
-  const removeIncludeKeyword = (index: number) => {
-    setIncludeKeywords(includeKeywords.filter((_, i) => i !== index));
-  };
+ 
+
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("keywordToolResult");
       const fileNameData = localStorage.getItem("fileNameData");
+       const savedIncludeKeywords = localStorage.getItem("includeKeywords");
       if (storedData && fileNameData) {
         setGenerateKeywordDetails(JSON.parse(storedData));
         setFileNameData(JSON.parse(fileNameData));
       }
+        if (savedIncludeKeywords) {
+      setIncludeKeywords(JSON.parse(savedIncludeKeywords));
+    }
     }
   }, [location.state]);
+
+   const removeIncludeKeyword = (index: number) => {
+    const updatedKeywords = includeKeywords.filter((_, i) => i !== index);
+    setIncludeKeywords(updatedKeywords);
+    localStorage.setItem("includeKeywords", JSON.stringify(updatedKeywords));
+  };
 
   const handleDeleteKeyword = (index: number) => {
     const updatedKeywords = [...generateKeywordDetails];
@@ -145,10 +156,12 @@ const KeywordToolResult = () => {
   };
 
   const handleSuggestPages = async () => {
+     setShowInputBox(false)
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
-    const limitedData = filteredData.slice(0, 50);
+
+    const limitedData = filteredData;
 
     setLoadingSuggestion(true);
     const finalKeywords =
@@ -159,7 +172,7 @@ const KeywordToolResult = () => {
         : [];
 
     const newData = {
-      file_name:FileNameData?.fileName,
+      file_name: FileNameData?.fileName,
       keywords: limitedData,
       delete_word: {
         branded_words: brandedWords,
@@ -210,6 +223,17 @@ const KeywordToolResult = () => {
     setShowFileModal(false);
   };
 
+  const handleSaveIncludeKeywords = () => {
+    if (includeKeywords.length > 0) {
+      localStorage.setItem("includeKeywords", JSON.stringify(includeKeywords));
+      setShowInputBox(false)
+      toast.success("Include keywords saved!", {
+        position: "top-right",
+        autoClose: 1000,
+      });
+    }
+  };
+
   return (
     <>
       {loadingSuggestion && <Loading />}
@@ -222,7 +246,13 @@ const KeywordToolResult = () => {
               <h2 className="font_25 font_600 mb-2">
                 <i className="bi bi-search me-1 font_20 text-primary"></i>{" "}
                 Keyword Manager /{" "}
-                <span style={{ fontSize: "18px", fontWeight: 600,color:"rgb(72, 114, 183)" }}>
+                <span
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: 600,
+                    color: "rgb(72, 114, 183)",
+                  }}
+                >
                   {FileNameData?.fileName
                     ? capitalizeFirstLetter(FileNameData.fileName)
                     : ""}
@@ -266,6 +296,7 @@ const KeywordToolResult = () => {
                         id="keyword_volume"
                         min={0}
                         max={500}
+                        step={10}
                         value={volume}
                         onChange={(e) => setVolume(Number(e.target.value))}
                       />
@@ -273,7 +304,7 @@ const KeywordToolResult = () => {
                     </div>
                   </div>
 
-                  <div className="col-12 col-md-8 col-xl-4">
+                  <div className="col-12 col-md-8 col-xl-2">
                     <div className="exclue_include_wrapper">
                       <select
                         className="form-select"
@@ -285,29 +316,28 @@ const KeywordToolResult = () => {
                         <option value="Branding Keywords">
                           Branding Keywords
                         </option>
-                        {/* <option value="2">Option 2</option>
-                          <option value="3">Option 3</option> */}
                       </select>
-
-                      {/* <select
-                          className="form-select"
-                          id="includeKeyword"
-                          aria-label="Include Keyword"
-                        >
-                          <option value="">Include</option>
-                          <option value="1">Option 1</option>
-                          <option value="2">Option 2</option>
-                          <option value="3">Option 3</option>
-                        </select> */}
-
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Include"
-                        style={{ color: "black" }}
-                        value={includeInput}
-                        onChange={(e) => setIncludeInput(e.target.value)}
-                        onKeyDown={handleIncludeKeyDown}
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-8 col-xl-2">
+                    <div className="exclue_include_wrapper"></div>
+                    <div className="brand_select">
+                      <div onClick={() => setShowInputBox((prev) => !prev)}>
+                        <div className="form-control">
+                          Include{" "}
+                          <span>
+                            <i className="bi bi-chevron-down"></i>
+                          </span>
+                        </div>
+                      </div>
+                       <IncludeKeywordBox
+                        show={showInputBox}
+                        includeKeywords={includeKeywords}
+                        includeInput={includeInput}
+                        setIncludeInput={setIncludeInput}
+                        handleIncludeKeyDown={handleIncludeKeyDown}
+                        removeIncludeKeyword={removeIncludeKeyword}
+                        handleSaveIncludeKeywords={handleSaveIncludeKeywords}
                       />
                     </div>
                   </div>
@@ -332,60 +362,34 @@ const KeywordToolResult = () => {
                     </div>
                   </div>
                 </div>
-                {includeKeywords.length > 0 && (
-                  <div
-                    className="mb-2 p-2 form-control mt-3"
-                    style={{
-                      backgroundColor: "#ffffff",
-                      border: "2px solid #e7e7e7",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    {includeKeywords.map((keyword, index) => (
-                      <span
-                        key={index}
-                        className="primary_btn  badge mx-1 px-2 py-1 "
-                      >
-                        {keyword}{" "}
-                        <i
-                          className="bi bi-x ms-1 "
-                          style={{ cursor: "pointer" }}
-                          onClick={() => removeIncludeKeyword(index)}
-                        ></i>
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div className="result_keyword box-shadow">
                 <div className="row">
                   {generateKeywordDetails.length > 0 ? (
-                    generateKeywordDetails.map((item: any, index: any) => (
-                      <div className="col-12 col-md-6 col-lg-4" key={index}>
-                        <div
-                          className={`keyword_item
-              ${
-                item.Avg_Monthly_Searches < volume
-                  ? "red-border"
-                  : item.isNew
-                  ? "active"
-                  : ""
-              }
-            `}
-                        >
-                          <p className="font_16 mb-0">{item.Keyword}</p>
-                          <div className="font_16">
-                            <span>{item.Avg_Monthly_Searches}</span>
-                            <i
-                              className="bi bi-x"
-                              onClick={() => handleDeleteKeyword(index)}
-                              style={{ cursor: "pointer" }}
-                            ></i>
+                    generateKeywordDetails
+                      .filter(
+                        (item: any) => item.Avg_Monthly_Searches >= volume
+                      )
+                      .map((item: any, index: any) => (
+                        <div className="col-12 col-md-6 col-lg-4" key={index}>
+                          <div
+                            className={`keyword_item ${
+                              item.isNew ? "active" : ""
+                            }`}
+                          >
+                            <p className="font_16 mb-0">{item.Keyword}</p>
+                            <div className="font_16">
+                              <span>{item.Avg_Monthly_Searches}</span>
+                              <i
+                                className="bi bi-x"
+                                onClick={() => handleDeleteKeyword(index)}
+                                style={{ cursor: "pointer" }}
+                              ></i>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      ))
                   ) : (
                     <div className="col-12">
                       <p>No keywords found</p>

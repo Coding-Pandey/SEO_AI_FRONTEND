@@ -12,6 +12,7 @@ import {
 } from "./PpcServices";
 import { capitalizeFirstLetter } from "../SeoProcess/Reports";
 import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
+import IncludeKeywordBox from "../../Page/IncludeKeywordBox";
 
 const CreateCampaignKeywordResult = () => {
   const location = useLocation();
@@ -34,7 +35,7 @@ const CreateCampaignKeywordResult = () => {
   const [FileNameData, setFileNameData] = useState<any>({});
   const [content, setContent] = useState<string>("");
   const [ShowFileModal, setShowFileModal] = useState<boolean>(false);
-
+  const [showInputBox, setShowInputBox] = useState<boolean>(false);
   const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
@@ -47,16 +48,22 @@ const CreateCampaignKeywordResult = () => {
   };
 
   const removeIncludeKeyword = (index: number) => {
-    setIncludeKeywords(includeKeywords.filter((_, i) => i !== index));
+    const updatedKeywords = includeKeywords.filter((_, i) => i !== index);
+    setIncludeKeywords(updatedKeywords);
+    localStorage.setItem("includeKeywords", JSON.stringify(updatedKeywords));
   };
 
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("keywordToolResult");
       const fileNameData = localStorage.getItem("fileNameData");
+      const savedIncludeKeywords = localStorage.getItem("includeKeywords");
       if (storedData && fileNameData) {
         setGenerateKeywordDetails(JSON.parse(storedData));
         setFileNameData(JSON.parse(fileNameData));
+      }
+      if (savedIncludeKeywords) {
+        setIncludeKeywords(JSON.parse(savedIncludeKeywords));
       }
     }
   }, [location.state]);
@@ -149,12 +156,13 @@ const CreateCampaignKeywordResult = () => {
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setBrandedWords(e.target.value === "Branding Keywords");
   };
-
+  console.log(generateKeywordDetails.length, "generateKeywordDetails");
   const handleSuggestPages = async () => {
+    setShowInputBox(false);
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
-    const limitedData = filteredData.slice(0, 50);
+    const limitedData = filteredData;
 
     const cleanedData = limitedData.map(({ isNew, ...rest }) => rest);
 
@@ -219,6 +227,17 @@ const CreateCampaignKeywordResult = () => {
     setShowFileModal(false);
   };
 
+  const handleSaveIncludeKeywords = () => {
+    if (includeKeywords.length > 0) {
+      localStorage.setItem("includeKeywords", JSON.stringify(includeKeywords));
+      setShowInputBox(false);
+      toast.success("Include keywords saved!", {
+        position: "top-right",
+        autoClose: 1000,
+      });
+    }
+  };
+
   return (
     <>
       {loadingSuggestion && <Loading />}
@@ -281,6 +300,7 @@ const CreateCampaignKeywordResult = () => {
                         className="form-range"
                         id="keyword_volume"
                         min={0}
+                        step={10}
                         max={500}
                         value={volume}
                         onChange={(e) => setVolume(Number(e.target.value))}
@@ -288,7 +308,7 @@ const CreateCampaignKeywordResult = () => {
                       <span>{volume}</span>
                     </div>
                   </div>
-                  <div className="col-12 col-md-6 col-xl-4">
+                  <div className="col-12 col-md-6 col-xl-2">
                     <div className="exclue_include_wrapper">
                       <select
                         className="form-select"
@@ -303,15 +323,27 @@ const CreateCampaignKeywordResult = () => {
                         {/* <option value="2">Option 2</option>
                           <option value="3">Option 3</option> */}
                       </select>
-
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Include"
-                        style={{ color: "black" }}
-                        value={includeInput}
-                        onChange={(e) => setIncludeInput(e.target.value)}
-                        onKeyDown={handleIncludeKeyDown}
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-8 col-xl-2">
+                    <div className="exclue_include_wrapper"></div>
+                    <div className="brand_select">
+                      <div onClick={() => setShowInputBox((prev) => !prev)}>
+                        <div className="form-control">
+                          Include{" "}
+                          <span>
+                            <i className="bi bi-chevron-down"></i>
+                          </span>
+                        </div>
+                      </div>
+                      <IncludeKeywordBox
+                        show={showInputBox}
+                        includeKeywords={includeKeywords}
+                        includeInput={includeInput}
+                        setIncludeInput={setIncludeInput}
+                        handleIncludeKeyDown={handleIncludeKeyDown}
+                        removeIncludeKeyword={removeIncludeKeyword}
+                        handleSaveIncludeKeywords={handleSaveIncludeKeywords}
                       />
                     </div>
                   </div>
@@ -335,30 +367,6 @@ const CreateCampaignKeywordResult = () => {
                     </div>
                   </div>
                 </div>
-                {includeKeywords.length > 0 && (
-                  <div
-                    className="mb-2 p-2 form-control mt-3"
-                    style={{
-                      backgroundColor: "#ffffff",
-                      border: "2px solid #e7e7e7",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    {includeKeywords.map((keyword, index) => (
-                      <span
-                        key={index}
-                        className="primary_btn  badge mx-1 px-2 py-1 "
-                      >
-                        {keyword}{" "}
-                        <i
-                          className="bi bi-x ms-1 "
-                          style={{ cursor: "pointer" }}
-                          onClick={() => removeIncludeKeyword(index)}
-                        ></i>
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
               <div className="result_keyword box-shadow">
                 <div className="result_table_wrapper table-responsive">
@@ -373,37 +381,37 @@ const CreateCampaignKeywordResult = () => {
                         <th scope="col"></th>
                       </tr>
                     </thead>
+
                     <tbody>
-                      {generateKeywordDetails.map((keywordDetail, index) => (
-                        <tr
-                          key={index}
-                          className={`
-                ${
-                  keywordDetail.Avg_Monthly_Searches < volume
-                    ? "red-border-ppc"
-                    : keywordDetail.isNew
-                    ? "active"
-                    : ""
-                } 
-              `}
-                        >
-                          <td>{keywordDetail.Keyword}</td>
-                          <td>{keywordDetail.Avg_Monthly_Searches}</td>
-                          <td>{keywordDetail.Competition}</td>
-                          <td>{keywordDetail.LowTopOfPageBid}</td>
-                          <td>{keywordDetail.HighTopOfPageBid}</td>
-                          <td>
-                            <span className="remove_key">
-                              <i
-                                className="bi bi-x"
-                                onClick={() =>
-                                  handleRemoveKeyword(keywordDetail.Keyword)
-                                }
-                              ></i>
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
+                      {generateKeywordDetails
+                        .filter(
+                          (keywordDetail) =>
+                            keywordDetail.Avg_Monthly_Searches >= volume
+                        )
+                        .map((keywordDetail, index) => (
+                          <tr
+                            key={index}
+                            className={`
+          ${keywordDetail.isNew ? "active" : ""}
+        `}
+                          >
+                            <td>{keywordDetail.Keyword}</td>
+                            <td>{keywordDetail.Avg_Monthly_Searches}</td>
+                            <td>{keywordDetail.Competition}</td>
+                            <td>{keywordDetail.LowTopOfPageBid}</td>
+                            <td>{keywordDetail.HighTopOfPageBid}</td>
+                            <td>
+                              <span className="remove_key">
+                                <i
+                                  className="bi bi-x"
+                                  onClick={() =>
+                                    handleRemoveKeyword(keywordDetail.Keyword)
+                                  }
+                                ></i>
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
