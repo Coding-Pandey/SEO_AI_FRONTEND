@@ -273,13 +273,13 @@ const GeneratedPostResult = () => {
     setScheduleDateAndTime("");
   };
 
-  const handleSchedule = async (scheduledDate: string,timeZone:any) => {
+  const handleSchedule = async (scheduledDate: string, timeZone: any) => {
     setScheduleDateAndTime(scheduledDate);
     const formData = {
       uuid: UUIDS,
       schedule_time: scheduledDate,
       content: [selectedPost],
-      timezone:timeZone
+      timezone: timeZone,
     };
     try {
       const response = await AddScheduleSocialMedia(formData);
@@ -363,7 +363,12 @@ const GeneratedPostResult = () => {
       console.log("Failed to delete file.");
     }
   };
-  console.log(generatedPostDetails?.data?.linkedin_posts,"generatedPostDetails.data.linkedin_posts")
+
+  const extractHashtags = (descriptionArray: string[]) => {
+    const text = descriptionArray.join(" ");
+    const hashtags = text.match(/#[a-zA-Z0-9_]+/g);
+    return hashtags || [];
+  };
 
   return (
     <>
@@ -605,30 +610,30 @@ const GeneratedPostResult = () => {
                             )}
 
                             <div className="social_post_content font_16">
-                              {post.discription.map((text: any, i: any) => (
-                                <ReactMarkdown key={i}>{text}</ReactMarkdown>
-                              ))}
-
-                              {post?.list_items?.length > 0 && (
-                                <ul>
-                                  {post.list_items.map(
-                                    (item: string, i: number) => (
-                                      <li key={i}>{item}</li>
-                                    )
-                                  )}
-                                </ul>
-                              )}
-
-                              {post.hashtag?.length > 0 && (
-                                <div className="post_hastag">
-                                  {post.hashtag.map((tag: any, i: any) => (
-                                    <span className="text_blue" key={i}>
-                                      #{tag}
-                                    </span>
-                                  ))}
-                                </div>
+                              {post.discription.map(
+                                (text: string, i: number) => {
+                                  const withoutHashtags = text
+                                    .replace(/#[a-zA-Z0-9_]+/g, "")
+                                    .trim();
+                                  return (
+                                    <ReactMarkdown key={i}>
+                                      {withoutHashtags}
+                                    </ReactMarkdown>
+                                  );
+                                }
                               )}
                             </div>
+                            {extractHashtags(post.discription).length > 0 && (
+                              <div className="post_hastag mt-3">
+                                {extractHashtags(post.discription).map(
+                                  (tag, idx) => (
+                                      <span className="hashtag me-2" style={{color:"rgb(72, 114, 183)"}} key={idx}>
+                                      {tag}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            )}
                           </div>
                         )
                       )}
@@ -734,21 +739,31 @@ const GeneratedPostResult = () => {
                               </div>
                             )}
 
-                            <div className="social_post_content font_16">
-                              {post.discription?.map((text: any, i: number) => (
-                                <ReactMarkdown key={i}>{text}</ReactMarkdown>
-                              ))}
-
-                              {post.hashtag?.length > 0 && (
-                                <div className="post_hastag">
-                                  {post.hashtag.map((tag: any, i: number) => (
-                                    <span className="text_blue" key={i}>
-                                      #{tag}
-                                    </span>
-                                  ))}
-                                </div>
+                             <div className="social_post_content font_16">
+                              {post.discription.map(
+                                (text: string, i: number) => {
+                                  const withoutHashtags = text
+                                    .replace(/#[a-zA-Z0-9_]+/g, "")
+                                    .trim();
+                                  return (
+                                    <ReactMarkdown key={i}>
+                                      {withoutHashtags}
+                                    </ReactMarkdown>
+                                  );
+                                }
                               )}
                             </div>
+                            {extractHashtags(post.discription).length > 0 && (
+                              <div className="post_hastag mt-3">
+                                {extractHashtags(post.discription).map(
+                                  (tag, idx) => (
+                                      <span className="hashtag me-2" style={{color:"rgb(72, 114, 183)"}} key={idx}>
+                                      {tag}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            )}
                           </div>
                         )
                       )}
@@ -856,20 +871,31 @@ const GeneratedPostResult = () => {
                             )}
 
                             <div className="social_post_content font_16">
-                              {post.discription.map((text: any, i: any) => (
-                                <ReactMarkdown key={i}>{text}</ReactMarkdown>
-                              ))}
-
-                              {post.hashtag?.length > 0 && (
-                                <div className="post_hastag">
-                                  {post.hashtag.map((tag: any, i: any) => (
-                                    <span className="text_blue" key={i}>
-                                      #{tag}
-                                    </span>
-                                  ))}
-                                </div>
+                              {post.discription.map(
+                                (text: string, i: number) => {
+                                  const withoutHashtags = text
+                                    .replace(/#[a-zA-Z0-9_]+/g, "")
+                                    .trim();
+                                  return (
+                                    <ReactMarkdown key={i}>
+                                      {withoutHashtags}
+                                    </ReactMarkdown>
+                                  );
+                                }
                               )}
                             </div>
+                            {extractHashtags(post.discription).length > 0 && (
+                              <div className="post_hastag mt-3">
+                                {extractHashtags(post.discription).map(
+                                  (tag, idx) => (
+                                      <span className="hashtag me-2" style={{color:"rgb(72, 114, 183)"}} key={idx}>
+                                      {tag}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            )}
+                         
                           </div>
                         )
                       )}
@@ -974,22 +1000,31 @@ const GeneratedPostResult = () => {
                                 </div>
                               </div>
                             )}
-                            <div className="social_post_content font_16">
-                              {post.discription.map((text: any, i: any) => (
-                                <ReactMarkdown key={i}>{text}</ReactMarkdown>
-                              ))}
-                              {post.hashtag?.length > 0 && (
-                                <div className="post_hastag">
-                                  {post.hashtag.map(
-                                    (tag: string, i: number) => (
-                                      <span className="text_blue" key={i}>
-                                        #{tag}
-                                      </span>
-                                    )
-                                  )}
-                                </div>
+                             <div className="social_post_content font_16">
+                              {post.discription.map(
+                                (text: string, i: number) => {
+                                  const withoutHashtags = text
+                                    .replace(/#[a-zA-Z0-9_]+/g, "")
+                                    .trim();
+                                  return (
+                                    <ReactMarkdown key={i}>
+                                      {withoutHashtags}
+                                    </ReactMarkdown>
+                                  );
+                                }
                               )}
                             </div>
+                            {extractHashtags(post.discription).length > 0 && (
+                              <div className="post_hastag mt-3">
+                                {extractHashtags(post.discription).map(
+                                  (tag, idx) => (
+                                      <span className="hashtag me-2" style={{color:"#e25087"}} key={idx}>
+                                      {tag}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            )}
                           </div>
                         )
                       )}
@@ -1095,21 +1130,30 @@ const GeneratedPostResult = () => {
                               </div>
                             )}
                             <div className="social_post_content font_16">
-                              {post.discription.map((text: any, i: any) => (
-                                <ReactMarkdown key={i}>{text}</ReactMarkdown>
-                              ))}
-                              {post.hashtag?.length > 0 && (
-                                <div className="post_hastag">
-                                  {post.hashtag.map(
-                                    (tag: string, i: number) => (
-                                      <span className="text_blue" key={i}>
-                                        #{tag}
-                                      </span>
-                                    )
-                                  )}
-                                </div>
+                              {post.discription.map(
+                                (text: string, i: number) => {
+                                  const withoutHashtags = text
+                                    .replace(/#[a-zA-Z0-9_]+/g, "")
+                                    .trim();
+                                  return (
+                                    <ReactMarkdown key={i}>
+                                      {withoutHashtags}
+                                    </ReactMarkdown>
+                                  );
+                                }
                               )}
                             </div>
+                            {extractHashtags(post.discription).length > 0 && (
+                              <div className="post_hastag mt-3">
+                                {extractHashtags(post.discription).map(
+                                  (tag, idx) => (
+                                      <span className="hashtag me-2" style={{color:"#9ce0ee"}} key={idx}>
+                                      {tag}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            )}
                           </div>
                         )
                       )}
