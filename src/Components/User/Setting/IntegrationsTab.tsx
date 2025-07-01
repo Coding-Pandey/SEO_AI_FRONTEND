@@ -47,13 +47,18 @@ const integrationsList = [
     img: "facebook.png",
     category: "facebook",
   },
+  {
+    name: "Google Sheet",
+    img: "GoogleSheet.png",
+    category: "google_sheets",
+  },
 ];
 
 const IntegrationsTab = ({
   IntegratedData,
   setSelectedCategory,
   handleConnect,
-}: {
+}:{
   IntegratedData: any;
   setSelectedCategory: (category: string) => void;
   handleConnect: () => void;
@@ -91,12 +96,14 @@ const IntegrationsTab = ({
                         setSelectedCategory(item.category);
                         setSelectedIntegration(item.category);  
                       }}
-                      data-bs-toggle={
-                        item.name === "Search console" ? "modal" : ""
-                      }
-                      data-bs-target={
-                        item.name === "Search console" ? "#integratedCard" : ""
-                      }
+                      data-bs-toggle={"modal"}
+                      data-bs-target={"#integratedCard"}
+                      // data-bs-toggle={
+                      //   item.name === "Search console" ? "modal" : ""
+                      // }
+                      // data-bs-target={
+                      //   item.name === "Search console" ? "#integratedCard" : ""
+                      // }
                     >
                       <div className="left_part">
                         <img

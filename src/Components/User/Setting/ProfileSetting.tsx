@@ -39,6 +39,7 @@ const ProfileSetting = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [FileEditData, setFileEditData] = useState<any>({});
+  const [activeTab, setActiveTab] = useState<string | null>("Profile");
 
   const openDeleteModal = (uuid: string) => {
     setSelectedDeleteId(uuid);
@@ -187,7 +188,7 @@ const ProfileSetting = () => {
             <div className="content_header mb-4">
               <h2 className="font_25 font_600 mb-2">
                 <i className="bi bi-gear-fill heading_icon me-1 text_blue"></i>
-                Settings <span className="text_blue">/ Profile settings</span>
+                Settings <span className="text_blue">/ {activeTab}</span>
               </h2>
             </div>
             <div className="profile_settings_wrapper">
@@ -209,6 +210,7 @@ const ProfileSetting = () => {
                           role="tab"
                           aria-controls="pills-profile"
                           aria-selected="true"
+                          onClick={() => setActiveTab("Profile")}
                         >
                           Profile{" "}
                           <span>
@@ -226,6 +228,7 @@ const ProfileSetting = () => {
                           role="tab"
                           aria-controls="pills-integration"
                           aria-selected="false"
+                          onClick={() => setActiveTab("Integrations")}
                         >
                           Integrations{" "}
                           <span>
@@ -243,6 +246,7 @@ const ProfileSetting = () => {
                           role="tab"
                           aria-controls="pills-source"
                           aria-selected="false"
+                          onClick={() => setActiveTab("Source files")}
                         >
                           Source files{" "}
                           <span>

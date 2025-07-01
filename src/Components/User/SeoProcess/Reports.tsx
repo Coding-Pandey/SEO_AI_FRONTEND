@@ -258,7 +258,7 @@ const Reports = () => {
                   className="heading_icon me-1"
                   alt="heading icon"
                 />
-                Organic reports <span className="text_blue">/ Overview</span>
+                Organic reports <span className="text_blue">/ {activeTab === "overview" ? "Overview" : activeTab === "brand" ? "Brand vs Generic" :"Rankings"}</span>
               </h2>
 
               {webList?.length > 0 && !isModalOpen && (

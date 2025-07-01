@@ -11,23 +11,30 @@ import Logout from "./Components/Page/Logout";
  
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
+
 const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
-const ContentGeneration = lazy(() => import("./Components/User/Content/ContentGeneration"));
-const CreateCampaign = lazy(() => import("./Components/User/PPC/CreateCampaign"));
-const GeneratePost = lazy(() => import("./Components/User/SocialMedia/GeneratePost"));
-const GeneratedPostResult = lazy(() => import("./Components/User/SocialMedia/GeneratedPostResult")); 
-const KeywordToolResult = lazy(() => import("./Components/User/SeoProcess/KeywordToolResult")); 
-const CreateCampaignKeywordResult = lazy(() => import("./Components/User/PPC/CreateCampaignKeywordResult")); 
+const SeoAudit = lazy(() => import("./Components/User/SeoProcess/SEOAudit/SeoAudit"));
+const KeywordToolResult = lazy(() => import("./Components/User/SeoProcess/KeywordToolResult"));
 const SuggestionsResultById = lazy(() => import("./Components/User/SeoProcess/SuggestionsResultById"));
-const CampaignSuggestionById = lazy(() => import("./Components/User/PPC/CampaignSuggestionById")); 
+const Reports = lazy(() => import("./Components/User/SeoProcess/Reports")); 
+
+const GeneratePost = lazy(() => import("./Components/User/SocialMedia/GeneratePost"));
 const Planner = lazy(() => import("./Components/User/SocialMedia/Planner")); 
+const GeneratedPostResult = lazy(() => import("./Components/User/SocialMedia/GeneratedPostResult")); 
+
+const CreateCampaign = lazy(() => import("./Components/User/PPC/CreateCampaign"));
+const CreateCampaignKeywordResult = lazy(() => import("./Components/User/PPC/CreateCampaignKeywordResult")); 
+const CampaignSuggestionById = lazy(() => import("./Components/User/PPC/CampaignSuggestionById")); 
+
 const ContentGenerationResult = lazy(() => import("./Components/User/Content/ContentGenerationResult")); 
 const ContentSuggestionResult = lazy(() => import("./Components/User/Content/ContentSuggestionResult")); 
 const ContentGeneratBySeo = lazy(() => import("./Components/User/Content/ContentGeneratBySeo")); 
 const ContentPreviousList = lazy(() => import("./Components/User/Content/ContentPreviousList")); 
+const ContentGeneration = lazy(() => import("./Components/User/Content/ContentGeneration"));
+
 const ProfileSetting = lazy(() => import("./Components/User/Setting/ProfileSetting")); 
 const ProfileSettingSuccess = lazy(() => import("./Components/User/Setting/ProfileSettingSuccess")); 
-const Reports = lazy(() => import("./Components/User/SeoProcess/Reports")); 
+
 
 function App() {
   return (
@@ -47,6 +54,7 @@ function App() {
             <Route path="/seo/keywordToolResult" element={<KeywordToolResult />} />
             <Route path="/seo/SuggestionsResultById/:id" element={<SuggestionsResultById />} />
             <Route path="/seo/Reports" element={<Reports />} />
+            <Route path="/seo/SeoAudit" element={<SeoAudit />} />
 
             <Route path="/ppc/CreateCampaign" element={<CreateCampaign />} />
             <Route path="/ppc/CreateCampaignKeywordResult" element={<CreateCampaignKeywordResult />} />

@@ -273,17 +273,16 @@ const GeneratedPostResult = () => {
     setScheduleDateAndTime("");
   };
 
-  const handleSchedule = async (scheduledDate: string) => {
+  const handleSchedule = async (scheduledDate: string,timeZone:any) => {
     setScheduleDateAndTime(scheduledDate);
     const formData = {
       uuid: UUIDS,
       schedule_time: scheduledDate,
       content: [selectedPost],
+      timezone:timeZone
     };
-
     try {
       const response = await AddScheduleSocialMedia(formData);
-      // console.log(response.data, "response.data");
       if (response.status === 201 || response.status === 200) {
         toast.success("Added Schedule successfully");
         setGeneratedPostDetails((prev: any) => {
@@ -364,6 +363,7 @@ const GeneratedPostResult = () => {
       console.log("Failed to delete file.");
     }
   };
+  console.log(generatedPostDetails?.data?.linkedin_posts,"generatedPostDetails.data.linkedin_posts")
 
   return (
     <>

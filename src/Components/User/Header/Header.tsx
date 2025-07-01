@@ -224,23 +224,14 @@ const Header = () => {
                         <li className="dropdown-item">
                           <Link
                             className={`submenu-link ${
-                              isActive("#") ? "active" : ""
+                              isActive("/seo/SeoAudit") ? "active" : ""
                             }`}
-                            to="#"
+                            to="/seo/SeoAudit"
                           >
-                            Scheduled
+                            SEO Audit
                           </Link>
                         </li>
-                        <li className="dropdown-item">
-                          <Link
-                            className={`submenu-link ${
-                              isActive("#") ? "active" : ""
-                            }`}
-                            to="#"
-                          >
-                            Comment
-                          </Link>
-                        </li>
+                       
                       </ul>
                     </li>
 

@@ -416,11 +416,6 @@ const ContentGeneratBySeo = () => {
         return;
       }
 
-      if (keywords.length > 10) {
-        toast.error("Please select a maximum of 10  keywords");
-        return;
-      }
-
       if (keywords.length <= 0) {
         toast.error("Please enter at least one keyword.");
         return;

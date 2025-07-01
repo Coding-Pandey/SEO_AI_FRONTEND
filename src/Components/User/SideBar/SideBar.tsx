@@ -21,8 +21,7 @@ const SideBar = () => {
         { title: 'Overview', to: '#' },
         { title: 'Keyword tool', to: '/seo/keywordTool' },
         { title: 'Reports', to: '/seo/Reports' },
-        { title: 'Scheduled', to: '#' },
-        { title: 'Comment', to: '#' },
+        { title: 'SEO Audit', to: '/seo/SeoAudit' },
       ],
     },
     {

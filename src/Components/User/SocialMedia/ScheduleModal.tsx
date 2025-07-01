@@ -13,11 +13,12 @@ import {
   isBefore,
   startOfDay,
 } from "date-fns";
+import TimezoneSelect from "react-timezone-select";
 
 interface ScheduleModalProps {
   show: boolean;
   onClose: () => void;
-  onSchedule: (date: string) => void;
+  onSchedule: (date:string,timeZone:any) => void;
 }
 
 const suggestedTimes = ["07:47", "10:36", "13:19", "15:18", "18:03"];
@@ -30,6 +31,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const today = startOfDay(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   //   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTimezone, setSelectedTimezone] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedTime, setSelectedTime] = useState<string>("");
 
@@ -37,6 +39,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const [minute, setMinute] = useState("");
 
   if (!show) return null;
+ 
 
   const renderHeader = () => {
     return (
@@ -96,7 +99,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
         days.push(
           <div
-          className="date_text"
+            className="date_text"
             key={day.toString()}
             onClick={() => {
               if (!isDisabled) setSelectedDate(cloneDay);
@@ -115,7 +118,11 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
         day = addDays(day, 1);
       }
       rows.push(
-        <div className="date_row" key={day.toString()} style={{ display: "flex", marginBottom: 5 }}>
+        <div
+          className="date_row"
+          key={day.toString()}
+          style={{ display: "flex", marginBottom: 5 }}
+        >
           {days}
         </div>
       );
@@ -141,7 +148,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
     setMinute(e.target.value);
     setSelectedTime(`${hour}:${e.target.value}`);
   };
-
+ 
   const handleSchedule = () => {
     if (!selectedDate) {
       alert("Please select a date");
@@ -152,15 +159,22 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
       return;
     }
 
+    if (!selectedTimezone || !selectedTimezone.value) {
+      alert("Please select a timezone");
+      return;
+    }
+
     const [h, m] = selectedTime.split(":").map(Number);
     const scheduledDate = new Date(selectedDate);
     scheduledDate.setHours(h, m, 0, 0);
     const isoString = scheduledDate.toISOString();
-    onSchedule(isoString);
-    setSelectedTime('')
-    setHour("")
-    setMinute("")
-    setSelectedDate(today)
+    const timeZone=selectedTimezone
+    onSchedule(isoString,timeZone);
+    setSelectedTime("");
+    setHour("");
+    setMinute("");
+    setSelectedTimezone("")
+    setSelectedDate(today);
   };
 
   return (
@@ -257,6 +271,14 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
               </select>
             </div>
           </div>
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <label style={{ marginBottom: "10px" }}>Select Timezone :</label>
+          <TimezoneSelect
+            value={selectedTimezone}
+            onChange={setSelectedTimezone}
+          />
         </div>
         <button
           onClick={handleSchedule}

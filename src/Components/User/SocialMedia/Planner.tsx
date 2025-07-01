@@ -183,13 +183,12 @@ const Planner = () => {
     setREScheduleDateAndTime("");
   };
 
-  const handleSchedule = async (scheduledDate: string) => {
+  const handleSchedule = async (scheduledDate: string,timeZone:any) => {
     setREScheduleDateAndTime(scheduledDate);
-    // console.log(scheduledDate,"scheduledDate")
-
     let formData = new FormData();
     formData.append("id", PlatformId);
     formData.append("reschedule_time", scheduledDate);
+    formData.append("timezone", JSON.stringify(timeZone));
 
     try {
       const response = await UpdateScheduleSocialMediaPlanner(
@@ -197,7 +196,7 @@ const Planner = () => {
         UUIDS,
         formData
       );
-      console.log(response.data, "response.data");
+      // console.log(response.data, "response.data");
       if (response.status === 201 || response.status === 200) {
         toast.success("Updated Schedule successfully");
         setShowModal(false);

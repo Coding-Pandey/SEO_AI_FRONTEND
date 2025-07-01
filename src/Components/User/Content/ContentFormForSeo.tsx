@@ -201,11 +201,6 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
           {/* Keywords */}
           <div className="col-12  ">
              <label htmlFor="post_msg" className="font_20 font_500 mb-2">Keywords</label>
-            {keywords.length > 10 && (
-              <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
-                Error: Limit Reached. Please enter no more than 10 keywords.
-              </p>
-            )}
             <div
               className="keyword_box p-2 border rounded d-flex flex-wrap"
               style={{ gap: "8px" }}
