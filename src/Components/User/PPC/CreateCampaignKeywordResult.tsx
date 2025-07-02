@@ -13,6 +13,7 @@ import {
 import { capitalizeFirstLetter } from "../SeoProcess/Reports";
 import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
 import IncludeKeywordBox from "../../Page/IncludeKeywordBox";
+import ExcludeKeywordBox from "../../Page/ExcludeKeywordBox";
 
 const CreateCampaignKeywordResult = () => {
   const location = useLocation();
@@ -28,7 +29,6 @@ const CreateCampaignKeywordResult = () => {
   const [description, setDescription] = useState<string>("");
   const [country, setCountry] = useState<any>([]);
   const [language, setLanguage] = useState<string | null>(null);
-  const [brandedWords, setBrandedWords] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
   const [includeInput, setIncludeInput] = useState<string>("");
@@ -36,22 +36,9 @@ const CreateCampaignKeywordResult = () => {
   const [content, setContent] = useState<string>("");
   const [ShowFileModal, setShowFileModal] = useState<boolean>(false);
   const [showInputBox, setShowInputBox] = useState<boolean>(false);
-  const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      const trimmed = includeInput.trim();
-      if (trimmed && !includeKeywords.includes(trimmed)) {
-        setIncludeKeywords([...includeKeywords, trimmed]);
-      }
-      setIncludeInput("");
-    }
-  };
-
-  const removeIncludeKeyword = (index: number) => {
-    const updatedKeywords = includeKeywords.filter((_, i) => i !== index);
-    setIncludeKeywords(updatedKeywords);
-    localStorage.setItem("includeKeywords", JSON.stringify(updatedKeywords));
-  };
+  const [excludeKeywords, setExcludeKeywords] = useState<string[]>([]);
+  const [excludeInput, setExcludeInput] = useState<string>("");
+  const [showExcludeBox, setShowExcludeBox] = useState<boolean>(false);
 
   useEffect(() => {
     if (location.state) {
@@ -67,6 +54,40 @@ const CreateCampaignKeywordResult = () => {
       }
     }
   }, [location.state]);
+
+  const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const trimmed = includeInput.trim();
+      if (trimmed && !includeKeywords.includes(trimmed)) {
+        setIncludeKeywords([...includeKeywords, trimmed]);
+      }
+      setIncludeInput("");
+    }
+  };
+
+  const handleExcludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const trimmed = excludeInput.trim();
+      if (trimmed && !excludeKeywords.includes(trimmed)) {
+        setExcludeKeywords([...excludeKeywords, trimmed]);
+      }
+      setExcludeInput("");
+    }
+  };
+
+  const removeIncludeKeyword = (index: number) => {
+    const updatedKeywords = includeKeywords.filter((_, i) => i !== index);
+    setIncludeKeywords(updatedKeywords);
+    localStorage.setItem("includeKeywords", JSON.stringify(updatedKeywords));
+  };
+
+  const removeExcludeKeyword = (index: number) => {
+    const updated = excludeKeywords.filter((_, i) => i !== index);
+    setExcludeKeywords(updated);
+    localStorage.setItem("excludeKeywords", JSON.stringify(updated));
+  };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
@@ -153,16 +174,14 @@ const CreateCampaignKeywordResult = () => {
     });
   };
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setBrandedWords(e.target.value === "Branding Keywords");
-  };
-  console.log(generateKeywordDetails.length, "generateKeywordDetails");
   const handleSuggestPages = async () => {
     setShowInputBox(false);
+    setShowExcludeBox(false);
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
-    const limitedData = filteredData;
+
+    const limitedData = filteredData.slice(0, 200);
 
     const cleanedData = limitedData.map(({ isNew, ...rest }) => rest);
 
@@ -173,12 +192,19 @@ const CreateCampaignKeywordResult = () => {
         ? [includeInput.trim()]
         : [];
 
+    const brandedWords =
+      excludeKeywords.length > 0
+        ? excludeKeywords
+        : excludeInput.trim() !== ""
+        ? [excludeInput.trim()]
+        : [];
+
     const newData = {
       file_name: FileNameData?.fileName,
       keywords: cleanedData,
       delete_word: {
-        branded_words: brandedWords,
-        branded_keyword: finalKeywords,
+        include: finalKeywords,
+        exlude: brandedWords
       },
     };
 
@@ -192,10 +218,6 @@ const CreateCampaignKeywordResult = () => {
         const id = SEOClusterResponse.data.uuid;
         console.log(SEOClusterResponse.data, "ClusterData");
         navigate(`/ppc/CampaignSuggestionById/${id}`);
-        //  const ClusterData = SEOClusterResponse.data;
-        // localStorage.setItem("ClusterData", JSON.stringify(ClusterData));
-        // navigate("/ppc/CreateCampaignSuggestionResult", { state: ClusterData });
-        // setLoadingSuggestion(false);
       }
     } catch (error: any) {
       console.log("Error handleSuggestPages:", error);
@@ -232,6 +254,17 @@ const CreateCampaignKeywordResult = () => {
       localStorage.setItem("includeKeywords", JSON.stringify(includeKeywords));
       setShowInputBox(false);
       toast.success("Include keywords saved!", {
+        position: "top-right",
+        autoClose: 1000,
+      });
+    }
+  };
+
+  const handleSaveExcludeKeywords = () => {
+    if (excludeKeywords.length > 0) {
+      localStorage.setItem("excludeKeywords", JSON.stringify(excludeKeywords));
+      setShowExcludeBox(false);
+      toast.success("Exclude keywords saved!", {
         position: "top-right",
         autoClose: 1000,
       });
@@ -308,27 +341,41 @@ const CreateCampaignKeywordResult = () => {
                       <span>{volume}</span>
                     </div>
                   </div>
-                  <div className="col-12 col-md-6 col-xl-2">
-                    <div className="exclue_include_wrapper">
-                      <select
-                        className="form-select"
-                        id="excludeKeyword"
-                        aria-label="Exclude Keyword"
-                        onChange={handleSelectChange}
+                  <div className="col-12 col-md-8 col-xl-2">
+                    <div className="brand_select">
+                      <div
+                        onClick={() => {
+                          setShowExcludeBox((prev) => !prev);
+                          setShowInputBox(false);
+                        }}
                       >
-                        <option value="">Exclude</option>
-                        <option value="Branding Keywords">
-                          Branding Keywords
-                        </option>
-                        {/* <option value="2">Option 2</option>
-                          <option value="3">Option 3</option> */}
-                      </select>
+                        <div className="form-control">
+                          Exclude{" "}
+                          <span>
+                            <i className="bi bi-chevron-down"></i>
+                          </span>
+                        </div>
+                      </div>
+                      <ExcludeKeywordBox
+                        show={showExcludeBox}
+                        excludeKeywords={excludeKeywords}
+                        excludeInput={excludeInput}
+                        setExcludeInput={setExcludeInput}
+                        handleExcludeKeyDown={handleExcludeKeyDown}
+                        removeExcludeKeyword={removeExcludeKeyword}
+                        handleSaveExcludeKeywords={handleSaveExcludeKeywords}
+                      />
                     </div>
                   </div>
                   <div className="col-12 col-md-8 col-xl-2">
                     <div className="exclue_include_wrapper"></div>
                     <div className="brand_select">
-                      <div onClick={() => setShowInputBox((prev) => !prev)}>
+                      <div
+                        onClick={() => {
+                          setShowInputBox((prev) => !prev);
+                          setShowExcludeBox(false);
+                        }}
+                      >
                         <div className="form-control">
                           Include{" "}
                           <span>

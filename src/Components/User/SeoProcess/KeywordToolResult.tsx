@@ -10,6 +10,7 @@ import { SEOClusterKeywordService, SEOGenerateKeyword } from "./SeoServices";
 import { capitalizeFirstLetter } from "./Reports";
 import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
 import IncludeKeywordBox from "../../Page/IncludeKeywordBox";
+import ExcludeKeywordBox from "../../Page/ExcludeKeywordBox";
 
 const KeywordToolResult = () => {
   const location = useLocation();
@@ -26,13 +27,35 @@ const KeywordToolResult = () => {
   const [country, setCountry] = useState<any>([]);
   const [language, setLanguage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [brandedWords, setBrandedWords] = useState<boolean>(false);
   const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
   const [includeInput, setIncludeInput] = useState<string>("");
   const [FileNameData, setFileNameData] = useState<any>({});
   const [content, setContent] = useState<string>("");
   const [ShowFileModal, setShowFileModal] = useState<boolean>(false);
   const [showInputBox, setShowInputBox] = useState<boolean>(false);
+  const [excludeKeywords, setExcludeKeywords] = useState<string[]>([]);
+  const [excludeInput, setExcludeInput] = useState<string>("");
+  const [showExcludeBox, setShowExcludeBox] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (location.state) {
+      const storedData = localStorage.getItem("keywordToolResult");
+      const fileNameData = localStorage.getItem("fileNameData");
+      const savedIncludeKeywords = localStorage.getItem("includeKeywords");
+      const savedExcludeKeywords = localStorage.getItem("excludeKeywords");
+      if (storedData && fileNameData) {
+        setGenerateKeywordDetails(JSON.parse(storedData));
+        setFileNameData(JSON.parse(fileNameData));
+      }
+      if (savedIncludeKeywords) {
+        setIncludeKeywords(JSON.parse(savedIncludeKeywords));
+      }
+      if (savedExcludeKeywords) {
+        setExcludeKeywords(JSON.parse(savedExcludeKeywords));
+      }
+    }
+  }, [location.state]);
+
   const handleIncludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
@@ -44,27 +67,27 @@ const KeywordToolResult = () => {
     }
   };
 
- 
-
-  useEffect(() => {
-    if (location.state) {
-      const storedData = localStorage.getItem("keywordToolResult");
-      const fileNameData = localStorage.getItem("fileNameData");
-       const savedIncludeKeywords = localStorage.getItem("includeKeywords");
-      if (storedData && fileNameData) {
-        setGenerateKeywordDetails(JSON.parse(storedData));
-        setFileNameData(JSON.parse(fileNameData));
+  const handleExcludeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const trimmed = excludeInput.trim();
+      if (trimmed && !excludeKeywords.includes(trimmed)) {
+        setExcludeKeywords([...excludeKeywords, trimmed]);
       }
-        if (savedIncludeKeywords) {
-      setIncludeKeywords(JSON.parse(savedIncludeKeywords));
+      setExcludeInput("");
     }
-    }
-  }, [location.state]);
+  };
 
-   const removeIncludeKeyword = (index: number) => {
+  const removeIncludeKeyword = (index: number) => {
     const updatedKeywords = includeKeywords.filter((_, i) => i !== index);
     setIncludeKeywords(updatedKeywords);
     localStorage.setItem("includeKeywords", JSON.stringify(updatedKeywords));
+  };
+
+  const removeExcludeKeyword = (index: number) => {
+    const updated = excludeKeywords.filter((_, i) => i !== index);
+    setExcludeKeywords(updated);
+    localStorage.setItem("excludeKeywords", JSON.stringify(updated));
   };
 
   const handleDeleteKeyword = (index: number) => {
@@ -134,7 +157,7 @@ const KeywordToolResult = () => {
         // Add flag for new result to highlight
         const updatedResultData = resultData.map((item: any) => ({
           ...item,
-          isNew: true, // custom flag to show blue border
+          isNew: true,  
         }));
 
         const finalData = [...updatedResultData, ...generateKeywordDetails];
@@ -151,17 +174,14 @@ const KeywordToolResult = () => {
     }
   };
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setBrandedWords(e.target.value === "Branding Keywords");
-  };
-
   const handleSuggestPages = async () => {
-     setShowInputBox(false)
+    setShowInputBox(false);
+    setShowExcludeBox(false);
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
 
-    const limitedData = filteredData;
+    const limitedData = filteredData.slice(0, 200);
 
     setLoadingSuggestion(true);
     const finalKeywords =
@@ -171,12 +191,19 @@ const KeywordToolResult = () => {
         ? [includeInput.trim()]
         : [];
 
+    const brandedWords =
+      excludeKeywords.length > 0
+        ? excludeKeywords
+        : excludeInput.trim() !== ""
+        ? [excludeInput.trim()]
+        : [];
+
     const newData = {
       file_name: FileNameData?.fileName,
       keywords: limitedData,
       delete_word: {
-        branded_words: brandedWords,
-        branded_keyword: finalKeywords,
+        include: finalKeywords,
+        exlude: brandedWords   
       },
     };
 
@@ -188,10 +215,6 @@ const KeywordToolResult = () => {
       ) {
         const id = SEOClusterResponse.data.uuid;
         navigate(`/seo/SuggestionsResultById/${id}`);
-        //  const ClusterData = SEOClusterResponse.data;
-        // localStorage.setItem("ClusterData", JSON.stringify(ClusterData));
-        // navigate("/seo/KeywordsSuggestionsResult", { state: ClusterData });
-        // setLoadingSuggestion(false);
       }
     } catch (error: any) {
       console.log("error fetching handleSuggestPages", error);
@@ -226,8 +249,19 @@ const KeywordToolResult = () => {
   const handleSaveIncludeKeywords = () => {
     if (includeKeywords.length > 0) {
       localStorage.setItem("includeKeywords", JSON.stringify(includeKeywords));
-      setShowInputBox(false)
+      setShowInputBox(false);
       toast.success("Include keywords saved!", {
+        position: "top-right",
+        autoClose: 1000,
+      });
+    }
+  };
+
+  const handleSaveExcludeKeywords = () => {
+    if (excludeKeywords.length > 0) {
+      localStorage.setItem("excludeKeywords", JSON.stringify(excludeKeywords));
+      setShowExcludeBox(false);
+      toast.success("Exclude keywords saved!", {
         position: "top-right",
         autoClose: 1000,
       });
@@ -305,24 +339,40 @@ const KeywordToolResult = () => {
                   </div>
 
                   <div className="col-12 col-md-8 col-xl-2">
-                    <div className="exclue_include_wrapper">
-                      <select
-                        className="form-select"
-                        id="excludeKeyword"
-                        aria-label="Exclude Keyword"
-                        onChange={handleSelectChange}
-                      >
-                        <option value="">Exclude</option>
-                        <option value="Branding Keywords">
-                          Branding Keywords
-                        </option>
-                      </select>
+                    <div className="brand_select">
+                      <div  
+                         onClick={() => {
+                          setShowExcludeBox((prev) => !prev);
+                          setShowInputBox(false);
+                        }}>
+                        <div className="form-control">
+                          Exclude{" "}
+                          <span>
+                            <i className="bi bi-chevron-down"></i>
+                          </span>
+                        </div>
+                      </div>
+                      <ExcludeKeywordBox
+                        show={showExcludeBox}
+                        excludeKeywords={excludeKeywords}
+                        excludeInput={excludeInput}
+                        setExcludeInput={setExcludeInput}
+                        handleExcludeKeyDown={handleExcludeKeyDown}
+                        removeExcludeKeyword={removeExcludeKeyword}
+                        handleSaveExcludeKeywords={handleSaveExcludeKeywords}
+                      />
                     </div>
                   </div>
+
                   <div className="col-12 col-md-8 col-xl-2">
                     <div className="exclue_include_wrapper"></div>
                     <div className="brand_select">
-                      <div onClick={() => setShowInputBox((prev) => !prev)}>
+                      <div
+                        onClick={() => {
+                          setShowInputBox((prev) => !prev);
+                          setShowExcludeBox(false);
+                        }}
+                      >
                         <div className="form-control">
                           Include{" "}
                           <span>
@@ -330,7 +380,7 @@ const KeywordToolResult = () => {
                           </span>
                         </div>
                       </div>
-                       <IncludeKeywordBox
+                      <IncludeKeywordBox
                         show={showInputBox}
                         includeKeywords={includeKeywords}
                         includeInput={includeInput}

@@ -9,8 +9,8 @@ export interface SEOGenerateKeywordDetails {
   interface SEOClusterKeywordData {
     keywords: any[];  
     delete_word: {
-      branded_words: boolean;  
-      branded_keyword: string[]; 
+      include: string[]; 
+      exlude: string[];  
     };
   }
   
