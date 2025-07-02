@@ -45,12 +45,16 @@ const CreateCampaignKeywordResult = () => {
       const storedData = localStorage.getItem("keywordToolResult");
       const fileNameData = localStorage.getItem("fileNameData");
       const savedIncludeKeywords = localStorage.getItem("includeKeywords");
+      const savedExcludeKeywords = localStorage.getItem("excludeKeywords");
       if (storedData && fileNameData) {
         setGenerateKeywordDetails(JSON.parse(storedData));
         setFileNameData(JSON.parse(fileNameData));
       }
       if (savedIncludeKeywords) {
         setIncludeKeywords(JSON.parse(savedIncludeKeywords));
+      }
+      if (savedExcludeKeywords) {
+        setExcludeKeywords(JSON.parse(savedExcludeKeywords));
       }
     }
   }, [location.state]);
@@ -204,7 +208,7 @@ const CreateCampaignKeywordResult = () => {
       keywords: cleanedData,
       delete_word: {
         include: finalKeywords,
-        exlude: brandedWords
+        exlude: brandedWords,
       },
     };
 
@@ -250,6 +254,18 @@ const CreateCampaignKeywordResult = () => {
   };
 
   const handleSaveIncludeKeywords = () => {
+    const trimmed = includeInput.trim();
+
+    if (trimmed && !includeKeywords.includes(trimmed)) {
+      toast.warning(
+        "Please press Enter or comma after typing to add the keyword.",
+        {
+          position: "top-right",
+          autoClose: 2000,
+        }
+      );
+      return;
+    }
     if (includeKeywords.length > 0) {
       localStorage.setItem("includeKeywords", JSON.stringify(includeKeywords));
       setShowInputBox(false);
@@ -261,12 +277,25 @@ const CreateCampaignKeywordResult = () => {
   };
 
   const handleSaveExcludeKeywords = () => {
+    const trimmed = excludeInput.trim();
+
+    if (trimmed && !excludeKeywords.includes(trimmed)) {
+      toast.warning(
+        "Please press Enter or comma after typing to add the keyword.",
+        {
+          position: "top-right",
+          autoClose: 2000,
+        }
+      );
+      return;
+    }
+
     if (excludeKeywords.length > 0) {
       localStorage.setItem("excludeKeywords", JSON.stringify(excludeKeywords));
       setShowExcludeBox(false);
       toast.success("Exclude keywords saved!", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 2000,
       });
     }
   };

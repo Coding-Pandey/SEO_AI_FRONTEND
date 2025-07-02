@@ -247,6 +247,18 @@ const KeywordToolResult = () => {
   };
 
   const handleSaveIncludeKeywords = () => {
+    const trimmed = includeInput.trim();
+
+    if (trimmed && !includeKeywords.includes(trimmed)) {
+      toast.warning(
+        "Please press Enter or comma after typing to add the keyword.",
+        {
+          position: "top-right",
+          autoClose: 2000,
+        }
+      );
+      return;
+    }
     if (includeKeywords.length > 0) {
       localStorage.setItem("includeKeywords", JSON.stringify(includeKeywords));
       setShowInputBox(false);
@@ -258,12 +270,25 @@ const KeywordToolResult = () => {
   };
 
   const handleSaveExcludeKeywords = () => {
+    const trimmed = excludeInput.trim();
+
+    if (trimmed && !excludeKeywords.includes(trimmed)) {
+      toast.warning(
+        "Please press Enter or comma after typing to add the keyword.",
+        {
+          position: "top-right",
+          autoClose: 2000,
+        }
+      );
+      return;
+    }
+
     if (excludeKeywords.length > 0) {
       localStorage.setItem("excludeKeywords", JSON.stringify(excludeKeywords));
       setShowExcludeBox(false);
       toast.success("Exclude keywords saved!", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 2000,
       });
     }
   };
