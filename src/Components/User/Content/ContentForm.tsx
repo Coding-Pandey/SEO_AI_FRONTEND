@@ -1,5 +1,6 @@
 import React from "react";
-
+import { language_options, location_options } from "../../Page/store";
+import Select from "react-select";
 interface ContentFormProps {
   contentType: string;
   FileName: string;
@@ -11,7 +12,6 @@ interface ContentFormProps {
   linkInput: string;
   links: string[];
   FormDynamictData: any;
-
   handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleObjectiveChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleTargetAudience: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -26,6 +26,11 @@ interface ContentFormProps {
   handleRemoveLink: (index: number) => void;
   handleGenerateSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   UploadedSourcefiles: any;
+  language:any,
+  setLanguage:any,
+  country:any,
+  setCountry:any,
+  NewMessage:any
 }
 
 const ContentForm: React.FC<ContentFormProps> = ({
@@ -53,7 +58,17 @@ const ContentForm: React.FC<ContentFormProps> = ({
   handleRemoveLink,
   handleGenerateSubmit,
   UploadedSourcefiles,
+  language,
+  setLanguage,
+  country,
+  setCountry,
+  NewMessage
 }) => {
+  const locationOptions = location_options.map((location) => ({
+    value: location.id,
+    label: location.country,
+  }));
+
   return (
     <form onSubmit={handleGenerateSubmit}>
       {!contentType ? (
@@ -215,7 +230,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
 
             {/* File Upload */}
             <div className="col-12">
-              <label htmlFor="post_upload" className="font_20 font_500 mb-2">
+              <label htmlFor="post_upload" className="font_20 font_500 mb-1">
                 Upload Campaign Files
               </label>
               <div className="doc_file_wrapper">
@@ -276,6 +291,44 @@ const ContentForm: React.FC<ContentFormProps> = ({
 
             <div className="col-12">
               <label htmlFor="add_link" className="font_20 font_500 mb-2">
+                Add Country
+              </label>
+              <div className="country_box" style={NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}}>
+                <Select
+                  options={locationOptions}
+                  value={country}
+                  onChange={setCountry}
+                  isMulti
+                  placeholder="Select Target Country"
+                  classNamePrefix="react_select_new"
+                  isDisabled={NewMessage !== "newContent"}
+                />
+              </div>
+            </div>
+            <div className="col-12 country_box">
+              <label htmlFor="add_link" className="font_20 font_500 mb-2">
+                Add Language
+              </label>
+                <select
+                  className="form-control"
+                  id="targetLanguage"
+                  aria-label="target_language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  style={NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}}
+                  disabled={NewMessage !== "newContent"}
+                >
+                  <option value="">Select Language</option>
+                  {language_options.map((language) => (
+                    <option key={language.ID} value={language.ID}>
+                      {language.Name}
+                    </option>
+                  ))}
+                </select>
+            </div>
+
+            <div className="col-12">
+              <label htmlFor="add_link" className="font_20 font_500 mb-2">
                 Add Links
               </label>
               <div className="add_link_wrapper">
@@ -314,6 +367,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
                 ))}
               </ul>
             </div>
+
 
             <div className="col-12">
               <button className="btn primary_btn" type="submit">

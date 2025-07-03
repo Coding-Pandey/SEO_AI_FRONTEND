@@ -7,7 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../Page/Loading/Loading";
 import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
-import { SEOPPCGenerateKeyword ,GetPpcClusterData,deletePpcClusterData } from "./PpcServices";
+import {
+  SEOPPCGenerateKeyword,
+  GetPpcClusterData,
+  deletePpcClusterData,
+} from "./PpcServices";
 
 interface PpcCluster {
   uuid: string;
@@ -24,7 +28,7 @@ const CreateCampaign = () => {
   const [language, setLanguage] = useState<string | null>(null);
   const [ppcClusterData, setPpcClusterData] = useState<PpcCluster[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
-   const [fileName, setFileName] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +40,11 @@ const CreateCampaign = () => {
       setLoadingData(true);
       const response = await GetPpcClusterData();
       if (response.status === 200 || response.status === 201) {
-        setPpcClusterData(response.data);
+        const sortedData = response.data.sort(
+          (a: PpcCluster, b: PpcCluster) =>
+            new Date(b.last_reset).getTime() - new Date(a.last_reset).getTime()
+        );
+        setPpcClusterData(sortedData);
       }
     } catch (error: any) {
       setLoadingData(false);
@@ -66,20 +74,25 @@ const CreateCampaign = () => {
   };
 
   const handleSubmit = async () => {
-    const selectedLocationIds = country.map((c: any) => c.value);
-    const selectedLanguageId = Number(language);
+    const selectedCountries = location_options.filter((loc) =>
+      country.some((c: any) => c.value === loc.id)
+    );
+
+    const selectedLanguage = language_options.find(
+      (lang) => lang.ID === Number(language)
+    );
     const finalKeywords =
       keywords.length > 0
         ? keywords.join(",")
         : input.trim() !== ""
         ? input.trim()
         : "";
-    // Construct the data to send
+
     const formData = {
       keywords: finalKeywords,
       description: description,
-      language_id: selectedLanguageId,
-      location_ids: selectedLocationIds,
+      language_id: selectedLanguage!,
+      location_ids: selectedCountries,
     };
     setLoading(true);
     try {
@@ -92,6 +105,11 @@ const CreateCampaign = () => {
         const fileNameData = { fileName };
         localStorage.removeItem("includeKeywords");
         localStorage.removeItem("excludeKeywords");
+        const NewData = {
+          language: selectedLanguage?.ID,
+          country: selectedCountries.map((c) => c.id),
+        };
+        localStorage.setItem("languageAndCountry", JSON.stringify(NewData));
         localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
         navigate("/ppc/CreateCampaignKeywordResult", { state: resultData });
@@ -136,7 +154,7 @@ const CreateCampaign = () => {
     }
   };
 
-    const handleNavigate = (id: string) => {
+  const handleNavigate = (id: string) => {
     navigate(`/ppc/CampaignSuggestionById/${id}`);
   };
 
@@ -156,20 +174,22 @@ const CreateCampaign = () => {
             </div>
             <div className="keyword_search_form">
               <div className="row gy-3">
-                 <PreviouslyCreatedPosts
+                <PreviouslyCreatedPosts
                   posts={ppcClusterData}
                   onDelete={handleDelete}
                   onNavigate={handleNavigate}
-                /> 
+                />
                 <div className="col-12 col-xl-7">
                   <form>
-                    <h2 className="font_25 font_500 mb-3">Start  new research</h2>
+                    <h2 className="font_25 font_500 mb-3">
+                      Start new research
+                    </h2>
                     <input
                       type="text"
                       className="form-control mb-2"
                       placeholder="Name your research"
                       value={fileName}
-                      onChange={(e) => setFileName(e.target.value)}  
+                      onChange={(e) => setFileName(e.target.value)}
                     />
                     {keywords.length > 10 && (
                       <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
@@ -241,6 +261,7 @@ const CreateCampaign = () => {
                             onChange={setCountry}
                             isMulti
                             placeholder="Select Target Country"
+                            classNamePrefix="react_select"
                           />
                         </div>
                       </div>
@@ -270,7 +291,8 @@ const CreateCampaign = () => {
                             (keywords.length === 0 && input.trim() === "") ||
                             keywords.length > 10 ||
                             country.length === 0 ||
-                            !language || fileName.trim() === ""
+                            !language ||
+                            fileName.trim() === ""
                           }
                         >
                           {loading ? "Please wait..." : "Start"}

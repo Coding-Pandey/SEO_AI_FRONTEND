@@ -100,6 +100,18 @@ export const AddScheduleSocialMedia = async (formData: any) => {
   }
 };
 
+export const PostPublicSocialMedia = async (formData: any) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/publish_social_media_post`,
+      formData
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const GetPlannerSocialMediaData = async () => {
   try {
     const response = await axiosInstance.get(

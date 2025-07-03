@@ -28,7 +28,7 @@ const CreateCampaignKeywordResult = () => {
   const [input, setInput] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [country, setCountry] = useState<any>([]);
-  const [language, setLanguage] = useState<string | null>(null);
+  const [language, setLanguage] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [includeKeywords, setIncludeKeywords] = useState<string[]>([]);
   const [includeInput, setIncludeInput] = useState<string>("");
@@ -46,9 +46,18 @@ const CreateCampaignKeywordResult = () => {
       const fileNameData = localStorage.getItem("fileNameData");
       const savedIncludeKeywords = localStorage.getItem("includeKeywords");
       const savedExcludeKeywords = localStorage.getItem("excludeKeywords");
-      if (storedData && fileNameData) {
+      const savedLanguageAndCountry =
+        localStorage.getItem("languageAndCountry");
+      if (storedData && fileNameData && savedLanguageAndCountry) {
         setGenerateKeywordDetails(JSON.parse(storedData));
         setFileNameData(JSON.parse(fileNameData));
+        const LanguageAndCountryData = JSON.parse(savedLanguageAndCountry);
+        setLanguage(String(LanguageAndCountryData.language));
+
+        const mappedCountries = location_options
+          .filter((loc) => LanguageAndCountryData.country.includes(loc.id))
+          .map((loc) => ({ value: loc.id, label: loc.country }));
+        setCountry(mappedCountries);
       }
       if (savedIncludeKeywords) {
         setIncludeKeywords(JSON.parse(savedIncludeKeywords));
@@ -123,18 +132,23 @@ const CreateCampaignKeywordResult = () => {
     setDescription("");
     setKeywords([]);
     setCountry([]);
-    setLanguage(null);
+    setLanguage("");
   };
 
   const handleSubmit = async () => {
-    const selectedLocationIds = country.map((c: any) => c.value);
-    const selectedLanguageId = Number(language);
+    const selectedCountries = location_options.filter((loc) =>
+      country.some((c: any) => c.value === loc.id)
+    );
+
+    const selectedLanguage = language_options.find(
+      (lang) => lang.ID === Number(language)
+    );
 
     const formData = {
       keywords: keywords.join(","),
       description: description,
-      language_id: selectedLanguageId,
-      location_ids: selectedLocationIds,
+      language_id: selectedLanguage!,
+      location_ids: selectedCountries,
     };
 
     setLoading(true);
@@ -145,16 +159,12 @@ const CreateCampaignKeywordResult = () => {
         SEOGenerateResponse.status === 200
       ) {
         const resultData = SEOGenerateResponse.data;
-
-        // Add flag for new result to highlight
         const updatedResultData = resultData.map((item: any) => ({
           ...item,
-          isNew: true, // custom flag to show blue border
+          isNew: true,
         }));
 
         const finalData = [...updatedResultData, ...generateKeywordDetails];
-
-        // Update local storage and state
         localStorage.setItem("keywordToolResult", JSON.stringify(finalData));
         setGenerateKeywordDetails(finalData);
         closeModal();
@@ -181,6 +191,13 @@ const CreateCampaignKeywordResult = () => {
   const handleSuggestPages = async () => {
     setShowInputBox(false);
     setShowExcludeBox(false);
+    const selectedCountries = location_options.filter((loc) =>
+      country.some((c: any) => c.value === loc.id)
+    );
+    
+    const selectedLanguage = language_options.find(
+      (lang) => lang.ID === Number(language)
+    );
     const filteredData = generateKeywordDetails.filter(
       (item) => item.Avg_Monthly_Searches >= volume
     );
@@ -210,6 +227,8 @@ const CreateCampaignKeywordResult = () => {
         include: finalKeywords,
         exlude: brandedWords,
       },
+      language_id: selectedLanguage!,
+      location_ids: selectedCountries,
     };
 
     setLoadingSuggestion(true);
@@ -600,13 +619,18 @@ const CreateCampaignKeywordResult = () => {
                                 </div>
 
                                 <div className="col-6">
-                                  <div className="form_input">
+                                  <div
+                                    className="form_input"
+                                    style={{ cursor: "not-allowed" }}
+                                  >
                                     <Select
                                       options={locationOptions}
                                       value={country}
                                       onChange={setCountry}
                                       isMulti
                                       placeholder="Select Target Country"
+                                      classNamePrefix="react_select"
+                                      isDisabled={!!location.state}
                                     />
                                   </div>
                                 </div>
@@ -617,9 +641,12 @@ const CreateCampaignKeywordResult = () => {
                                       className="form-select"
                                       id="targetLanguage"
                                       aria-label="target_language"
+                                      value={language || ""}
                                       onChange={(e) =>
                                         setLanguage(e.target.value)
                                       }
+                                      style={{ cursor: "not-allowed" }}
+                                      disabled
                                     >
                                       <option value="">Language</option>
                                       {language_options.map((language) => (

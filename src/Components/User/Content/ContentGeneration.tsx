@@ -20,6 +20,7 @@ import {
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
 import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
+import { language_options, location_options } from "../../Page/store";
 
 interface contentData {
   uuid: string;
@@ -42,12 +43,13 @@ const ContentGeneration = () => {
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
   const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
+  const [country, setCountry] = useState<any>([]);
+  const [language, setLanguage] = useState<string | null>(null);
+  const [NewMessage,setNewMessage]=useState<string>("newContent")
 
   useEffect(() => {
     fetchGenerateData();
   }, []);
-
- 
 
   const fetchGenerateData = async () => {
     try {
@@ -57,7 +59,11 @@ const ContentGeneration = () => {
       const responseSourcefiles = await GetUploadedSourcefiles();
       // console.log(responseForm.data, "responseForm");
       if (response.status === 200 || response.status === 201) {
-        setContentData(response.data);
+        const sortedData = response.data.sort(
+          (a: contentData, b: contentData) =>
+            new Date(b.last_reset).getTime() - new Date(a.last_reset).getTime()
+        );
+        setContentData(sortedData);
         setUploadedSourcefiles(responseSourcefiles.data);
         setFormDynamictData(responseForm.data);
       }
@@ -211,6 +217,7 @@ const ContentGeneration = () => {
   };
 
   const handleGenerateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setNewMessage("newContent")
     e.preventDefault();
 
     try {
@@ -230,6 +237,25 @@ const ContentGeneration = () => {
         );
         return;
       }
+
+      if (country.length === 0) {
+        toast.error("Please select at least one country");
+        return;
+      }
+
+      if (!language || language === "") {
+        toast.error("Please select a language");
+        return;
+      }
+
+       const selectedCountries = location_options.filter((loc) =>
+            country.some((c: any) => c.value === loc.id)
+          );
+      
+          const selectedLanguage = language_options.find(
+            (lang) => lang.ID === Number(language)
+          );
+ 
       setFileUrl([]);
       setLoadingData(true);
       const formData = new FormData();
@@ -238,6 +264,8 @@ const ContentGeneration = () => {
       formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
       formData.append("text_data", AddInstructions);
+      // formData.append("language_id", JSON.stringify(selectedLanguage));
+      // formData.append("location_ids", JSON.stringify(selectedCountries));
       let newFileUpload;
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
@@ -253,6 +281,8 @@ const ContentGeneration = () => {
         AddInstructions,
         uploadedFiles: newFileUpload,
         links,
+        language: selectedLanguage?.ID,
+        country: selectedCountries.map((c) => c.id),
       };
       const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
@@ -329,6 +359,11 @@ const ContentGeneration = () => {
                     handleRemoveLink={handleRemoveLink}
                     handleGenerateSubmit={handleGenerateSubmit}
                     UploadedSourcefiles={UploadedSourcefiles}
+                    language={language}
+                    setLanguage={setLanguage}
+                    country={country}
+                    setCountry={setCountry}
+                    NewMessage={NewMessage}
                   />
                 </div>
               </div>

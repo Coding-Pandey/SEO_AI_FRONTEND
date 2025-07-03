@@ -7,7 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../Page/Loading/Loading";
 import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
-import { deleteClusterData, GetSeoClusterData, SEOGenerateKeyword } from "./SeoServices";
+import {
+  deleteClusterData,
+  GetSeoClusterData,
+  SEOGenerateKeyword,
+} from "./SeoServices";
 
 interface SeoCluster {
   uuid: string;
@@ -27,18 +31,20 @@ const KeywordTool = () => {
   const [fileName, setFileName] = useState<string>("");
   const navigate = useNavigate();
 
- 
-
   useEffect(() => {
-    fetchSeoClusterData()
-  }, [])
+    fetchSeoClusterData();
+  }, []);
 
   const fetchSeoClusterData = async () => {
     try {
       setLoadingData(true);
       const response = await GetSeoClusterData();
       if (response.status === 200 || response.status === 201) {
-        setSeoClusterData(response.data);
+        const sortedData = response.data.sort(
+          (a: SeoCluster, b: SeoCluster) =>
+            new Date(b.last_reset).getTime() - new Date(a.last_reset).getTime()
+        );
+        setSeoClusterData(sortedData);
       }
     } catch (error: any) {
       setLoadingData(false);
@@ -47,7 +53,6 @@ const KeywordTool = () => {
       setLoadingData(false);
     }
   };
-
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
@@ -69,15 +74,26 @@ const KeywordTool = () => {
   };
 
   const handleSubmit = async () => {
-    const selectedLocationIds = country.map((c: any) => c.value);
-    const selectedLanguageId = Number(language);
-    const finalKeywords = keywords.length > 0 ? keywords.join(",") : input.trim() !== "" ? input.trim() : "";
-    // Construct the data to send
+    const selectedCountries = location_options.filter((loc) =>
+      country.some((c: any) => c.value === loc.id)
+    );
+
+    const selectedLanguage = language_options.find(
+      (lang) => lang.ID === Number(language)
+    );
+
+    const finalKeywords =
+      keywords.length > 0
+        ? keywords.join(",")
+        : input.trim() !== ""
+        ? input.trim()
+        : "";
+
     const formData = {
       keywords: finalKeywords,
       description: description,
-      language_id: selectedLanguageId,
-      location_ids: selectedLocationIds,
+      language_id: selectedLanguage!,
+      location_ids: selectedCountries,
     };
     setLoading(true);
     try {
@@ -86,11 +102,15 @@ const KeywordTool = () => {
         SEOGenerateResponse.status === 201 ||
         SEOGenerateResponse.status === 200
       ) {
-        console.log(SEOGenerateResponse.data);
         const resultData = SEOGenerateResponse.data;
         const fileNameData = { fileName };
         localStorage.removeItem("includeKeywords");
         localStorage.removeItem("excludeKeywords");
+        const NewData = {
+          language: selectedLanguage?.ID,
+          country: selectedCountries.map((c) => c.id),
+        };
+        localStorage.setItem("languageAndCountry", JSON.stringify(NewData));
         localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
         navigate("/seo/KeywordToolResult", { state: resultData });
@@ -102,38 +122,45 @@ const KeywordTool = () => {
     }
   };
 
-
   const locationOptions = location_options.map((location) => ({
     value: location.id,
     label: location.country,
   }));
 
-
   const handleDelete = async (uuid: string) => {
     try {
- 
-      const isConfirmed = window.confirm("Are you sure you want to delete this file?");
+      const isConfirmed = window.confirm(
+        "Are you sure you want to delete this file?"
+      );
       if (!isConfirmed) {
         return;
       }
       const formData = { uuid };
       const response = await deleteClusterData(formData);
       if (response.status === 200) {
-        setSeoClusterData(prevData => prevData.filter(item => item.uuid !== uuid));
-        toast.success("File successfully deleted!", { position: "top-right", autoClose: 3000 });
+        setSeoClusterData((prevData) =>
+          prevData.filter((item) => item.uuid !== uuid)
+        );
+        toast.success("File successfully deleted!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       }
     } catch (error: any) {
-      toast.error("Failed to delete file.", { position: "top-right", autoClose: 3000 });
+      toast.error("Failed to delete file.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
 
-    const handleNavigate = (id: string) => {
+  const handleNavigate = (id: string) => {
     navigate(`/seo/SuggestionsResultById/${id}`);
-   };
+  };
 
   return (
     <>
-    {loadingData && <Loading/>  }
+      {loadingData && <Loading />}
       <Header />
       <main className="main_wrapper">
         <SideBar />
@@ -151,16 +178,18 @@ const KeywordTool = () => {
                   posts={seoClusterData}
                   onDelete={handleDelete}
                   onNavigate={handleNavigate}
-                /> 
+                />
                 <div className="col-12 col-xl-7">
                   <form>
-                    <h2 className="font_25 font_500 mb-3">Start  new research</h2>
+                    <h2 className="font_25 font_500 mb-3">
+                      Start new research
+                    </h2>
                     <input
                       type="text"
                       className="form-control mb-2"
                       placeholder="Name your research"
                       value={fileName}
-                      onChange={(e) => setFileName(e.target.value)}  
+                      onChange={(e) => setFileName(e.target.value)}
                     />
                     {keywords.length > 10 && (
                       <p className="keyword_error font_16 text-danger bg-danger-subtle p-2">
@@ -212,7 +241,6 @@ const KeywordTool = () => {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      
                     />
                     <div className="row">
                       <div className="col-12">
@@ -233,6 +261,7 @@ const KeywordTool = () => {
                             onChange={setCountry}
                             isMulti
                             placeholder="Select Target Country"
+                            classNamePrefix="react_select"
                           />
                         </div>
                       </div>
@@ -244,7 +273,7 @@ const KeywordTool = () => {
                             aria-label="target_language"
                             onChange={(e) => setLanguage(e.target.value)}
                           >
-                            <option value="">Language</option>
+                            <option value="">Select Language</option>
                             {language_options.map((language) => (
                               <option key={language.ID} value={language.ID}>
                                 {language.Name}
@@ -262,7 +291,8 @@ const KeywordTool = () => {
                             (keywords.length === 0 && input.trim() === "") ||
                             keywords.length > 10 ||
                             country.length === 0 ||
-                            !language || fileName.trim() === ""
+                            !language ||
+                            fileName.trim() === ""
                           }
                         >
                           {loading ? "Please wait..." : "Start"}

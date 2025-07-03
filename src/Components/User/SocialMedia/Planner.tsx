@@ -79,6 +79,7 @@ const Planner = () => {
 
   const filteredPosts = () => {
     let posts: any[] = [];
+
     if (!selectedPlatform) {
       platforms.forEach((plat) => {
         if (plannerData[plat]?.length) {
@@ -89,15 +90,22 @@ const Planner = () => {
       const key = `${selectedPlatform}_posts`;
       if (plannerData[key]?.length) posts = plannerData[key];
     }
+
     if (selectedDate) {
       posts = posts.filter((post) => {
         const postDate = new Date(post.schedule_time).toLocaleDateString(
           "en-CA"
         );
-
         return postDate === selectedDate;
       });
     }
+    posts.sort((a, b) => {
+      return (
+        new Date(b.schedule_time).getTime() -
+        new Date(a.schedule_time).getTime()
+      );
+    });
+
     return posts;
   };
 

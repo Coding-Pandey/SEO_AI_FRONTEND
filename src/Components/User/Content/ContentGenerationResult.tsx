@@ -20,6 +20,7 @@ import {
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
 import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
+import { language_options, location_options } from "../../Page/store";
 
 const ContentGenerationResult = () => {
   const location = useLocation();
@@ -46,7 +47,9 @@ const ContentGenerationResult = () => {
   const [links, setLinks] = useState<string[]>([]);
   const [EditFormOpen, setEditFormOpen] = useState<boolean>(false);
   const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
-  // console.log(generateKeywordDetails, "generateKeywordDetails");
+  const [country, setCountry] = useState<any>([]);
+  const [language, setLanguage] = useState<string | null>(null);
+  const [NewMessage, setNewMessage] = useState<string>("editContent");
 
   useEffect(() => {
     fetchGenerateData();
@@ -55,7 +58,7 @@ const ContentGenerationResult = () => {
   const fetchGenerateData = async () => {
     try {
       setloadingData(true);
-       const responseSourcefiles = await GetUploadedSourcefiles();
+      const responseSourcefiles = await GetUploadedSourcefiles();
       const responseForm = await GetFormDetails();
       if (responseForm.status === 200 || responseForm.status === 201) {
         setFormDynamictData(responseForm.data);
@@ -75,6 +78,7 @@ const ContentGenerationResult = () => {
       const formDataDetail = localStorage.getItem("FormDataDetails");
 
       if (formDataDetail) {
+        setNewMessage("editContent");
         const parsedFormData = JSON.parse(formDataDetail);
         setFormPreDetails(parsedFormData);
         setFileName(parsedFormData?.FileName || "");
@@ -86,6 +90,14 @@ const ContentGenerationResult = () => {
         if (parsedFormData?.temp_file_path?.length > 0) {
           setFileUrl([parsedFormData?.temp_file_path]);
         }
+        const { country, language } = parsedFormData;
+
+        setLanguage(String(language));
+
+        const mappedCountries = location_options
+          .filter((loc) => country.includes(loc.id))
+          .map((loc) => ({ value: loc.id, label: loc.country }));
+        setCountry(mappedCountries);
       }
       if (storedData) {
         const parsedData = JSON.parse(storedData);
@@ -446,6 +458,13 @@ const ContentGenerationResult = () => {
         );
         return;
       }
+      const selectedCountries = location_options.filter((loc) =>
+        country.some((c: any) => c.value === loc.id)
+      );
+
+      const selectedLanguage = language_options.find(
+        (lang) => lang.ID === Number(language)
+      );
 
       setloadingData(true);
       const formData = new FormData();
@@ -454,6 +473,8 @@ const ContentGenerationResult = () => {
       formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
       formData.append("text_data", AddInstructions);
+    // formData.append("language_id", JSON.stringify(selectedLanguage));
+    // formData.append("location_ids", JSON.stringify(selectedCountries));
       let newFileUpload;
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
@@ -474,6 +495,8 @@ const ContentGenerationResult = () => {
         AddInstructions,
         uploadedFiles: newFileUpload,
         links,
+        language: selectedLanguage?.ID,
+        country: selectedCountries.map((c) => c.id),
       };
       const response = await EditGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
@@ -580,6 +603,11 @@ const ContentGenerationResult = () => {
                     handleRemoveLink={handleRemoveLink}
                     handleGenerateSubmit={handleGenerateSubmit}
                     UploadedSourcefiles={UploadedSourcefiles}
+                    language={language}
+                    setLanguage={setLanguage}
+                    country={country}
+                    setCountry={setCountry}
+                    NewMessage={NewMessage}
                   />
                 </div>
               </div>

@@ -12,6 +12,12 @@ import {
   GetUploadedSourcefiles,
 } from "./SocialMediaServices";
 
+interface GeneratePostCluster {
+  uuid: string;
+  file_name: string;
+  last_reset: string;
+}
+
 const GeneratePost = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
@@ -21,7 +27,7 @@ const GeneratePost = () => {
   const [objectives, setObjectives] = useState<string[]>([]);
   const [audience, setAudience] = useState<string[]>([]);
   const [additional, setAdditional] = useState<string[]>([]);
-  const [generatedPostData, setGeneratedPostData] = useState<any[]>([]);
+  const [generatedPostData, setGeneratedPostData] = useState<GeneratePostCluster[]>([]);
   const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
   const navigate = useNavigate();
 
@@ -29,7 +35,7 @@ const GeneratePost = () => {
     fetchPPCClusterData();
   }, []);
 
-  
+  console.log(generatedPostData,"generatedPostData")
 
   const fetchPPCClusterData = async () => {
     try {
@@ -37,7 +43,11 @@ const GeneratePost = () => {
       const response = await GetSocialMediaData();
       const responseSourcefiles = await GetUploadedSourcefiles();
       if (response.status === 200 || response.status === 201) {
-        setGeneratedPostData(response.data);
+         const sortedData = response.data.sort(
+        (a: GeneratePostCluster, b: GeneratePostCluster) =>
+          new Date(b.last_reset).getTime() - new Date(a.last_reset).getTime()
+      );
+        setGeneratedPostData(sortedData);
         setUploadedSourcefiles(responseSourcefiles.data);
       }
     } catch (error: any) {

@@ -1050,6 +1050,15 @@ form .row {
     box-shadow: rgba(99, 99, 99, 0.2) 0px 1px 4px 0px;
 }
 
+.country_box .form_input{
+    /* background-color: #fff !important; */
+    padding: 0px !important;
+    border-radius: 6px !important;
+    /* box-shadow: rgba(99, 99, 99, 0.2) 0px 1px 4px 0px !important; */
+    background-color: #ffffff !important;
+ 
+}
+
 .multicheckbox {
     display: flex;
     flex-direction: column;
@@ -2434,6 +2443,38 @@ font-weight: 500;
     width: calc(100% - 30px);
     margin-bottom: 0px;
 }
+
+.react_select__control {
+    padding: 4px;
+    background-color: #ffffff !important;
+    border: 2px solid #e7e7e7 !important;
+    font-size: 16px !important;
+}
+
+.react_select_new__control {
+    padding: 4px;
+    /* padding-bottom: 5px; */
+    background-color: #ffffff !important;
+    border: 2px solid #e7e7e7 !important;
+    font-size: 16px !important;
+}
+
+.react_select__control--is-focused, .react_select__control:focus {
+    box-shadow: none !important;
+    border-color: var(--primary-color) !important;
+}
+
+ 
+.react_select__control--is-disabled {
+  background-color: #f1f1f1;
+  color: #999;
+  border-color: #ddd;
+}
+
+.react_select__single-value {
+  color: #999;
+}
+
 
  
 /* Responsive css */
