@@ -1,4 +1,5 @@
 import React from "react";
+import { capitalizeFirstLetter } from "../User/SeoProcess/Reports";
 
 interface PostItem {
   uuid: string;
@@ -50,7 +51,7 @@ const PreviouslyCreatedPosts: React.FC<Props> = ({ posts, onDelete,onNavigate })
             return (
               <li className="previous_item row" key={item.uuid}>
                 <div className="col-7">
-                  <h3 className="font_16 font_600">{item.file_name}</h3>
+                  <h3 className="font_16 font_600">{capitalizeFirstLetter(item.file_name.trim())}</h3>
                   <p className="font_16 mb-0">
                     {isExpired
                       ? "File Expired"

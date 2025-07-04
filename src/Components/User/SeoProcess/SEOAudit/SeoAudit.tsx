@@ -539,7 +539,7 @@ const cardsMeta = [
   },
 ];
 
-const tableHeadersMeta = ["URL Address", "","Meta Description",""];
+const tableHeadersMeta = ["URL Address", "", "Meta Description", ""];
 
 const tableRowsMeta = [
   {
@@ -662,7 +662,7 @@ const SeoAudit = () => {
                             role="tab"
                             aria-controls={`audit-${item.id}`}
                             aria-selected={index === 0 ? "true" : "false"}
-                             onClick={() => setSelectedTab(item.label)}
+                            onClick={() => setSelectedTab(item.label)}
                           >
                             {item.label}
                             <span>

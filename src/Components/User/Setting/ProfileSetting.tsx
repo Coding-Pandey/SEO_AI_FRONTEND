@@ -13,6 +13,7 @@ import IntegrationsTab from "./IntegrationsTab";
 import SourceFileModal from "./SourceFileModal";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import { capitalizeFirstLetter } from "../SeoProcess/Reports";
 // import BuyerPersonaModal from "./BuyerPersonaModal";
 
 interface FileItem {
@@ -291,7 +292,7 @@ const ProfileSetting = () => {
                               )}
 
                               <p className="font_16 font_600 mb-2">
-                                Name: <span>{userDetails?.username}</span>
+                                Name: <span>{userDetails?.username ? capitalizeFirstLetter(userDetails.username.trim()) : "N/A"}</span>
                               </p>
                               <p className="font_16 font_600 mb-2">
                                 Email:{" "}
@@ -300,7 +301,7 @@ const ProfileSetting = () => {
                                 </span>
                               </p>
                               <p className="font_16 font_600 mb-2">
-                                User: <span>{userDetails?.role}</span>
+                                User: <span>{userDetails?.role ? capitalizeFirstLetter(userDetails.role.trim()) : "N/A"}</span>
                               </p>
                             </div>
                           </div>
