@@ -14,12 +14,13 @@ import { toast } from "react-toastify";
 import TitleOrFileUpdateModal from "../../Page/TitleOrFileUpdateModal";
 import Loading from "../../Page/Loading/Loading";
 import {
-    AddGenerateContent,
+  AddGenerateContent,
   GetFormDetails,
   MoreGenerateSuggestion,
 } from "./ContentServices";
 import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
 import ContentFormForSeo from "./ContentFormForSeo";
+import { language_options, location_options } from "../../Page/store";
 
 const ContentGeneratBySeo = () => {
   const location = useLocation();
@@ -49,8 +50,10 @@ const ContentGeneratBySeo = () => {
   const [id, userid] = useState<string>("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState<string>("");
-  // console.log(generateKeywordDetails, "generateKeywordDetails");
-  
+  const [country, setCountry] = useState<any>([]);
+  const [language, setLanguage] = useState<string | null>(null);
+  const [NewMessage, setNewMessage] = useState<string>("editContent");
+
   useEffect(() => {
     fetchGenerateData();
   }, []);
@@ -73,12 +76,23 @@ const ContentGeneratBySeo = () => {
 
   useEffect(() => {
     if (location.state) {
-   const newData=location.state
-   console.log(location.state,"location.state")
-   setFileName(newData?.items?.Page_Title);
-   userid(newData?.id)
-   const extractedKeywords =  newData?.items?.Keywords.map((k:any) => k.Keyword);
-   setKeywords(extractedKeywords);
+      const newData = location.state;
+      setFileName(newData?.items?.Page_Title);
+      userid(newData?.id);
+      const extractedKeywords = newData?.items?.Keywords.map(
+        (k: any) => k.Keyword
+      );
+      setKeywords(extractedKeywords);
+      const LanguageAndCountryData = newData;
+      setLanguage(String(LanguageAndCountryData.language.ID));
+      setNewMessage("editContent");
+      const mappedCountries = location_options
+        .filter((loc) =>
+          LanguageAndCountryData.country.some((c: any) => c.id === loc.id)
+        )
+        .map((loc) => ({ value: loc.id, label: loc.country }));
+
+      setCountry(mappedCountries);
     }
   }, [location.state]);
 
@@ -95,8 +109,6 @@ const ContentGeneratBySeo = () => {
     updateLocalStorage(updatedSections);
     toast.success("Suggestion Deleted successfully");
   };
-
- 
 
   const handleSaveEdit = () => {
     if (Message === "Add More") {
@@ -144,8 +156,6 @@ const ContentGeneratBySeo = () => {
       [e.target.name]: e.target.value,
     });
   };
-
- 
 
   const handleOpenTitleModal = async (data: string) => {
     setShowModal(true);
@@ -228,7 +238,6 @@ const ContentGeneratBySeo = () => {
 
   const handleAddSection = async () => {
     try {
-    
       const Instructions = FormPreDetails?.AddInstructions;
       const preUploadFile = FormPreDetails?.temp_file_path;
       const formData = new FormData();
@@ -406,7 +415,7 @@ const ContentGeneratBySeo = () => {
         toast.error("Please enter information page name");
         return;
       }
-      if(!contentType){
+      if (!contentType) {
         toast.error("Please select contentType");
         return;
       }
@@ -433,12 +442,21 @@ const ContentGeneratBySeo = () => {
       }
 
       setloadingData(true);
+      const selectedCountries = location_options.filter((loc) =>
+        country.some((c: any) => c.value === loc.id)
+      );
+
+      const selectedLanguage = language_options.find(
+        (lang) => lang.ID === Number(language)
+      );
       const formData = new FormData();
       formData.append("file_name", FileName);
       formData.append("content_type", String(contentType));
       formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
       formData.append("text_data", AddInstructions);
+      formData.append("language_id", JSON.stringify(selectedLanguage));
+      formData.append("location_ids", JSON.stringify(selectedCountries));
       let newFileUpload;
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
@@ -460,7 +478,9 @@ const ContentGeneratBySeo = () => {
         AddInstructions,
         uploadedFiles: newFileUpload,
         links,
-        keywords
+        keywords,
+        language: selectedLanguage?.ID,
+        country: selectedCountries.map((c) => c.id),
       };
       const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
@@ -513,8 +533,7 @@ const ContentGeneratBySeo = () => {
               <span className="text_blue">
                 /
                 {FileName
-                  ? FileName.charAt(0).toUpperCase() +
-                    FileName.slice(1)
+                  ? FileName.charAt(0).toUpperCase() + FileName.slice(1)
                   : ""}
               </span>
             </h2>
@@ -527,7 +546,9 @@ const ContentGeneratBySeo = () => {
                     <button
                       className="btn text_orange font_20 close_btn"
                       aria-label="remove_icon"
-                      onClick={() =>  navigate(`/seo/SuggestionsResultById/${id}`)}
+                      onClick={() =>
+                        navigate(`/seo/SuggestionsResultById/${id}`)
+                      }
                     >
                       <i className="bi bi-x"></i>
                     </button>
@@ -559,6 +580,11 @@ const ContentGeneratBySeo = () => {
                     setKeywords={setKeywords}
                     keywordInput={keywordInput}
                     setKeywordInput={setKeywordInput}
+                    language={language}
+                    setLanguage={setLanguage}
+                    country={country}
+                    setCountry={setCountry}
+                    NewMessage={NewMessage}
                   />
                 </div>
               </div>

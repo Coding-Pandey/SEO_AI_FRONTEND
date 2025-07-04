@@ -313,7 +313,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
                   className="form-control"
                   id="targetLanguage"
                   aria-label="target_language"
-                  value={language}
+                  value={language || ''}
                   onChange={(e) => setLanguage(e.target.value)}
                   style={NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}}
                   disabled={NewMessage !== "newContent"}

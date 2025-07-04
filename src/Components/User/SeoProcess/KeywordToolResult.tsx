@@ -144,11 +144,10 @@ const KeywordToolResult = () => {
   };
 
   const handleSubmit = async () => {
-
     const selectedCountries = location_options.filter((loc) =>
       country.some((c: any) => c.value === loc.id)
     );
-    
+
     const selectedLanguage = language_options.find(
       (lang) => lang.ID === Number(language)
     );
@@ -192,40 +191,24 @@ const KeywordToolResult = () => {
   const handleSuggestPages = async () => {
     setShowInputBox(false);
     setShowExcludeBox(false);
-      const selectedCountries = location_options.filter((loc) =>
+    const selectedCountries = location_options.filter((loc) =>
       country.some((c: any) => c.value === loc.id)
     );
-    
+
     const selectedLanguage = language_options.find(
       (lang) => lang.ID === Number(language)
     );
-    const filteredData = generateKeywordDetails.filter(
-      (item) => item.Avg_Monthly_Searches >= volume
-    );
 
-    const limitedData = filteredData.slice(0, 200);
+    const limitedData = filteredKeywords.slice(0, 200);
 
     setLoadingSuggestion(true);
-    const finalKeywords =
-      includeKeywords.length > 0
-        ? includeKeywords
-        : includeInput.trim() !== ""
-        ? [includeInput.trim()]
-        : [];
-
-    const brandedWords =
-      excludeKeywords.length > 0
-        ? excludeKeywords
-        : excludeInput.trim() !== ""
-        ? [excludeInput.trim()]
-        : [];
 
     const newData = {
       file_name: FileNameData?.fileName,
       keywords: limitedData,
       delete_word: {
-        include: finalKeywords,
-        exlude: brandedWords,
+        include: [],
+        exlude: [],
       },
       language_id: selectedLanguage!,
       location_ids: selectedCountries,
@@ -272,7 +255,10 @@ const KeywordToolResult = () => {
 
   const handleSaveIncludeKeywords = () => {
     const trimmed = includeInput.trim();
-
+    if (trimmed === "") {
+      setShowInputBox(false);
+      return;
+    }
     if (trimmed && !includeKeywords.includes(trimmed)) {
       toast.warning(
         "Please press Enter or comma after typing to add the keyword.",
@@ -295,6 +281,10 @@ const KeywordToolResult = () => {
 
   const handleSaveExcludeKeywords = () => {
     const trimmed = excludeInput.trim();
+    if (trimmed === "") {
+      setShowExcludeBox(false);
+      return;
+    }
 
     if (trimmed && !excludeKeywords.includes(trimmed)) {
       toast.warning(
@@ -316,6 +306,26 @@ const KeywordToolResult = () => {
       });
     }
   };
+
+  const filteredKeywords = generateKeywordDetails
+    .filter((item) => item.Avg_Monthly_Searches > volume)
+    .filter((item) => {
+      const keywordText = item.Keyword.toLowerCase();
+      if (excludeKeywords.length > 0) {
+        const hasExcluded = excludeKeywords.some((word) =>
+          keywordText.includes(word.toLowerCase())
+        );
+        if (hasExcluded) return false;
+      }
+      if (includeKeywords.length > 0) {
+        const hasIncluded = includeKeywords.some((word) =>
+          keywordText.includes(word.toLowerCase())
+        );
+        return hasIncluded;
+      }
+
+      return true;
+    });
 
   return (
     <>
@@ -466,30 +476,26 @@ const KeywordToolResult = () => {
 
               <div className="result_keyword box-shadow">
                 <div className="row">
-                  {generateKeywordDetails.length > 0 ? (
-                    generateKeywordDetails
-                      .filter(
-                        (item: any) => item.Avg_Monthly_Searches >= volume
-                      )
-                      .map((item: any, index: any) => (
-                        <div className="col-12 col-md-6 col-lg-4" key={index}>
-                          <div
-                            className={`keyword_item ${
-                              item.isNew ? "active" : ""
-                            }`}
-                          >
-                            <p className="font_16 mb-0">{item.Keyword}</p>
-                            <div className="font_16">
-                              <span>{item.Avg_Monthly_Searches}</span>
-                              <i
-                                className="bi bi-x"
-                                onClick={() => handleDeleteKeyword(index)}
-                                style={{ cursor: "pointer" }}
-                              ></i>
-                            </div>
+                  {filteredKeywords.length > 0 ? (
+                    filteredKeywords.map((item: any, index: any) => (
+                      <div className="col-12 col-md-6 col-lg-4" key={index}>
+                        <div
+                          className={`keyword_item ${
+                            item.isNew ? "active" : ""
+                          }`}
+                        >
+                          <p className="font_16 mb-0">{item.Keyword}</p>
+                          <div className="font_16">
+                            <span>{item.Avg_Monthly_Searches}</span>
+                            <i
+                              className="bi bi-x"
+                              onClick={() => handleDeleteKeyword(index)}
+                              style={{ cursor: "pointer" }}
+                            ></i>
                           </div>
                         </div>
-                      ))
+                      </div>
+                    ))
                   ) : (
                     <div className="col-12">
                       <p>No keywords found</p>

@@ -194,38 +194,21 @@ const CreateCampaignKeywordResult = () => {
     const selectedCountries = location_options.filter((loc) =>
       country.some((c: any) => c.value === loc.id)
     );
-    
+
     const selectedLanguage = language_options.find(
       (lang) => lang.ID === Number(language)
     );
-    const filteredData = generateKeywordDetails.filter(
-      (item) => item.Avg_Monthly_Searches >= volume
-    );
 
-    const limitedData = filteredData.slice(0, 200);
+    const limitedData = filteredKeywords.slice(0, 200);
 
     const cleanedData = limitedData.map(({ isNew, ...rest }) => rest);
-
-    const finalKeywords =
-      includeKeywords.length > 0
-        ? includeKeywords
-        : includeInput.trim() !== ""
-        ? [includeInput.trim()]
-        : [];
-
-    const brandedWords =
-      excludeKeywords.length > 0
-        ? excludeKeywords
-        : excludeInput.trim() !== ""
-        ? [excludeInput.trim()]
-        : [];
 
     const newData = {
       file_name: FileNameData?.fileName,
       keywords: cleanedData,
       delete_word: {
-        include: finalKeywords,
-        exlude: brandedWords,
+        include: [],
+        exlude: [],
       },
       language_id: selectedLanguage!,
       location_ids: selectedCountries,
@@ -274,7 +257,10 @@ const CreateCampaignKeywordResult = () => {
 
   const handleSaveIncludeKeywords = () => {
     const trimmed = includeInput.trim();
-
+    if (trimmed === "") {
+      setShowInputBox(false);
+      return;
+    }
     if (trimmed && !includeKeywords.includes(trimmed)) {
       toast.warning(
         "Please press Enter or comma after typing to add the keyword.",
@@ -297,6 +283,10 @@ const CreateCampaignKeywordResult = () => {
 
   const handleSaveExcludeKeywords = () => {
     const trimmed = excludeInput.trim();
+    if (trimmed === "") {
+      setShowExcludeBox(false);
+      return;
+    }
 
     if (trimmed && !excludeKeywords.includes(trimmed)) {
       toast.warning(
@@ -318,6 +308,26 @@ const CreateCampaignKeywordResult = () => {
       });
     }
   };
+
+  const filteredKeywords = generateKeywordDetails
+    .filter((item) => item.Avg_Monthly_Searches > volume)
+    .filter((item) => {
+      const keywordText = item.Keyword.toLowerCase();
+      if (excludeKeywords.length > 0) {
+        const hasExcluded = excludeKeywords.some((word) =>
+          keywordText.includes(word.toLowerCase())
+        );
+        if (hasExcluded) return false;
+      }
+      if (includeKeywords.length > 0) {
+        const hasIncluded = includeKeywords.some((word) =>
+          keywordText.includes(word.toLowerCase())
+        );
+        return hasIncluded;
+      }
+
+      return true;
+    });
 
   return (
     <>
@@ -478,35 +488,30 @@ const CreateCampaignKeywordResult = () => {
                     </thead>
 
                     <tbody>
-                      {generateKeywordDetails
-                        .filter(
-                          (keywordDetail) =>
-                            keywordDetail.Avg_Monthly_Searches >= volume
-                        )
-                        .map((keywordDetail, index) => (
-                          <tr
-                            key={index}
-                            className={`
+                      {filteredKeywords.map((keywordDetail, index) => (
+                        <tr
+                          key={index}
+                          className={`
           ${keywordDetail.isNew ? "active" : ""}
         `}
-                          >
-                            <td>{keywordDetail.Keyword}</td>
-                            <td>{keywordDetail.Avg_Monthly_Searches}</td>
-                            <td>{keywordDetail.Competition}</td>
-                            <td>{keywordDetail.LowTopOfPageBid}</td>
-                            <td>{keywordDetail.HighTopOfPageBid}</td>
-                            <td>
-                              <span className="remove_key">
-                                <i
-                                  className="bi bi-x"
-                                  onClick={() =>
-                                    handleRemoveKeyword(keywordDetail.Keyword)
-                                  }
-                                ></i>
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
+                        >
+                          <td>{keywordDetail.Keyword}</td>
+                          <td>{keywordDetail.Avg_Monthly_Searches}</td>
+                          <td>{keywordDetail.Competition}</td>
+                          <td>{keywordDetail.LowTopOfPageBid}</td>
+                          <td>{keywordDetail.HighTopOfPageBid}</td>
+                          <td>
+                            <span className="remove_key">
+                              <i
+                                className="bi bi-x"
+                                onClick={() =>
+                                  handleRemoveKeyword(keywordDetail.Keyword)
+                                }
+                              ></i>
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>

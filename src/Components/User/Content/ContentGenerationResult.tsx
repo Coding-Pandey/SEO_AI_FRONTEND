@@ -473,8 +473,8 @@ const ContentGenerationResult = () => {
       formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
       formData.append("text_data", AddInstructions);
-    // formData.append("language_id", JSON.stringify(selectedLanguage));
-    // formData.append("location_ids", JSON.stringify(selectedCountries));
+      formData.append("language_id", JSON.stringify(selectedLanguage));
+      formData.append("location_ids", JSON.stringify(selectedCountries));
       let newFileUpload;
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];

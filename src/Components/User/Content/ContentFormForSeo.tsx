@@ -1,5 +1,6 @@
 import React from "react";
-
+import { language_options, location_options } from "../../Page/store";
+import Select from "react-select";
 interface ContentFormProps {
   contentType: string;
   PostObjectives: string[];
@@ -27,6 +28,11 @@ interface ContentFormProps {
   setKeywords: (keywords: string[]) => void;
   keywordInput: string;
   setKeywordInput: (input: string) => void;
+  language:any,
+  setLanguage:any,
+  country:any,
+  setCountry:any,
+  NewMessage:any
 }
 
 const ContentFormForSeo: React.FC<ContentFormProps> = ({
@@ -55,7 +61,12 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
   keywords,
   setKeywords,
   keywordInput,
-  setKeywordInput
+  setKeywordInput,
+  language,
+  setLanguage,
+  country,
+  setCountry,
+  NewMessage
 }) => {
 
   const handleKeywordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +88,11 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
     newKeywords.splice(index, 1);
     setKeywords(newKeywords);
   };
+
+    const locationOptions = location_options.map((location) => ({
+      value: location.id,
+      label: location.country,
+    }));
 
   return (
     <form onSubmit={handleGenerateSubmit}>
@@ -295,6 +311,44 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
                 ))}
             </ul>
           </div>
+
+          <div className="col-12">
+              <label htmlFor="add_link" className="font_20 font_500 mb-2">
+                Add Country
+              </label>
+              <div className="country_box" style={NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}}>
+                <Select
+                  options={locationOptions}
+                  value={country}
+                  onChange={setCountry}
+                  isMulti
+                  placeholder="Select Target Country"
+                  classNamePrefix="react_select_new"
+                  isDisabled={NewMessage !== "newContent"}
+                />
+              </div>
+            </div>
+            <div className="col-12 country_box">
+              <label htmlFor="add_link" className="font_20 font_500 mb-2">
+                Add Language
+              </label>
+                <select
+                  className="form-control"
+                  id="targetLanguage"
+                  aria-label="target_language"
+                  value={language || ''}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  style={NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}}
+                  disabled={NewMessage !== "newContent"}
+                >
+                  <option value="">Select Language</option>
+                  {language_options.map((language) => (
+                    <option key={language.ID} value={language.ID}>
+                      {language.Name}
+                    </option>
+                  ))}
+                </select>
+            </div>
 
           <div className="col-12">
             <label htmlFor="add_link" className="font_20 font_500 mb-2">
