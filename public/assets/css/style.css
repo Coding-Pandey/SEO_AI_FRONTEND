@@ -1810,7 +1810,7 @@ form .row {
 
 
 .settings_tabs_wrapper {
-    height: 400px;
+    height: 100%;
     position: sticky;
     top: 80px;
 }
@@ -2473,6 +2473,50 @@ font-weight: 500;
 
 .react_select__single-value {
   color: #999;
+}
+
+.font_18 {
+    font-size: 18px;
+    line-height: 22px;
+}
+
+.settings_tabs_wrapper .nav-pills .nav-link {
+    color: var(--black-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 16px;
+    line-height: 22px;
+    text-align: left;
+}
+
+.seo_audit_wrapper .settings_tabs_wrapper {
+    height: 470px;
+}
+
+.indexables_table_filter .filter_btn_wrapper {
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    list-style: none;
+    flex-wrap: wrap;
+    row-gap: 10px;
+}
+
+.indexable_table.branded_keywords th,
+.indexable_table.branded_keywords tr td {
+    text-align: left;
+}
+
+.indexable_table.branded_keywords th:first-child,
+.indexable_table.branded_keywords tr td:first-child {
+    width: 45%;
+}
+
+.settings_tabs_wrapper .nav-pills .nav-link i::before {
+    font-weight: 800 !important;
 }
 
 
