@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import Header from "../Header/Header";
-import SideBar from "../SideBar/SideBar";
+import Header from "../../Header/Header";
+import SideBar from "../../SideBar/SideBar";
 import {
   AddBrandedWordanalysis,
   AddRankingKeyword,
   AddSearchConsole,
   GetFilterData,
   GetWebListDetails,
-} from "./SeoServices";
-import Loading from "../../Page/Loading/Loading";
+} from "../SeoServices";
+import Loading from "../../../Page/Loading/Loading";
 import SelectSiteModal from "./SelectSiteModal";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";

@@ -1,16 +1,16 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import Header from "../Header/Header";
-import SideBar from "../SideBar/SideBar";
+import Header from "../../Header/Header";
+import SideBar from "../../SideBar/SideBar";
 import { KeyboardEvent, useEffect, useState } from "react";
 import Select from "react-select";
-import { language_options, location_options } from "../../Page/store";
+import { language_options, location_options } from "../../../Page/store";
 import { toast } from "react-toastify";
-import Loading from "../../Page/Loading/Loading";
-import { SEOClusterKeywordService, SEOGenerateKeyword } from "./SeoServices";
-import { capitalizeFirstLetter } from "./Reports";
-import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
-import IncludeKeywordBox from "../../Page/IncludeKeywordBox";
-import ExcludeKeywordBox from "../../Page/ExcludeKeywordBox";
+import Loading from "../../../Page/Loading/Loading";
+import { SEOClusterKeywordService, SEOGenerateKeyword } from "../SeoServices";
+import { capitalizeFirstLetter } from "../SEOReport/Reports";
+import FileNameUpdateModal from "../../../Page/FileNameUpdateModal";
+import IncludeKeywordBox from "../../../Page/IncludeKeywordBox";
+import ExcludeKeywordBox from "../../../Page/ExcludeKeywordBox";
 
 const KeywordToolResult = () => {
   const location = useLocation();

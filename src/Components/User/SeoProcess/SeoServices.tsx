@@ -20,14 +20,7 @@ export const GetFilterData = async () => {
   }
 };
 
-// export const GetWebListDetails = async () => {
-//   try {
-//     const response = await axiosInstance.get(`/api/search_console/sites`);
-//     return response;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+
 
 const refreshToken = async () => {
   try {
@@ -226,6 +219,36 @@ export const UpdateSEOtitle = async (
       `/api/seo-files/${uuid}/pages/${id}`,
       formData
     );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//SEO Audit
+
+export const GetAuditListDetails = async () => {
+  try {
+    const response = await axiosInstance.get(`/api/crawl_data_info`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const  AddDomainCrawlURL = async (formData:{domain: string}) => {
+  try {
+    const response = await axiosInstance.post(`/api/sheets/crawl`,formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const  GetCrawDataById = async (uuid: string) => {
+  try {
+    const response = await axiosInstance.get(`/api/crawl_data/${uuid}`,);
     return response;
   } catch (error) {
     throw error;

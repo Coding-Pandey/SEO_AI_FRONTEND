@@ -2520,6 +2520,14 @@ font-weight: 500;
 }
 
 
+.indexable_btn.active {
+  background-color: white !important;
+  color: rgb(250, 122, 78);
+  border: 2px solid var(--primary-color)!important;
+}
+
+
+
  
 /* Responsive css */
 @media only screen and (max-width:1599px) {

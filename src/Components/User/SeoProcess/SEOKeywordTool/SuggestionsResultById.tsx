@@ -1,17 +1,17 @@
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../Header/Header";
-import SideBar from "../SideBar/SideBar";
+import Header from "../../Header/Header";
+import SideBar from "../../SideBar/SideBar";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Loading from "../../Page/Loading/Loading";
+import Loading from "../../../Page/Loading/Loading";
 import {
   deleteKeywordData,
   deletePageData,
   GetSeoClusterDataById,
   UpdateSEOFileName,
   UpdateSEOtitle,
-} from "./SeoServices";
-import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
+} from "../SeoServices";
+import FileNameUpdateModal from "../../../Page/FileNameUpdateModal";
 
 interface Keyword {
   Keyword_id: string;

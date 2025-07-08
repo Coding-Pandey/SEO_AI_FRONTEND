@@ -36,7 +36,7 @@ const SelectSiteModal: React.FC<SelectSiteModalProps> = ({
 
   return (
     <>
-      {((webListAllData === "" || webListAllData === null) && !isLoading ) && (
+      {((webListAllData === "" || webListAllData === null || webListAllData === undefined) && !isLoading ) && (
         <div className="modal-container">
           <h2 className="modal-title">🔗 Select a Site</h2>
 
@@ -48,7 +48,7 @@ const SelectSiteModal: React.FC<SelectSiteModalProps> = ({
                   selectedSite?.siteUrl === site.siteUrl ? "selected" : ""
                 }`}
                 onClick={() => {
-                  if (webListAllData === "" || webListAllData === null) {
+                  if (webListAllData === "" || webListAllData === null || webListAllData === undefined) {
                     onSelect(site);
                   }
                 }}

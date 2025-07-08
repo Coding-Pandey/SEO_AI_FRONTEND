@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../../Header/Header";
 import SideBar from "../../SideBar/SideBar";
 import AuditSection from "./AuditSection";
+import { GetAuditListDetails, GetCrawDataById } from "../SeoServices";
+import Loading from "../../../Page/Loading/Loading";
+import AuditAllSiteModal from "./SeoAuditModals/AuditAllSiteModal";
+import AuditIndexability, {
+  CardItem,
+} from "./SeoAuditModals/AuditIndexability";
 
 const cards = [
   {
@@ -107,73 +113,14 @@ const tableRows = [
   },
 ];
 
-const filters = [
-  "200 Response",
-  "3xx Response",
-  "4xx Response",
-  "5xx Response",
-  "Redirect Loop",
-  "Redirect Chain",
-];
-
-const cardsIndexability = [
-  {
-    title: "Indexable",
-    value: "1,398",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Non-Indexable",
-    value: "230",
-    percent: "0.5%",
-    icon: "bi-arrow-down-short",
-    color: "text-danger",
-  },
-  {
-    title: "URL with Noindex",
-    value: "48",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Blocked by robots.txt",
-    value: "39",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Contains Canonical Tag",
-    value: "28",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Missing Canonical Tag",
-    value: "17",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Sel Referencing Canonical",
-    value: "2",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Outside <head>",
-    value: "2",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-];
+// const filters = [
+//   "200 Response",
+//   "3xx Response",
+//   "4xx Response",
+//   "5xx Response",
+//   "Redirect Loop",
+//   "Redirect Chain",
+// ];
 
 const tableHeadersIndexability = [
   "URL Address",
@@ -182,72 +129,7 @@ const tableHeadersIndexability = [
   "Page title",
 ];
 
-const tableRowsIndexability = [
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "PDUs Fixing & Management",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "PDUs Fixing & Management",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Indexable",
-    type: "-",
-    title: "PDUs Fixing & Management",
-  },
-];
-
-const filtersIndexability = [
-  "Indexable",
-  "Non-indexable",
-  "Meta Noindex",
-  "Blocked by robots.txt",
-  "Contains Canonical Tag",
-  "Missing Canonical Tag",
-  "Sel Referencing Canonical",
-];
+ 
 
 const cardsPageTitle = [
   {
@@ -605,17 +487,128 @@ const filtersMeta = [
   "Too short",
   "Multiple",
 ];
+export interface CrawlSite {
+  uuid: string;
+  crawl_url: string;
+}
+
+type KPI = {
+  count: number;
+  percentage: number;
+};
+
+type IndexabilityKpis = Record<string, KPI>;
 
 const SeoAudit = () => {
   const [selectedTab, setSelectedTab] = useState<string>("Overview");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+  const [AllCrawlList, setAllCrawlList] = useState<CrawlSite[]>([]);
+  const [AlreadySelectedCrawl, setAlreadySelectedCrawl] = useState<
+    string | null
+  >(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedSite, setSelectedSite] = useState<CrawlSite | null>(null);
+  const [IndexabilityData, setIndexabilityData] = useState<any>(null);
+  const [filters, setFilters] = useState<string[]>([]);
+  const [IndexbilityCards, setIndexbilityCards] = useState<CardItem[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string>("");
+  const [activeFilterData, setActiveFilterData] = useState<any[]>([]);
+ 
+
+  useEffect(() => {
+    fetchWebListDetails();
+  }, []);
+
+  useEffect(() => {
+    if (selectedSite) {
+      handleCloseModal();
+    }
+  }, [selectedSite]);
+
+  const fetchWebListDetails = async () => {
+    try {
+      setIsLoading(true);
+      const response = await GetAuditListDetails();
+      if (response?.status === 200 || response?.status === 201) {
+        // console.log(response?.data?.sites || []);
+        setAllCrawlList(response?.data || []);
+        setAlreadySelectedCrawl(response?.data?.selected_site);
+      }
+    } catch (error: any) {
+      console.error("Error fetchWebList:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCloseModal = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await GetCrawDataById(selectedSite?.uuid!);
+
+      if (response.status === 200) {
+        const indexability = response?.data?.indexability;
+        setIndexabilityData(indexability);
+        const availableFilters = Object.keys(indexability?.tables || {});
+        setFilters(availableFilters);
+
+        // Set the first filter as active by default if available
+        if (availableFilters.length > 0) {
+          const firstFilter = availableFilters[0];
+          setActiveFilter(firstFilter);
+          setActiveFilterData(indexability.tables[firstFilter]);
+        }
+
+        const newData = indexability?.kpis
+          ?.indexability_kpis as IndexabilityKpis;
+
+        if (newData) {
+          const cards = Object.entries(newData).map(([key, value]) => {
+            const percent = value.percentage;
+            const isDown = percent < 0;
+
+            return {
+              title: key
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase()), // make it readable
+              value: value.count,
+              percent: percent,
+              isDown,
+              chart: [
+                { name: "Count", value: percent },
+                { name: "Remaining", value: 100 - percent },
+              ],
+            };
+          });
+          setIndexbilityCards(cards);
+        }
+
+        setIsModalOpen(false);
+      }
+    } catch (error: any) {
+      console.error("Error fetchWebList:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
+      {isLoading && <Loading />}
       <Header />
       <main className="main_wrapper">
         <SideBar />
         <div className="inner_content">
           <div className="keyword_tool_content  generate_post create_content">
-            <div className="content_header mb-4">
+            <div
+              className="content_header mb-4"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <h2 className="font_25 font_600 mb-2">
                 <img
                   src="/assets/images/seo_report_icon.png"
@@ -624,211 +617,259 @@ const SeoAudit = () => {
                 />
                 SEO Audit <span className="text_blue">/ {selectedTab}</span>
               </h2>
+
+              {AllCrawlList?.length > 0 && !isModalOpen && (
+                <select
+                  className="form-select"
+                  style={{ width: "auto" }}
+                  value={selectedSite?.crawl_url || ""}
+                  onChange={(e) => {
+                    const selected = AllCrawlList.find(
+                      (site) => site.crawl_url === e.target.value
+                    );
+                    if (selected) {
+                      setSelectedSite(selected);
+                    }
+                  }}
+                >
+                  {AllCrawlList.map((item, index) => (
+                    <option key={index} value={item.crawl_url}>
+                      {item.crawl_url}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
-            <div className="profile_settings_wrapper seo_audit_wrapper">
-              <div className="row gy-3">
-                <div className="col-12 col-xl-3 col-xxl-2">
-                  <div className="settings_tabs_wrapper previously_created_warpper">
-                    <ul
-                      className="nav nav-pills flex-column nav-pills"
-                      id="audit-tab"
-                      role="tablist"
-                    >
-                      {[
-                        { id: "overview", label: "Overview" },
-                        { id: "indexability", label: "Indexability" },
-                        { id: "status", label: "Status Codes" },
-                        { id: "titles", label: "Page Titles" },
-                        { id: "meta", label: "Meta Descriptions" },
-                        { id: "tags", label: "H tags" },
-                        { id: "internal", label: "Internal Links" },
-                        { id: "content", label: "Content" },
-                        { id: "url", label: "URLs" },
-                        { id: "images", label: "Images" },
-                      ].map((item, index) => (
-                        <li
-                          className="nav-item"
-                          role="presentation"
-                          key={item.id}
-                        >
-                          <button
-                            className={`nav-link ${
-                              index === 0 ? "active" : ""
-                            }`}
-                            id={`audit-${item.id}-tab`}
-                            data-bs-toggle="pill"
-                            data-bs-target={`#audit-${item.id}`}
-                            type="button"
-                            role="tab"
-                            aria-controls={`audit-${item.id}`}
-                            aria-selected={index === 0 ? "true" : "false"}
-                            onClick={() => setSelectedTab(item.label)}
+            {isModalOpen ? (
+              <>
+                <AuditAllSiteModal
+                  isOpen={isModalOpen}
+                  AllCrawlList={AllCrawlList}
+                  onSelect={(site) => {
+                    setSelectedSite(site);
+                  }}
+                  selectedSite={selectedSite}
+                  AlreadySelectedCrawl={AlreadySelectedCrawl}
+                  isLoading={isLoading}
+                />
+              </>
+            ) : (
+              <div className="profile_settings_wrapper seo_audit_wrapper">
+                <div className="row gy-3">
+                  <div className="col-12 col-xl-3 col-xxl-2">
+                    <div className="settings_tabs_wrapper previously_created_warpper">
+                      <ul
+                        className="nav nav-pills flex-column nav-pills"
+                        id="audit-tab"
+                        role="tablist"
+                      >
+                        {[
+                          { id: "overview", label: "Overview" },
+                          { id: "indexability", label: "Indexability" },
+                          { id: "status", label: "Status Codes" },
+                          { id: "titles", label: "Page Titles" },
+                          { id: "meta", label: "Meta Descriptions" },
+                          { id: "tags", label: "H tags" },
+                          { id: "internal", label: "Internal Links" },
+                          { id: "content", label: "Content" },
+                          { id: "url", label: "URLs" },
+                          { id: "images", label: "Images" },
+                        ].map((item, index) => (
+                          <li
+                            className="nav-item"
+                            role="presentation"
+                            key={item.id}
                           >
-                            {item.label}
-                            <span>
-                              <i className="bi bi-chevron-right"></i>
-                            </span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                            <button
+                              className={`nav-link ${
+                                index === 0 ? "active" : ""
+                              }`}
+                              id={`audit-${item.id}-tab`}
+                              data-bs-toggle="pill"
+                              data-bs-target={`#audit-${item.id}`}
+                              type="button"
+                              role="tab"
+                              aria-controls={`audit-${item.id}`}
+                              aria-selected={index === 0 ? "true" : "false"}
+                              onClick={() => setSelectedTab(item.label)}
+                            >
+                              {item.label}
+                              <span>
+                                <i className="bi bi-chevron-right"></i>
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                </div>
 
-                <div className="col-12 col-xl-9 col-xxl-10">
-                  <div
-                    className="tab-content setting_tab_content"
-                    id="pills-tabContent"
-                  >
+                  <div className="col-12 col-xl-9 col-xxl-10">
                     <div
-                      className="tab-pane fade show active"
-                      id="audit-overview"
-                      role="tabpanel"
-                      aria-labelledby="audit-overview-tab"
+                      className="tab-content setting_tab_content"
+                      id="pills-tabContent"
                     >
-                      <div className="seo_report_content overview_content">
-                        <form className="row">
-                          <div className="col-12">
-                            <div className="row overview_cards">
-                              <div className="col-12 col-sm-6 col-xxl-3">
-                                <div className="card_box">
-                                  <h3 className="font_18 font_300 mb-2">
-                                    Indexable URLs
-                                  </h3>
-                                  <h4 className="font_25 font_500 mb-1">
-                                    1,398
-                                  </h4>
-                                  <p className="font_14 text-success mb-1">
-                                    <i className="bi bi-arrow-up-short"></i>{" "}
-                                    4.8%
-                                  </p>
+                      <div
+                        className="tab-pane fade show active"
+                        id="audit-overview"
+                        role="tabpanel"
+                        aria-labelledby="audit-overview-tab"
+                      >
+                        <div className="seo_report_content overview_content">
+                          <form className="row">
+                            <div className="col-12">
+                              <div className="row overview_cards">
+                                <div className="col-12 col-sm-6 col-xxl-3">
+                                  <div className="card_box">
+                                    <h3 className="font_18 font_300 mb-2">
+                                      Indexable URLs
+                                    </h3>
+                                    <h4 className="font_25 font_500 mb-1">
+                                      1,398
+                                    </h4>
+                                    <p className="font_14 text-success mb-1">
+                                      <i className="bi bi-arrow-up-short"></i>{" "}
+                                      4.8%
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
 
-                              <div className="col-12 col-sm-6 col-xxl-3">
-                                <div className="card_box">
-                                  <h3 className="font_18 font_300 mb-2">
-                                    Non-Indexable URLs
-                                  </h3>
-                                  <h4 className="font_25 font_500 mb-1">330</h4>
-                                  <p className="font_14 text-danger mb-1">
-                                    <i className="bi bi-arrow-down-short"></i>{" "}
-                                    0.5%
-                                  </p>
+                                <div className="col-12 col-sm-6 col-xxl-3">
+                                  <div className="card_box">
+                                    <h3 className="font_18 font_300 mb-2">
+                                      Non-Indexable URLs
+                                    </h3>
+                                    <h4 className="font_25 font_500 mb-1">
+                                      330
+                                    </h4>
+                                    <p className="font_14 text-danger mb-1">
+                                      <i className="bi bi-arrow-down-short"></i>{" "}
+                                      0.5%
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
 
-                              <div className="col-12 col-sm-6 col-xxl-3">
-                                <div className="card_box">
-                                  <h3 className="font_18 font_300 mb-2">
-                                    Ranking Keywords
-                                  </h3>
-                                  <h4 className="font_25 font_500 mb-1">
-                                    1,398
-                                  </h4>
-                                  <p className="font_14 text-success mb-1">
-                                    <i className="bi bi-arrow-up-short"></i>{" "}
-                                    4.8%
-                                  </p>
+                                <div className="col-12 col-sm-6 col-xxl-3">
+                                  <div className="card_box">
+                                    <h3 className="font_18 font_300 mb-2">
+                                      Ranking Keywords
+                                    </h3>
+                                    <h4 className="font_25 font_500 mb-1">
+                                      1,398
+                                    </h4>
+                                    <p className="font_14 text-success mb-1">
+                                      <i className="bi bi-arrow-up-short"></i>{" "}
+                                      4.8%
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
 
-                              <div className="col-12 col-sm-6 col-xxl-3">
-                                <div className="card_box">
-                                  <h3 className="font_18 font_300 mb-2">
-                                    Ranking URLs
-                                  </h3>
-                                  <h4 className="font_25 font_500 mb-1">330</h4>
-                                  <p className="font_14 text-success mb-1">
-                                    <i className="bi bi-arrow-up-short"></i>{" "}
-                                    0.5%
-                                  </p>
+                                <div className="col-12 col-sm-6 col-xxl-3">
+                                  <div className="card_box">
+                                    <h3 className="font_18 font_300 mb-2">
+                                      Ranking URLs
+                                    </h3>
+                                    <h4 className="font_25 font_500 mb-1">
+                                      330
+                                    </h4>
+                                    <p className="font_14 text-success mb-1">
+                                      <i className="bi bi-arrow-up-short"></i>{" "}
+                                      0.5%
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </form>
+                          </form>
+                        </div>
                       </div>
-                    </div>
 
-                    <div
-                      className="tab-pane fade"
-                      id="audit-indexability"
-                      role="tabpanel"
-                      aria-labelledby="audit-indexability-tab"
-                    >
-                      <AuditSection
-                        title="Indexable"
-                        cards={cardsIndexability}
-                        filters={filtersIndexability}
-                        tableHeaders={tableHeadersIndexability}
-                        tableRows={tableRowsIndexability}
-                      />
-                    </div>
+                      <div
+                        className="tab-pane fade"
+                        id="audit-indexability"
+                        role="tabpanel"
+                        aria-labelledby="audit-indexability-tab"
+                      >
+                        <AuditIndexability
+                          title="Indexable"
+                          cards={IndexbilityCards}
+                          filters={filters}
+                          tableHeaders={tableHeadersIndexability}
+                          tableRows={activeFilterData}
+                          activeFilter={activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setActiveFilter(filter);
+                            setActiveFilterData(
+                              IndexabilityData.tables[filter]
+                            ); 
+                          }}
+                        />
+                      </div>
 
-                    <div
-                      className="tab-pane fade"
-                      id="audit-status"
-                      role="tabpanel"
-                      aria-labelledby="audit-status-tab"
-                    >
-                      <AuditSection
-                        title="200 Response"
-                        cards={cards}
-                        filters={filters}
-                        tableHeaders={tableHeaders}
-                        tableRows={tableRows}
-                      />
-                    </div>
+                      <div
+                        className="tab-pane fade"
+                        id="audit-status"
+                        role="tabpanel"
+                        aria-labelledby="audit-status-tab"
+                      >
+                        <AuditSection
+                          title="200 Response"
+                          cards={cards}
+                          filters={filters}
+                          tableHeaders={tableHeaders}
+                          tableRows={tableRows}
+                        />
+                      </div>
 
-                    <div
-                      className="tab-pane fade"
-                      id="audit-titles"
-                      role="tabpanel"
-                      aria-labelledby="audit-titles-tab"
-                    >
-                      <AuditSection
-                        title="Title Missing"
-                        cards={cardsPageTitle}
-                        filters={filtersPageTitle}
-                        tableHeaders={tableHeadersPageTitle}
-                        tableRows={tableRowsPageTitle}
-                      />
-                    </div>
+                      <div
+                        className="tab-pane fade"
+                        id="audit-titles"
+                        role="tabpanel"
+                        aria-labelledby="audit-titles-tab"
+                      >
+                        <AuditSection
+                          title="Title Missing"
+                          cards={cardsPageTitle}
+                          filters={filtersPageTitle}
+                          tableHeaders={tableHeadersPageTitle}
+                          tableRows={tableRowsPageTitle}
+                        />
+                      </div>
 
-                    <div
-                      className="tab-pane fade"
-                      id="audit-meta"
-                      role="tabpanel"
-                      aria-labelledby="audit-meta-tab"
-                    >
-                      <AuditSection
-                        title="Meta description over 1600 characters"
-                        cards={cardsMeta}
-                        filters={filtersMeta}
-                        tableHeaders={tableHeadersMeta}
-                        tableRows={tableRowsMeta}
-                      />
-                    </div>
+                      <div
+                        className="tab-pane fade"
+                        id="audit-meta"
+                        role="tabpanel"
+                        aria-labelledby="audit-meta-tab"
+                      >
+                        <AuditSection
+                          title="Meta description over 1600 characters"
+                          cards={cardsMeta}
+                          filters={filtersMeta}
+                          tableHeaders={tableHeadersMeta}
+                          tableRows={tableRowsMeta}
+                        />
+                      </div>
 
-                    <div
-                      className="tab-pane fade"
-                      id="audit-tags"
-                      role="tabpanel"
-                      aria-labelledby="audit-tags-tab"
-                    >
-                      <AuditSection
-                        title="H1 Missing"
-                        cards={cardsHTags}
-                        filters={filtersHTags}
-                        tableHeaders={tableHeadersHTags}
-                        tableRows={tableRowsHTags}
-                      />
+                      <div
+                        className="tab-pane fade"
+                        id="audit-tags"
+                        role="tabpanel"
+                        aria-labelledby="audit-tags-tab"
+                      >
+                        <AuditSection
+                          title="H1 Missing"
+                          cards={cardsHTags}
+                          filters={filtersHTags}
+                          tableHeaders={tableHeadersHTags}
+                          tableRows={tableRowsHTags}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </main>

@@ -12,11 +12,11 @@ import Logout from "./Components/Page/Logout";
 const Login = lazy(() => import("./auth/Login"));
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 
-const KeywordTool = lazy(() => import("./Components/User/SeoProcess/KeywordTool"));
+const KeywordTool = lazy(() => import("./Components/User/SeoProcess/SEOKeywordTool/KeywordTool"));
 const SeoAudit = lazy(() => import("./Components/User/SeoProcess/SEOAudit/SeoAudit"));
-const KeywordToolResult = lazy(() => import("./Components/User/SeoProcess/KeywordToolResult"));
-const SuggestionsResultById = lazy(() => import("./Components/User/SeoProcess/SuggestionsResultById"));
-const Reports = lazy(() => import("./Components/User/SeoProcess/Reports")); 
+const KeywordToolResult = lazy(() => import("./Components/User/SeoProcess/SEOKeywordTool/KeywordToolResult"));
+const SuggestionsResultById = lazy(() => import("./Components/User/SeoProcess/SEOKeywordTool/SuggestionsResultById"));
+const Reports = lazy(() => import("./Components/User/SeoProcess/SEOReport/Reports")); 
 
 const GeneratePost = lazy(() => import("./Components/User/SocialMedia/GeneratePost"));
 const Planner = lazy(() => import("./Components/User/SocialMedia/Planner")); 

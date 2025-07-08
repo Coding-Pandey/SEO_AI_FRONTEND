@@ -10,7 +10,7 @@ import {
   SEOPPCGenerateKeyword,
   SEOPPCClusterKeywordService,
 } from "./PpcServices";
-import { capitalizeFirstLetter } from "../SeoProcess/Reports";
+import { capitalizeFirstLetter } from "../SeoProcess/SEOReport/Reports";
 import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
 import IncludeKeywordBox from "../../Page/IncludeKeywordBox";
 import ExcludeKeywordBox from "../../Page/ExcludeKeywordBox";

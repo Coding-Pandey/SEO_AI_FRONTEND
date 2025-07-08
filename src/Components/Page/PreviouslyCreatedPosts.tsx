@@ -1,5 +1,5 @@
 import React from "react";
-import { capitalizeFirstLetter } from "../User/SeoProcess/Reports";
+import { capitalizeFirstLetter } from "../User/SeoProcess/SEOReport/Reports";
 
 interface PostItem {
   uuid: string;

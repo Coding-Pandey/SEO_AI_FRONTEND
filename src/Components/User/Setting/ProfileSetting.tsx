@@ -13,7 +13,7 @@ import IntegrationsTab from "./IntegrationsTab";
 import SourceFileModal from "./SourceFileModal";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "./DeleteConfirmModal";
-import { capitalizeFirstLetter } from "../SeoProcess/Reports";
+import { capitalizeFirstLetter } from "../SeoProcess/SEOReport/Reports";
 // import BuyerPersonaModal from "./BuyerPersonaModal";
 
 interface FileItem {

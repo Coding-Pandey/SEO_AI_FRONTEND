@@ -1,17 +1,17 @@
 import { useState, KeyboardEvent, useEffect } from "react";
-import Header from "../Header/Header";
-import SideBar from "../SideBar/SideBar";
-import { language_options, location_options } from "../../Page/store";
+import Header from "../../Header/Header";
+import SideBar from "../../SideBar/SideBar";
+import { language_options, location_options } from "../../../Page/store";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Loading from "../../Page/Loading/Loading";
-import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
+import Loading from "../../../Page/Loading/Loading";
+import PreviouslyCreatedPosts from "../../../Page/PreviouslyCreatedPosts";
 import {
   deleteClusterData,
   GetSeoClusterData,
   SEOGenerateKeyword,
-} from "./SeoServices";
+} from "../SeoServices";
 
 interface SeoCluster {
   uuid: string;
