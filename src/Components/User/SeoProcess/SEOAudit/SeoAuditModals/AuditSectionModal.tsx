@@ -1,5 +1,6 @@
 import React from "react";
 import { AreaChart, Area, Tooltip, ResponsiveContainer, YAxis } from "recharts";
+import { capitalizeFirstLetter } from "../../SEOReport/Reports";
 
 export interface ChartItem {
   name: string;
@@ -14,38 +15,28 @@ export interface CardItem {
   chart: ChartItem[];
 }
 
-interface TableRow {
-  Address: string;
-  Indexability: string;
-  Indexability_Status: string;
-  Title_1: string;
-}
-
-interface AuditIndexabilityProps {
-  title: string;
+interface AuditSectionModalProps {
   cards: CardItem[];
   filters: string[];
   tableHeaders: string[];
-  activeFilter:string
-  tableRows: TableRow[];
+  activeFilter: string;
+  tableRows: any[];
   setActiveFilter: (filter: string) => void;
-
+  isIndexability?: boolean;
 }
 
-const AuditIndexability: React.FC<AuditIndexabilityProps> = ({
-  title,
+const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
   cards,
   filters,
   tableHeaders,
   activeFilter,
   tableRows,
-  setActiveFilter
+  setActiveFilter,
+  isIndexability = false,
 }) => {
-  console.log(filters)
   return (
     <div className="seo_report_content brand_content">
       <form className="row">
-
         <div className="col-12">
           <div className="row overview_cards">
             {cards.map((card, idx) => (
@@ -112,13 +103,18 @@ const AuditIndexability: React.FC<AuditIndexabilityProps> = ({
         <div className="col-12 col-xxl-12">
           <div className="indexables_table_filter">
             <h3 className="font_18 mb-3">
-              Pages - <span className="text_blue">{title}</span>
+              Pages -{" "}
+              <span className="text_blue">
+                {capitalizeFirstLetter(activeFilter)}
+              </span>
             </h3>
             <ul className="filter_btn_wrapper">
               {filters.map((filter, idx) => (
                 <li key={idx}>
                   <button
-                         className={`indexable_btn primary_btn ${activeFilter === filter ? "active" : ""}`}
+                    className={`indexable_btn primary_btn ${
+                      activeFilter === filter ? "active" : ""
+                    }`}
                     onClick={(e) => {
                       e.preventDefault();
                       setActiveFilter(filter);
@@ -144,18 +140,38 @@ const AuditIndexability: React.FC<AuditIndexabilityProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {tableRows?.map((row, rowIdx) => (
-                    <tr key={rowIdx}>
-                      <td>{row?.Address}</td>
-                      <td>{row?.Indexability}</td>
-                      <td>
-                        {row?.Indexability_Status
-                          ? row?.Indexability_Status
-                          : "-"}
+                  {tableRows && tableRows.length > 0 ? (
+                    tableRows.map((row, rowIdx) => (
+                      <tr key={rowIdx}>
+                        <td>{row?.Address || "-"}</td>
+                        <td>
+                          {row?.Indexability
+                            ? row.Indexability
+                            : row?.Canonical_Link_Element_1
+                            ? row.Canonical_Link_Element_1
+                            : row?.Meta_Robots_1
+                            ? row.Meta_Robots_1
+                            : row?.Status
+                            ? row.Status
+                            : "-"}
+                        </td>
+                        <td>
+                          {isIndexability
+                            ? row?.Indexability_Status ||
+                              row?.Status_Code ||
+                              "-"
+                            : row?.Status_Code || "-"}
+                        </td>
+                        <td>{row?.Title_1 || "-"}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="text-center">
+                        Data not found
                       </td>
-                      <td>{row?.Title_1}</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -166,4 +182,4 @@ const AuditIndexability: React.FC<AuditIndexabilityProps> = ({
   );
 };
 
-export default AuditIndexability;
+export default AuditSectionModal;

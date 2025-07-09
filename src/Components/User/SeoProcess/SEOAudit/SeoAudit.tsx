@@ -5,122 +5,16 @@ import AuditSection from "./AuditSection";
 import { GetAuditListDetails, GetCrawDataById } from "../SeoServices";
 import Loading from "../../../Page/Loading/Loading";
 import AuditAllSiteModal from "./SeoAuditModals/AuditAllSiteModal";
-import AuditIndexability, {
+import AuditSectionModal, {
   CardItem,
-} from "./SeoAuditModals/AuditIndexability";
+} from "./SeoAuditModals/AuditSectionModal";
 
-const cards = [
-  {
-    title: "200 Response",
-    value: "1,398",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "3xx Response",
-    value: "230",
-    percent: "0.5%",
-    icon: "bi-arrow-down-short",
-    color: "text-danger",
-  },
-  {
-    title: "4xx Response",
-    value: "48",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "5xx Response",
-    value: "39",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Redirect Loop",
-    value: "28",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Redirect Chain",
-    value: "17",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
+const tableStatusCodeHeaders = [
+  "URL Address",
+  "Status",
+  "Status Type",
+  "Title",
 ];
-
-const tableHeaders = ["URL Address", "Status", "Status Type", "Title"];
-
-const tableRows = [
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "PDUs Fixing & Management",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "PDUs Fixing & Management",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "OK",
-    title: "PDUs Fixing & Management",
-  },
-];
-
-// const filters = [
-//   "200 Response",
-//   "3xx Response",
-//   "4xx Response",
-//   "5xx Response",
-//   "Redirect Loop",
-//   "Redirect Chain",
-// ];
 
 const tableHeadersIndexability = [
   "URL Address",
@@ -128,8 +22,6 @@ const tableHeadersIndexability = [
   "Indexability Status",
   "Page title",
 ];
-
- 
 
 const cardsPageTitle = [
   {
@@ -499,6 +391,30 @@ type KPI = {
 
 type IndexabilityKpis = Record<string, KPI>;
 
+interface IndexabilityState {
+  data: {
+    tables: {
+      [key: string]: any[];
+    };
+  } | null;
+  filters: string[];
+  cards: CardItem[];
+  activeFilter: string;
+  tableData: any[];
+}
+
+interface IndexabilityState {
+  data: {
+    tables: {
+      [key: string]: any[];
+    };
+  } | null;
+  filters: string[];
+  cards: CardItem[];
+  activeFilter: string;
+  tableData: any[];
+}
+
 const SeoAudit = () => {
   const [selectedTab, setSelectedTab] = useState<string>("Overview");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
@@ -508,12 +424,21 @@ const SeoAudit = () => {
   >(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedSite, setSelectedSite] = useState<CrawlSite | null>(null);
-  const [IndexabilityData, setIndexabilityData] = useState<any>(null);
-  const [filters, setFilters] = useState<string[]>([]);
-  const [IndexbilityCards, setIndexbilityCards] = useState<CardItem[]>([]);
-  const [activeFilter, setActiveFilter] = useState<string>("");
-  const [activeFilterData, setActiveFilterData] = useState<any[]>([]);
- 
+  const [indexability, setIndexability] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
+
+  const [statusCode, setStatusCode] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
 
   useEffect(() => {
     fetchWebListDetails();
@@ -541,6 +466,23 @@ const SeoAudit = () => {
     }
   };
 
+  const generateCards = (kpis: IndexabilityKpis): CardItem[] =>
+    Object.entries(kpis).map(([key, value]) => {
+      const percent = value.percentage;
+      const isDown = percent < 0;
+
+      return {
+        title: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+        value: value.count,
+        percent,
+        isDown,
+        chart: [
+          { name: "Count", value: percent },
+          { name: "Remaining", value: 100 - percent },
+        ],
+      };
+    });
+
   const handleCloseModal = async () => {
     try {
       setIsLoading(true);
@@ -548,42 +490,32 @@ const SeoAudit = () => {
       const response = await GetCrawDataById(selectedSite?.uuid!);
 
       if (response.status === 200) {
-        const indexability = response?.data?.indexability;
-        setIndexabilityData(indexability);
-        const availableFilters = Object.keys(indexability?.tables || {});
-        setFilters(availableFilters);
+        const data = response.data;
 
-        // Set the first filter as active by default if available
-        if (availableFilters.length > 0) {
-          const firstFilter = availableFilters[0];
-          setActiveFilter(firstFilter);
-          setActiveFilterData(indexability.tables[firstFilter]);
-        }
+        const indexFilters = Object.keys(data.indexability?.tables || {});
+        const firstIndexFilter = indexFilters[0] || "";
 
-        const newData = indexability?.kpis
-          ?.indexability_kpis as IndexabilityKpis;
+        setIndexability({
+          data: data.indexability,
+          filters: indexFilters,
+          activeFilter: firstIndexFilter,
+          tableData: data.indexability?.tables?.[firstIndexFilter] || [],
+          cards: generateCards(
+            data.indexability?.kpis?.indexability_kpis || {}
+          ),
+        });
 
-        if (newData) {
-          const cards = Object.entries(newData).map(([key, value]) => {
-            const percent = value.percentage;
-            const isDown = percent < 0;
+        // Status Code
+        const statusFilters = Object.keys(data.status_code?.tables || {});
+        const firstStatusFilter = statusFilters[0] || "";
 
-            return {
-              title: key
-                .replace(/_/g, " ")
-                .replace(/\b\w/g, (l) => l.toUpperCase()), // make it readable
-              value: value.count,
-              percent: percent,
-              isDown,
-              chart: [
-                { name: "Count", value: percent },
-                { name: "Remaining", value: 100 - percent },
-              ],
-            };
-          });
-          setIndexbilityCards(cards);
-        }
-
+        setStatusCode({
+          data: data.status_code,
+          filters: statusFilters,
+          activeFilter: firstStatusFilter,
+          tableData: data.status_code?.tables?.[firstStatusFilter] || [],
+          cards: generateCards(data.status_code?.kpis?.status_code_kpis || {}),
+        });
         setIsModalOpen(false);
       }
     } catch (error: any) {
@@ -790,19 +722,20 @@ const SeoAudit = () => {
                         role="tabpanel"
                         aria-labelledby="audit-indexability-tab"
                       >
-                        <AuditIndexability
-                          title="Indexable"
-                          cards={IndexbilityCards}
-                          filters={filters}
+                        <AuditSectionModal
+                          cards={indexability.cards}
+                          filters={indexability.filters}
                           tableHeaders={tableHeadersIndexability}
-                          tableRows={activeFilterData}
-                          activeFilter={activeFilter}
+                          tableRows={indexability.tableData}
+                          activeFilter={indexability.activeFilter}
                           setActiveFilter={(filter: string) => {
-                            setActiveFilter(filter);
-                            setActiveFilterData(
-                              IndexabilityData.tables[filter]
-                            ); 
+                            setIndexability((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
                           }}
+                          isIndexability={true}
                         />
                       </div>
 
@@ -812,12 +745,20 @@ const SeoAudit = () => {
                         role="tabpanel"
                         aria-labelledby="audit-status-tab"
                       >
-                        <AuditSection
-                          title="200 Response"
-                          cards={cards}
-                          filters={filters}
-                          tableHeaders={tableHeaders}
-                          tableRows={tableRows}
+                        <AuditSectionModal
+                          cards={statusCode.cards}
+                          filters={statusCode.filters}
+                          tableHeaders={tableStatusCodeHeaders}
+                          tableRows={statusCode.tableData}
+                          activeFilter={statusCode.activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setStatusCode((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
+                          }}
+                          isIndexability={false}
                         />
                       </div>
 
