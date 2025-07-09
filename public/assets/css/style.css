@@ -487,13 +487,9 @@ header .dropdown-menu a {
 
 }
 
-/* .sidebar .nav-link.active,
-header .dropdown-menu a.active,
-.sidebar .nav-link:hover,
-header .dropdown-menu a:hover {
-    background-color: var(--secondary-color);
-    color: var(--white-color);
-} */
+
+
+
 
 .sidebar .nav-link:is(.active, :hover),
 header .dropdown-menu a:is(.active, :hover) {
@@ -2520,9 +2516,9 @@ font-weight: 500;
 }
 
 
-.indexable_btn.activeFilter {
+.indexable_btn.activeAudit {
   background-color: white !important;
-  color: rgb(250, 122, 78) !important;
+  color: rgb(250, 122, 78) ;
   border: 2px solid var(--primary-color)!important;
 }
 

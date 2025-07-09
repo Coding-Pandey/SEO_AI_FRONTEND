@@ -33,7 +33,7 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
   setActiveFilter,
   isIndexability = false,
 }) => {
- 
+  console.log(activeFilter, filters);
   return (
     <div className="seo_report_content brand_content">
       <form className="row">
@@ -105,7 +105,9 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
             <h3 className="font_18 mb-3">
               Pages -{" "}
               <span className="text_blue">
-               {activeFilter?.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
+                {activeFilter
+                  ?.replace(/_/g, " ")
+                  .replace(/\b\w/g, (char) => char.toUpperCase())}
               </span>
             </h3>
             <ul className="filter_btn_wrapper">
@@ -113,14 +115,19 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                 <li key={idx}>
                   <button
                     className={`indexable_btn primary_btn ${
-                      activeFilter === filter ? "activeFilter" : ""
+                      activeFilter.trim().toLowerCase() ===
+                      filter.trim().toLowerCase()
+                        ? "activeAudit"
+                        : ""
                     }`}
                     onClick={(e) => {
                       e.preventDefault();
                       setActiveFilter(filter);
                     }}
                   >
-                    {filter?.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
+                    {filter
+                      ?.replace(/_/g, " ")
+                      .replace(/\b\w/g, (char) => char.toUpperCase())}
                   </button>
                 </li>
               ))}
