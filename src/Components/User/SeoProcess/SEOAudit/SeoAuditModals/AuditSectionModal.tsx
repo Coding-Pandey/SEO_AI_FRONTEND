@@ -1,6 +1,5 @@
 import React from "react";
 import { AreaChart, Area, Tooltip, ResponsiveContainer, YAxis } from "recharts";
-import { capitalizeFirstLetter } from "../../SEOReport/Reports";
 
 export interface ChartItem {
   name: string;
@@ -34,6 +33,7 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
   setActiveFilter,
   isIndexability = false,
 }) => {
+ 
   return (
     <div className="seo_report_content brand_content">
       <form className="row">
@@ -105,7 +105,7 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
             <h3 className="font_18 mb-3">
               Pages -{" "}
               <span className="text_blue">
-                {capitalizeFirstLetter(activeFilter)}
+               {activeFilter?.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
               </span>
             </h3>
             <ul className="filter_btn_wrapper">
@@ -113,14 +113,14 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                 <li key={idx}>
                   <button
                     className={`indexable_btn primary_btn ${
-                      activeFilter === filter ? "active" : ""
+                      activeFilter === filter ? "activeFilter" : ""
                     }`}
                     onClick={(e) => {
                       e.preventDefault();
                       setActiveFilter(filter);
                     }}
                   >
-                    {filter}
+                    {filter?.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
                   </button>
                 </li>
               ))}

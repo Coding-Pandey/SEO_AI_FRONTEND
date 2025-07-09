@@ -2520,9 +2520,9 @@ font-weight: 500;
 }
 
 
-.indexable_btn.active {
+.indexable_btn.activeFilter {
   background-color: white !important;
-  color: rgb(250, 122, 78);
+  color: rgb(250, 122, 78) !important;
   border: 2px solid var(--primary-color)!important;
 }
 
