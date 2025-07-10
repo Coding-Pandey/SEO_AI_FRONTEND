@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Header from "../../Header/Header";
 import SideBar from "../../SideBar/SideBar";
-import AuditSection from "./AuditSection";
 import { GetAuditListDetails, GetCrawDataById } from "../SeoServices";
 import Loading from "../../../Page/Loading/Loading";
 import AuditAllSiteModal from "./SeoAuditModals/AuditAllSiteModal";
@@ -23,58 +22,6 @@ const tableHeadersIndexability = [
   "Page title",
 ];
 
-const cardsPageTitle = [
-  {
-    title: "All",
-    value: "1,398",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Missing",
-    value: "230",
-    percent: "0.5%",
-    icon: "bi-arrow-down-short",
-    color: "text-danger",
-  },
-  {
-    title: "Duplicate",
-    value: "48",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Over 60 characters",
-    value: "39",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Below 30 characters",
-    value: "28",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Same as H1",
-    value: "17",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Multiple",
-    value: "2",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-];
-
 const tableHeadersPageTitle = [
   "URL Address",
   "Title",
@@ -82,303 +29,10 @@ const tableHeadersPageTitle = [
   "Pixel Width",
 ];
 
-const tableRowsPageTitle = [
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Our Products",
-    type: "12",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Design - Dataracks",
-    type: "18",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Patching Rakcs - Dataracks",
-    type: "26",
-    title: "Patching Rakcs - Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Swtich Ducts - Dataracks",
-    type: "24",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Our Products",
-    type: "21",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Our Products",
-    type: "12",
-    title: "PDUs Fixing & Management",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Our Products",
-    type: "12",
-    title: "Our Products",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Our Products",
-    type: "12",
-    title: "Design-Dataracks",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "Our Products",
-    type: "12",
-    title: "PDUs Fixing & Management",
-  },
-];
-
-const filtersPageTitle = [
-  "Missing",
-  "Duplicate",
-  "Too long",
-  "Too short",
-  "Same as H1",
-  "Multiple",
-];
-
-const cardsHTags = [
-  {
-    title: "All",
-    value: "1,398",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "H1 Missing",
-    value: "230",
-    percent: "0.5%",
-    icon: "bi-arrow-down-short",
-    color: "text-danger",
-  },
-  {
-    title: "H1 Duplicate",
-    value: "48",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "H1 Over 70 characters",
-    value: "39",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Multiple H1s",
-    value: "28",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "H2 Missing",
-    value: "17",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "H2 Duplicate",
-    value: "2",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-];
+const tableHeadersMeta = ["URL Address", "Meta Description"];
 
 const tableHeadersHTags = ["URL Address", "Status", "H1", "H1 char. length"];
 
-const tableRowsHTags = [
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Our Products",
-    title: "12",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Design",
-    title: "18",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Patching Rakcs",
-    title: "26",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "	Switch Ducts",
-    title: "24",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Wallboxes",
-    title: "21",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Aisle Containment",
-    title: "21",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Chimney Cabinets",
-    title: "16",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Blanking Panels",
-    title: "25",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "200",
-    type: "Power Management",
-    title: "28",
-  },
-];
-
-const filtersHTags = [
-  "H1 Missing",
-  "H1 Duplicate",
-  "H1 Over 70 char.",
-  "H1 Missing",
-  "H2 Duplicate",
-  "Multiple H1",
-];
-
-const cardsMeta = [
-  {
-    title: "All",
-    value: "1,398",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Missing",
-    value: "230",
-    percent: "0.5%",
-    icon: "bi-arrow-down-short",
-    color: "text-danger",
-  },
-  {
-    title: "Duplicate",
-    value: "48",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Over 160 characters",
-    value: "39",
-    percent: "4.8%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Below 70 characters",
-    value: "28",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-  {
-    title: "Multiple",
-    value: "17",
-    percent: "0.5%",
-    icon: "bi-arrow-up-short",
-    color: "text-success",
-  },
-];
-
-const tableHeadersMeta = ["URL Address", "", "Meta Description", ""];
-
-const tableRowsMeta = [
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: "	- Site Survey -Bespoke Product Design - Prototyping - Structual & load analysis",
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: `	-SHRINK PROOF Our range of data centre shrink roof designs, provide a safe a robust solution for your site. Dataricks has introduced our new "Shrink" Panels for aisle containment. The Shrink Panels are specifically designed roof panels for aisle containment. So, in the case of a fire at your data centre, the Panels will automatically.`,
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: "- Site Survey -Bespoke Product Design - Prototyping - Structual & load analysis",
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: `	-SHRINK PROOF Our range of data centre shrink roof designs, provide a safe a robust solution for your site. Dataricks has introduced our new "Shrink" Panels for aisle containment. The Shrink Panels are specifically designed roof panels for aisle containment. So, in the case of a fire at your data centre, the Panels will automatically.`,
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: "- Site Survey -Bespoke Product Design - Prototyping - Structual & load analysis",
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: `-SHRINK PROOF Our range of data centre shrink roof designs, provide a safe a robust solution for your site. Dataricks has introduced our new "Shrink" Panels for aisle containment. The Shrink Panels are specifically designed roof panels for aisle containment. So, in the case of a fire at your data centre, the Panels will automatically.`,
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: "- Site Survey -Bespoke Product Design - Prototyping - Structual & load analysis",
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: `	-SHRINK PROOF Our range of data centre shrink roof designs, provide a safe a robust solution for your site. Dataricks has introduced our new "Shrink" Panels for aisle containment. The Shrink Panels are specifically designed roof panels for aisle containment. So, in the case of a fire at your data centre, the Panels will automatically.`,
-    title: "",
-  },
-  {
-    url: "https://dataracks.com/our-products/",
-    status: "",
-    type: "	- Site Survey -Bespoke Product Design - Prototyping - Structual & load analysis",
-    title: "",
-  },
-];
-
-const filtersMeta = [
-  "Missing",
-  "Duplicate",
-  "Too long",
-  "Too short",
-  "Multiple",
-];
 export interface CrawlSite {
   uuid: string;
   crawl_url: string;
@@ -440,6 +94,30 @@ const SeoAudit = () => {
     tableData: [],
   });
 
+  const [pageTitle, setPageTitle] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
+
+  const [metaDescription, setMetaDescription] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
+
+  const [hTags, setHTags] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
+
   useEffect(() => {
     fetchWebListDetails();
   }, []);
@@ -491,7 +169,7 @@ const SeoAudit = () => {
 
       if (response.status === 200) {
         const data = response.data;
-
+        // console.log(data, "data");
         const indexFilters = Object.keys(data.indexability?.tables || {});
         const firstIndexFilter = indexFilters[0] || "";
 
@@ -516,6 +194,48 @@ const SeoAudit = () => {
           tableData: data.status_code?.tables?.[firstStatusFilter] || [],
           cards: generateCards(data.status_code?.kpis?.status_code_kpis || {}),
         });
+
+        //page Title
+        const pageTitleFilters = Object.keys(data.page_title?.tables || {});
+        const firstpageTitleFilter = pageTitleFilters[0] || "";
+
+        setPageTitle({
+          data: data.page_title,
+          filters: pageTitleFilters,
+          activeFilter: firstpageTitleFilter,
+          tableData: data.page_title?.tables?.[firstpageTitleFilter] || [],
+          cards: generateCards(data.page_title?.kpis?.page_title_kpis || {}),
+        });
+
+        //Meta Description
+        const metaDescriptionFilters = Object.keys(
+          data.meta_description?.tables || {}
+        );
+        const firstMetaDescriptionFilter = metaDescriptionFilters[0] || "";
+        
+        setMetaDescription({
+          data: data.meta_description,
+          filters: metaDescriptionFilters,
+          activeFilter: firstMetaDescriptionFilter,
+          tableData:
+            data.meta_description?.tables?.[firstMetaDescriptionFilter] || [],
+          cards: generateCards(
+            data.meta_description?.kpis?.meta_description_kpis || {}
+          ),
+        });
+
+        //H-Tags
+        const hTagFilters = Object.keys(data.h_tags?.tables || {});
+        const firstHTagsFilter = hTagFilters[0] || "";
+
+        setHTags({
+          data: data.h_tags,
+          filters: hTagFilters,
+          activeFilter: firstHTagsFilter,
+          tableData: data.h_tags?.tables?.[firstHTagsFilter] || [],
+          cards: generateCards(data.h_tags?.kpis?.h_tags_kpis || {}),
+        });
+
         setIsModalOpen(false);
       }
     } catch (error: any) {
@@ -735,7 +455,7 @@ const SeoAudit = () => {
                               tableData: prev.data?.tables?.[filter] || [],
                             }));
                           }}
-                          isIndexability={true}
+                          isIndexability="indexability"
                         />
                       </div>
 
@@ -758,7 +478,7 @@ const SeoAudit = () => {
                               tableData: prev.data?.tables?.[filter] || [],
                             }));
                           }}
-                          isIndexability={false}
+                          isIndexability="statuscode"
                         />
                       </div>
 
@@ -768,12 +488,20 @@ const SeoAudit = () => {
                         role="tabpanel"
                         aria-labelledby="audit-titles-tab"
                       >
-                        <AuditSection
-                          title="Title Missing"
-                          cards={cardsPageTitle}
-                          filters={filtersPageTitle}
+                        <AuditSectionModal
+                          cards={pageTitle.cards}
+                          filters={pageTitle.filters}
                           tableHeaders={tableHeadersPageTitle}
-                          tableRows={tableRowsPageTitle}
+                          tableRows={pageTitle.tableData}
+                          activeFilter={pageTitle.activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setPageTitle((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
+                          }}
+                          isIndexability="pagetitle"
                         />
                       </div>
 
@@ -783,12 +511,20 @@ const SeoAudit = () => {
                         role="tabpanel"
                         aria-labelledby="audit-meta-tab"
                       >
-                        <AuditSection
-                          title="Meta description over 1600 characters"
-                          cards={cardsMeta}
-                          filters={filtersMeta}
+                        <AuditSectionModal
+                          cards={metaDescription.cards}
+                          filters={metaDescription.filters}
                           tableHeaders={tableHeadersMeta}
-                          tableRows={tableRowsMeta}
+                          tableRows={metaDescription.tableData}
+                          activeFilter={metaDescription.activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setMetaDescription((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
+                          }}
+                          isIndexability="metadescription"
                         />
                       </div>
 
@@ -798,12 +534,20 @@ const SeoAudit = () => {
                         role="tabpanel"
                         aria-labelledby="audit-tags-tab"
                       >
-                        <AuditSection
-                          title="H1 Missing"
-                          cards={cardsHTags}
-                          filters={filtersHTags}
+                        <AuditSectionModal
+                          cards={hTags.cards}
+                          filters={hTags.filters}
                           tableHeaders={tableHeadersHTags}
-                          tableRows={tableRowsHTags}
+                          tableRows={hTags.tableData}
+                          activeFilter={hTags.activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setHTags((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
+                          }}
+                          isIndexability="htags"
                         />
                       </div>
                     </div>

@@ -21,7 +21,7 @@ interface AuditSectionModalProps {
   activeFilter: string;
   tableRows: any[];
   setActiveFilter: (filter: string) => void;
-  isIndexability?: boolean;
+  isIndexability?: string;
 }
 
 const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
@@ -31,9 +31,8 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
   activeFilter,
   tableRows,
   setActiveFilter,
-  isIndexability = false,
+  isIndexability,
 }) => {
-  console.log(activeFilter, filters);
   return (
     <div className="seo_report_content brand_content">
       <form className="row">
@@ -152,7 +151,11 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                       <tr key={rowIdx}>
                         <td>{row?.Address || "-"}</td>
                         <td>
-                          {row?.Indexability
+                          {isIndexability === "pagetitle"
+                            ? row?.Title_1 || "-"
+                            : isIndexability === "htags"
+                            ? row?.Status_Code || "-"
+                            : row?.Indexability
                             ? row.Indexability
                             : row?.Canonical_Link_Element_1
                             ? row.Canonical_Link_Element_1
@@ -160,16 +163,32 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                             ? row.Meta_Robots_1
                             : row?.Status
                             ? row.Status
+                            : row?.Meta_Description_1
+                            ? row?.Meta_Description_1
                             : "-"}
                         </td>
-                        <td>
-                          {isIndexability
-                            ? row?.Indexability_Status ||
-                              row?.Status_Code ||
-                              "-"
-                            : row?.Status_Code || "-"}
-                        </td>
-                        <td>{row?.Title_1 || "-"}</td>
+                        {isIndexability !== "metadescription" && (
+                          <>
+                            <td>
+                              {isIndexability === "pagetitle"
+                                ? row?.Title_1_Length || "-"
+                                : isIndexability === "indexability"
+                                ? row?.Indexability_Status ||
+                                  row?.Status_Code ||
+                                  "-"
+                                : isIndexability === "htags"
+                                ? row?.H1_1 || "-"
+                                : row?.Status_Code || "-"}
+                            </td>
+                            <td>
+                              {isIndexability === "pagetitle"
+                                ? row?.Title_1_Pixel_Width || "-"
+                                : isIndexability === "htags"
+                                ? row?.H1_1_Length || "-"
+                                : row?.Title_1 || "-"}
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))
                   ) : (
