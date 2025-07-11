@@ -1319,6 +1319,13 @@ form .row {
 }
 
 
+.schedule_box .ok_Cancel {
+    padding: 40px !important;
+    font-size: 20px !important;
+    margin-top: 30px !important;
+}
+
+
 /* social planner  end*/
 .suggest_card_outer {
     column-count: 2;
@@ -1899,6 +1906,12 @@ img.img-fluid.integrated_icon {
     height: 120px;
 }
 
+.source_modal .schedule_box .ok_Cancel {
+    padding: 10px !important;
+    width: 150px;
+    height: 120px;
+}
+
 .source_file_wrapper .file_note {
     background-color: var(--secondary-color);
     color: var(--white-color);
@@ -2301,8 +2314,18 @@ font-weight: 500;
 
 
 
-/* components/Modal/SelectSiteModal.css */
-
+ 
+.modal-container-siteList {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 1000px;
+  width: 90%;
+  margin: 40px auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  max-height: 90vh;
+}
 
 .modal-container {
     background: white;
@@ -2521,6 +2544,34 @@ font-weight: 500;
   color: rgb(250, 122, 78) ;
   border: 2px solid var(--primary-color)!important;
 }
+
+
+
+.responsive-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.domain-input {
+  flex: 1 1 300px;
+  padding: 12px 14px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-width: 250px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px; /* consistent spacing */
+  margin-top: 20px;
+  flex-wrap: wrap; /* responsive stack on small screens */
+}
+
+ 
 
 
 
@@ -2829,6 +2880,11 @@ font-weight: 500;
         margin-top: 20px !important;
     }
 
+    .schedule_box .ok_Cancel {
+        padding: 30px !important;
+        margin-top: 20px !important;
+    }
+
     .upload_content_item li {
         width: 100%;
         font-size: 14px;
@@ -2869,6 +2925,12 @@ font-weight: 500;
     .brand_select  .brand_content_box {
         width: 80vw;
     }
+     .responsive-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  
 }
 
 @media only screen and (max-width:576px) {
@@ -3063,4 +3125,7 @@ font-weight: 500;
     .intergration_card {
         padding: 20px 10px;
     }
+    .modal-container-siteList  {
+    padding: 12px;
+}
 }

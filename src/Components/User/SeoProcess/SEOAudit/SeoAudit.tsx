@@ -3,10 +3,12 @@ import Header from "../../Header/Header";
 import SideBar from "../../SideBar/SideBar";
 import { GetAuditListDetails, GetCrawDataById } from "../SeoServices";
 import Loading from "../../../Page/Loading/Loading";
-import AuditAllSiteModal from "./SeoAuditModals/AuditAllSiteModal";
+import AuditAllSiteModal, { Site } from "./SeoAuditModals/AuditAllSiteModal";
 import AuditSectionModal, {
   CardItem,
 } from "./SeoAuditModals/AuditSectionModal";
+import ConfirmModal from "../../../Page/ConfirmModal";
+import DomainModal from "../../../Page/DomainModal";
 
 const tableStatusCodeHeaders = [
   "URL Address",
@@ -72,12 +74,14 @@ interface IndexabilityState {
 const SeoAudit = () => {
   const [selectedTab, setSelectedTab] = useState<string>("Overview");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
-  const [AllCrawlList, setAllCrawlList] = useState<CrawlSite[]>([]);
+  const [AllData, setAllData] = useState<any>([]);
   const [AlreadySelectedCrawl, setAlreadySelectedCrawl] = useState<
     string | null
-  >(null);
+  >("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedSite, setSelectedSite] = useState<CrawlSite | null>(null);
+  const [ActionConfirmModal, setActionConfirmModal] = useState(false);
+  const [ShowAddDomainModal, setShowAddDomainModal] = useState(false);
+  const [domainInput, setDomainInput] = useState<string>("");
   const [indexability, setIndexability] = useState<IndexabilityState>({
     data: null,
     filters: [],
@@ -122,20 +126,14 @@ const SeoAudit = () => {
     fetchWebListDetails();
   }, []);
 
-  useEffect(() => {
-    if (selectedSite) {
-      handleCloseModal();
-    }
-  }, [selectedSite]);
-
   const fetchWebListDetails = async () => {
     try {
       setIsLoading(true);
       const response = await GetAuditListDetails();
       if (response?.status === 200 || response?.status === 201) {
-        // console.log(response?.data?.sites || []);
-        setAllCrawlList(response?.data || []);
-        setAlreadySelectedCrawl(response?.data?.selected_site);
+        const selected = response?.data?.[0]?.selected_site;
+        setAllData(response?.data);
+        setAlreadySelectedCrawl(selected);
       }
     } catch (error: any) {
       console.error("Error fetchWebList:", error);
@@ -161,11 +159,11 @@ const SeoAudit = () => {
       };
     });
 
-  const handleCloseModal = async () => {
+  const handleCloseModal = async (site: Site) => {
     try {
       setIsLoading(true);
 
-      const response = await GetCrawDataById(selectedSite?.uuid!);
+      const response = await GetCrawDataById(site?.uuid!);
 
       if (response.status === 200) {
         const data = response.data;
@@ -212,7 +210,7 @@ const SeoAudit = () => {
           data.meta_description?.tables || {}
         );
         const firstMetaDescriptionFilter = metaDescriptionFilters[0] || "";
-        
+
         setMetaDescription({
           data: data.meta_description,
           filters: metaDescriptionFilters,
@@ -237,12 +235,26 @@ const SeoAudit = () => {
         });
 
         setIsModalOpen(false);
+        setShowAddDomainModal(false);
       }
     } catch (error: any) {
       console.error("Error fetchWebList:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleConfirmModal = () => {
+    setActionConfirmModal(false);
+    setShowAddDomainModal(true);
+  };
+
+  const handleCancel = () => {
+    setActionConfirmModal(false);
+  };
+
+  const handleCloseDomainModel = () => {
+    setShowAddDomainModal(false);
   };
 
   return (
@@ -270,37 +282,43 @@ const SeoAudit = () => {
                 SEO Audit <span className="text_blue">/ {selectedTab}</span>
               </h2>
 
-              {AllCrawlList?.length > 0 && !isModalOpen && (
-                <select
-                  className="form-select"
-                  style={{ width: "auto" }}
-                  value={selectedSite?.crawl_url || ""}
-                  onChange={(e) => {
-                    const selected = AllCrawlList.find(
-                      (site) => site.crawl_url === e.target.value
-                    );
-                    if (selected) {
-                      setSelectedSite(selected);
-                    }
-                  }}
+              {!isModalOpen && (
+                <button
+                  className="btn primary_btn ok_btn"
+                  onClick={() => setActionConfirmModal(true)}
                 >
-                  {AllCrawlList.map((item, index) => (
-                    <option key={index} value={item.crawl_url}>
-                      {item.crawl_url}
-                    </option>
-                  ))}
-                </select>
+                  Search New Domain
+                </button>
+              )}
+
+              <ConfirmModal
+                isOpen={ActionConfirmModal}
+                title="If you do this, your data from the previous domain will be removed."
+                onClose={handleConfirmModal}
+                onCancel={handleCancel}
+              />
+
+              {ShowAddDomainModal && (
+                <DomainModal
+                  title="🔍 Enter a New Domain"
+                  content={domainInput}
+                  setContent={setDomainInput}
+                  handleClose={handleCloseDomainModel}
+                  onSelect={(site: any) => {
+                    handleCloseModal(site);
+                    setShowAddDomainModal(false);
+                  }}
+                />
               )}
             </div>
             {isModalOpen ? (
               <>
                 <AuditAllSiteModal
                   isOpen={isModalOpen}
-                  AllCrawlList={AllCrawlList}
                   onSelect={(site) => {
-                    setSelectedSite(site);
+                    handleCloseModal(site);
                   }}
-                  selectedSite={selectedSite}
+                  AllData={AllData}
                   AlreadySelectedCrawl={AlreadySelectedCrawl}
                   isLoading={isLoading}
                 />

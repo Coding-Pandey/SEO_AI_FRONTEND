@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { AddDomainCrawlURL } from "../../SeoServices";
 
 export interface Site {
   uuid: string;
@@ -7,56 +8,97 @@ export interface Site {
 
 interface AuditAllSiteModalProps {
   isOpen: boolean;
-  AllCrawlList: Site[];
   onSelect: (site: Site) => void;
-  selectedSite: Site | null;
+  AllData: any;
   AlreadySelectedCrawl: string | null;
   isLoading: boolean;
 }
 
 const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
   isOpen,
-  AllCrawlList,
   onSelect,
-  selectedSite,
+  AllData,
   AlreadySelectedCrawl,
-  isLoading
+  isLoading,
 }) => {
-
+  const [domainInput, setDomainInput] = useState<string>("");
+  const [NewLoading, setNewLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>("");
+ 
   useEffect(() => {
-    if (isOpen && (AlreadySelectedCrawl !== null)) {
-      const matchedSite = AllCrawlList.find((site) => site.crawl_url === AlreadySelectedCrawl);
-      if (matchedSite) {
+    if (isOpen) {
+      const matched = AllData?.find(
+        (site: any) => site.selected_site === "True"
+      );
+      if (matched) {
+        const matchedSite = {
+          uuid: matched.uuid,
+          crawl_url: matched.crawl_url,
+        };
         onSelect(matchedSite);
       }
     }
-  }, [isOpen, AlreadySelectedCrawl, AllCrawlList, onSelect]);
+  }, [isOpen, onSelect]);
 
- 
+  const isValidDomain = (url: string) => {
+    return url.startsWith("http://") || url.startsWith("https://");
+  };
+
+  const handleSubmitDomain = async () => {
+    setErrorMsg("");
+    if (domainInput.trim() === "") {
+      setErrorMsg("⚠️ Domain is required.");
+      return;
+    }
+
+    if (!isValidDomain(domainInput.trim())) {
+      setErrorMsg("⚠️ Domain must start with http:// or https://");
+      return;
+    }
+    setNewLoading(true);
+    try {
+      const formData = {
+        domain: domainInput,
+      };
+      const response = await AddDomainCrawlURL(formData);
+      if (response.status === 201) {
+        const domainSite = response.data;
+        onSelect(domainSite);
+      }
+    } catch (error) {
+    } finally {
+      setNewLoading(false);
+    }
+  };
 
   return (
     <>
-      {((AlreadySelectedCrawl === "" || AlreadySelectedCrawl === null || AlreadySelectedCrawl === undefined) && !isLoading ) && (
+      {(AlreadySelectedCrawl === "false" || AlreadySelectedCrawl === null || AlreadySelectedCrawl === undefined)&& !isLoading && (
         <div className="modal-container">
-          <h2 className="modal-title">🔗 Select a Site</h2>
+          <h2 className="font_25 font_600 mb-3">🔗 Manage Your Crawl Sites</h2>
+              <div className="form-container">
+                <h3 className="font_18 mb-2">🔍 Enter a New Domain</h3>
+                <div className="domain-input-container responsive-form">
+                  <input
+                    type="text"
+                    placeholder="Enter domain e.g. https://example.com"
+                    value={domainInput}
+                    onChange={(e) => setDomainInput(e.target.value)}
+                    className="form-control mb-2"
+                  />
+                  <button
+                    type="submit"
+                    onClick={handleSubmitDomain}
+                    className="primary_btn"
+                  >
+                    {NewLoading ? "Please Wait..." : "Search & Crawl"}
+                  </button>
+                </div>
 
-          <ul className="site-list">
-            {AllCrawlList.map((site, index) => (
-              <li
-                key={index}
-                className={`site-item ${
-                  selectedSite?.crawl_url === site.crawl_url ? "selected" : ""
-                }`}
-                onClick={() => {
-                  if (AlreadySelectedCrawl === "" || AlreadySelectedCrawl === null || AlreadySelectedCrawl === undefined) {
-                    onSelect(site);
-                  }
-                }}
-              >
-                {site.crawl_url}
-              </li>
-            ))}
-          </ul>
+                {errorMsg && (
+                  <p style={{ color: "red", marginTop: "10px" }}>{errorMsg}</p>
+                )}
+              </div>
         </div>
       )}
     </>

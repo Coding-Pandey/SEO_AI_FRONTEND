@@ -9,6 +9,7 @@ import {
   GetPlannerSocialMediaData,
   UpdateScheduleSocialMediaPlanner,
 } from "./SocialMediaServices";
+import DynamicConfirmModal from "./DynamicConfirmModal";
 
 const platforms = [
   "linkedin_posts",
@@ -567,24 +568,12 @@ const Planner = () => {
           onSchedule={handleSchedule}
         />
 
-        {SuccessScheduleModel && (
-          <div className="custom-modal-overlay">
-            <div className="custom-modal-content">
-              <div className="schedule_box">
-                <p className="font_16 mb-1">Your post has been scheduled</p>
-                <p className="font_14 text_blue">
-                  {formatScheduledDate(REScheduleDateAndTime)}
-                </p>
-                <button
-                  className="btn primary_btn ok_btn"
-                  onClick={handleCloseSchedule}
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <DynamicConfirmModal
+          isOpen={SuccessScheduleModel}
+          title="Your post has been scheduled"
+          dateText={formatScheduledDate(REScheduleDateAndTime)}
+          onClose={handleCloseSchedule}
+        />
 
         {/* Delete Schedule Modal */}
         <div
