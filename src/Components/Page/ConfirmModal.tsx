@@ -5,7 +5,7 @@ interface ConformModalProps {
   title: string;
   message?: string;
   onClose: () => void;
-  onCancel?: () => void;  
+  onCancel?: () => void;
 }
 
 const ConformModal: React.FC<ConformModalProps> = ({
@@ -25,10 +25,10 @@ const ConformModal: React.FC<ConformModalProps> = ({
           {message && <p className="font_30 mb-1">{message}</p>}
 
           <div className="modal-actions">
-             <button className="btn primary_btn ok_btn" onClick={onClose}>
-             Ok
-          </button>
-            <button  className="btn secondary_btn ok_Cancel" onClick={onCancel}>
+            <button className="btn primary_btn ok_btn" onClick={onClose}>
+              Ok
+            </button>
+            <button className="btn secondary_btn ok_Cancel" onClick={onCancel}>
               Cancel
             </button>
           </div>

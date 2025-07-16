@@ -247,6 +247,16 @@ export const  AddDomainCrawlURL = async (formData:{domain: string}) => {
   }
 };
 
+export const  DeleteOldDomain = async (uuid: string) => {
+  try {
+    const response = await axiosInstance.delete(`/api/crawl_data/${uuid}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 
 export const  GetCrawDataById = async (uuid: string) => {
   try {

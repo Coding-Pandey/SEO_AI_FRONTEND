@@ -24,9 +24,9 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
   const [domainInput, setDomainInput] = useState<string>("");
   const [NewLoading, setNewLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
- 
+
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && AlreadySelectedCrawl === "True" ) {
       const matched = AllData?.find(
         (site: any) => site.selected_site === "True"
       );
@@ -38,7 +38,7 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
         onSelect(matchedSite);
       }
     }
-  }, [isOpen, onSelect]);
+  }, [isOpen, onSelect,AlreadySelectedCrawl]);
 
   const isValidDomain = (url: string) => {
     return url.startsWith("http://") || url.startsWith("https://");
@@ -73,34 +73,39 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
 
   return (
     <>
-      {(AlreadySelectedCrawl === "false" || AlreadySelectedCrawl === null || AlreadySelectedCrawl === undefined)&& !isLoading && (
-        <div className="modal-container">
-          <h2 className="font_25 font_600 mb-3">🔗 Manage Your Crawl Sites</h2>
-              <div className="form-container">
-                <h3 className="font_18 mb-2">🔍 Enter a New Domain</h3>
-                <div className="domain-input-container responsive-form">
-                  <input
-                    type="text"
-                    placeholder="Enter domain e.g. https://example.com"
-                    value={domainInput}
-                    onChange={(e) => setDomainInput(e.target.value)}
-                    className="form-control mb-2"
-                  />
-                  <button
-                    type="submit"
-                    onClick={handleSubmitDomain}
-                    className="primary_btn"
-                  >
-                    {NewLoading ? "Please Wait..." : "Search & Crawl"}
-                  </button>
-                </div>
-
-                {errorMsg && (
-                  <p style={{ color: "red", marginTop: "10px" }}>{errorMsg}</p>
-                )}
+      {(AlreadySelectedCrawl === "false" ||
+        AlreadySelectedCrawl === null ||
+        AlreadySelectedCrawl === undefined) &&
+        !isLoading && (
+          <div className="modal-container">
+            <h2 className="font_25 font_600 mb-3">
+              🔗 Manage Your Crawl Sites
+            </h2>
+            <div className="form-container">
+              <h3 className="font_18 mb-2">🔍 Enter a New Domain</h3>
+              <div className="domain-input-container responsive-form">
+                <input
+                  type="text"
+                  placeholder="Enter domain e.g. https://example.com"
+                  value={domainInput}
+                  onChange={(e) => setDomainInput(e.target.value)}
+                  className="form-control mb-2"
+                />
+                <button
+                  type="submit"
+                  onClick={handleSubmitDomain}
+                  className="primary_btn"
+                >
+                  {NewLoading ? "Please Wait..." : "Search & Crawl"}
+                </button>
               </div>
-        </div>
-      )}
+
+              {errorMsg && (
+                <p style={{ color: "red", marginTop: "10px" }}>{errorMsg}</p>
+              )}
+            </div>
+          </div>
+        )}
     </>
   );
 };

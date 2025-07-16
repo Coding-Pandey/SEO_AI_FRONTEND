@@ -1,5 +1,12 @@
 import React from "react";
-import { AreaChart, Area, Tooltip, ResponsiveContainer, YAxis } from "recharts";
+import {
+  AreaChart,
+  Area,
+  Tooltip,
+  ResponsiveContainer,
+  YAxis,
+  XAxis,
+} from "recharts";
 
 export interface ChartItem {
   name: string;
@@ -58,28 +65,51 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                     {card.percent ?? card.value}
                   </p>
                   {card.chart && (
-                    <div style={{ width: "100%", height: 60 }}>
-                      <ResponsiveContainer>
+                    <div
+                      style={{ width: "100%", height: 150, overflowX: "auto" }}
+                    >
+                      <ResponsiveContainer width="100%" minWidth={300}>
                         <AreaChart
                           data={card.chart}
-                          margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                          margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
                         >
-                          <YAxis domain={[0, 100]} />
+                          <XAxis
+                            dataKey="name"
+                            tick={{ fontSize: 10 }}
+                            interval={0}
+                            angle={-30}
+                          />
+                          <YAxis allowDecimals={false} />
                           <Tooltip
-                            cursor={{ stroke: "#ccc", strokeWidth: 1 }}
-                            formatter={(
-                              value: number,
-                              _name: string,
-                              props: any
-                            ) => {
-                              const itemName = props?.payload?.name;
-                              const label =
-                                itemName === "Count" ? "Current" : "Remaining";
-                              return [`${value.toFixed(1)}%`, label];
-                            }}
-                            labelFormatter={() => ""}
+                            formatter={(value: number) => [
+                              `${value}`,
+                              "Issue Count",
+                            ]}
+                            labelFormatter={(label: string) => `Date: ${label}`}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="value"
+                            stroke="#1E88E5"
+                            fill="#90CAF9"
+                            fillOpacity={0.3}
+                            strokeWidth={2}
+                            dot={true}
                           />
 
+                          {/* <XAxis
+                            dataKey="name"
+                            tick={{ fontSize: 10 }}
+                            interval={0} // shows all labels
+                            angle={-30} // optional: rotate labels to avoid overlap
+                            height={50} // ensure enough space for rotated text
+                          />
+                          <YAxis allowDecimals={false} />
+                          <Tooltip
+                            cursor={{ stroke: "#ccc", strokeWidth: 1 }}
+                            formatter={(value: number) => [`${value}`, "Count"]}
+                            labelFormatter={(label: string) => `Date: ${label}`}
+                          />
                           <Area
                             type="monotone"
                             dataKey="value"
@@ -88,7 +118,7 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                             fillOpacity={0.3}
                             strokeWidth={2}
                             dot={false}
-                          />
+                          /> */}
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>

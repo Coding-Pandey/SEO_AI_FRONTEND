@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { AddDomainCrawlURL } from "../User/SeoProcess/SeoServices";
+import {
+  AddDomainCrawlURL,
+  DeleteOldDomain,
+} from "../User/SeoProcess/SeoServices";
 
 export interface NewSearchSite {
   uuid: string;
@@ -11,7 +14,8 @@ interface DomainModalProps {
   content: string;
   setContent: (value: string) => void;
   handleClose: () => void;
-   onSelect: (site: NewSearchSite) => void;
+  onSelect: (site: NewSearchSite) => void;
+  AddAlreadySelectSite: any;
 }
 
 const DomainModal: React.FC<DomainModalProps> = ({
@@ -20,6 +24,7 @@ const DomainModal: React.FC<DomainModalProps> = ({
   setContent,
   handleClose,
   onSelect,
+  AddAlreadySelectSite,
 }) => {
   const [NewLoading, setNewLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -45,9 +50,12 @@ const DomainModal: React.FC<DomainModalProps> = ({
         domain: content,
       };
       const response = await AddDomainCrawlURL(formData);
-      if (response.status === 201) {
-        const domainSite = response.data;
-        onSelect(domainSite);
+      if (response.status === 201 || response.status === 200) {
+        const res = await DeleteOldDomain(AddAlreadySelectSite?.uuid);
+        if (res.status === 201 || res.status === 200) {
+          const domainSite = response.data;
+          onSelect(domainSite);
+        }
       }
     } catch (error) {
     } finally {

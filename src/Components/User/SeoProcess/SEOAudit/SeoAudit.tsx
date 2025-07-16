@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Header from "../../Header/Header";
 import SideBar from "../../SideBar/SideBar";
 import { GetAuditListDetails, GetCrawDataById } from "../SeoServices";
@@ -40,25 +40,6 @@ export interface CrawlSite {
   crawl_url: string;
 }
 
-type KPI = {
-  count: number;
-  percentage: number;
-};
-
-type IndexabilityKpis = Record<string, KPI>;
-
-interface IndexabilityState {
-  data: {
-    tables: {
-      [key: string]: any[];
-    };
-  } | null;
-  filters: string[];
-  cards: CardItem[];
-  activeFilter: string;
-  tableData: any[];
-}
-
 interface IndexabilityState {
   data: {
     tables: {
@@ -74,11 +55,13 @@ interface IndexabilityState {
 const SeoAudit = () => {
   const [selectedTab, setSelectedTab] = useState<string>("Overview");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+  const [AddAlreadySelectSite, setAddAlreadySelectSite] = useState<any>(null);
   const [AllData, setAllData] = useState<any>([]);
   const [AlreadySelectedCrawl, setAlreadySelectedCrawl] = useState<
     string | null
   >("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isNewLoading, setIsNewLoading] = useState<boolean>(false);
   const [ActionConfirmModal, setActionConfirmModal] = useState(false);
   const [ShowAddDomainModal, setShowAddDomainModal] = useState(false);
   const [domainInput, setDomainInput] = useState<string>("");
@@ -142,32 +125,40 @@ const SeoAudit = () => {
     }
   };
 
-  const generateCards = (kpis: IndexabilityKpis): CardItem[] =>
-    Object.entries(kpis).map(([key, value]) => {
-      const percent = value.percentage;
-      const isDown = percent < 0;
+  const generateCards = (
+    kpis: Record<string, { date: string; count: number; percentage: number }[]>
+  ): CardItem[] => {
+    return Object.entries(kpis).map(([key, entries]) => {
+      const title = key
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+
+      const chart = entries.map((item) => ({
+        name: new Date(item.date).toLocaleDateString("en-GB"),
+        value: item.count,
+      }));
+
+      const latest = entries[entries.length - 1];
 
       return {
-        title: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
-        value: value.count,
-        percent,
-        isDown,
-        chart: [
-          { name: "Count", value: percent },
-          { name: "Remaining", value: 100 - percent },
-        ],
+        title,
+        value: latest?.count || 0,
+        percent: latest?.percentage || 0,
+        isDown: (latest?.percentage || 0) < 0,
+        chart,
       };
     });
+  };
 
+ 
   const handleCloseModal = async (site: Site) => {
     try {
-      setIsLoading(true);
-
+      setIsNewLoading(true);
       const response = await GetCrawDataById(site?.uuid!);
 
       if (response.status === 200) {
         const data = response.data;
-        // console.log(data, "data");
+        console.log(data, "data");
         const indexFilters = Object.keys(data.indexability?.tables || {});
         const firstIndexFilter = indexFilters[0] || "";
 
@@ -234,13 +225,13 @@ const SeoAudit = () => {
           cards: generateCards(data.h_tags?.kpis?.h_tags_kpis || {}),
         });
 
-        setIsModalOpen(false);
         setShowAddDomainModal(false);
       }
     } catch (error: any) {
       console.error("Error fetchWebList:", error);
     } finally {
-      setIsLoading(false);
+      setIsModalOpen(false);
+      setIsNewLoading(false);
     }
   };
 
@@ -257,9 +248,16 @@ const SeoAudit = () => {
     setShowAddDomainModal(false);
   };
 
+  const handleSelect = useCallback((site: Site) => {
+    setAddAlreadySelectSite(site);
+    handleCloseModal(site);
+    setShowAddDomainModal(false);
+  }, []);
+
   return (
     <>
       {isLoading && <Loading />}
+      {isNewLoading && <Loading />}
       <Header />
       <main className="main_wrapper">
         <SideBar />
@@ -304,10 +302,8 @@ const SeoAudit = () => {
                   content={domainInput}
                   setContent={setDomainInput}
                   handleClose={handleCloseDomainModel}
-                  onSelect={(site: any) => {
-                    handleCloseModal(site);
-                    setShowAddDomainModal(false);
-                  }}
+                  onSelect={handleSelect}
+                  AddAlreadySelectSite={AddAlreadySelectSite}
                 />
               )}
             </div>
@@ -315,9 +311,7 @@ const SeoAudit = () => {
               <>
                 <AuditAllSiteModal
                   isOpen={isModalOpen}
-                  onSelect={(site) => {
-                    handleCloseModal(site);
-                  }}
+                  onSelect={handleSelect}
                   AllData={AllData}
                   AlreadySelectedCrawl={AlreadySelectedCrawl}
                   isLoading={isLoading}
