@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   addMonths,
   subMonths,
@@ -14,11 +14,12 @@ import {
   startOfDay,
 } from "date-fns";
 import TimezoneSelect from "react-timezone-select";
+import { GetUserDetails } from "../Services/Services";
 
 interface ScheduleModalProps {
   show: boolean;
   onClose: () => void;
-  onSchedule: (date:string,timeZone:any) => void;
+  onSchedule: (date: string, timeZone: any) => void;
 }
 
 const suggestedTimes = ["07:47", "10:36", "13:19", "15:18", "18:03"];
@@ -34,12 +35,32 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const [selectedTimezone, setSelectedTimezone] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedTime, setSelectedTime] = useState<string>("");
-
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
 
-  if (!show) return null;
  
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  const fetchUserDetails = async () => {
+    try {
+ 
+      const response = await GetUserDetails();
+      if (response.status === 200 || response.status === 201) {
+        if (response.data.timezone !== null) {
+          setSelectedTimezone(
+            response?.data?.timezone?.formData?.additionalProp1
+          );
+        }
+      }
+    } catch (error: any) {
+      console.error("Error fetchUserDetails:", error);
+    }  
+  };
+
+   if (!show) return null;
 
   const renderHeader = () => {
     return (
@@ -148,7 +169,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
     setMinute(e.target.value);
     setSelectedTime(`${hour}:${e.target.value}`);
   };
- 
+
   const handleSchedule = () => {
     if (!selectedDate) {
       alert("Please select a date");
@@ -168,12 +189,12 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
     const scheduledDate = new Date(selectedDate);
     scheduledDate.setHours(h, m, 0, 0);
     const isoString = scheduledDate.toISOString();
-    const timeZone=selectedTimezone
-    onSchedule(isoString,timeZone);
+    const timeZone = selectedTimezone;
+    onSchedule(isoString, timeZone);
     setSelectedTime("");
     setHour("");
     setMinute("");
-    setSelectedTimezone("")
+    setSelectedTimezone("");
     setSelectedDate(today);
   };
 

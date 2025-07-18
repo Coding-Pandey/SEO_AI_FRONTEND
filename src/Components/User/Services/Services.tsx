@@ -10,4 +10,13 @@ export const GetUserDetails = async () => {
   }
 };
 
+
+export const UpdateUserProfile = async (formData:any) => {
+  try {
+    const response = await axiosInstance.patch("/api/profile/edit",{formData});
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
  

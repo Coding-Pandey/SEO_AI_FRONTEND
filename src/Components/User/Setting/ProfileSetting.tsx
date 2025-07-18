@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
-import { GetUserDetails } from "../Services/Services";
+import { GetUserDetails, UpdateUserProfile } from "../Services/Services";
 import Loading from "../../Page/Loading/Loading";
 import {
   DeleteSource,
@@ -14,6 +14,7 @@ import SourceFileModal from "./SourceFileModal";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { capitalizeFirstLetter } from "../SeoProcess/SEOReport/Reports";
+import TimeZoneModal from "../../Page/TimeZoneModal";
 // import BuyerPersonaModal from "./BuyerPersonaModal";
 
 interface FileItem {
@@ -41,13 +42,14 @@ const ProfileSetting = () => {
   const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
   const [FileEditData, setFileEditData] = useState<any>({});
   const [activeTab, setActiveTab] = useState<string | null>("Profile");
-
+  const [selectedTimezone, setSelectedTimezone] = useState<any>();
   const openDeleteModal = (uuid: string) => {
     setSelectedDeleteId(uuid);
     setIsDeleteModalOpen(true);
   };
   // const [isBuyerModalOpen, setIsBuyerModalOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
+  const [showTimeZoneModal, setShowTimeZoneModal] = useState<boolean>(false);
 
   useEffect(() => {
     fetchUserDetails();
@@ -62,6 +64,9 @@ const ProfileSetting = () => {
       if (response.status === 200 || response.status === 201) {
         setIntegratedData(responseSuccess?.data?.integrations);
         setUserDetails(response?.data);
+        setSelectedTimezone(
+          response?.data?.timezone?.formData?.additionalProp1
+        );
         const sourceFileList: FileItem[] =
           responseUploadFile?.data?.uploaded_files;
         console.log(sourceFileList, "sourceFileList");
@@ -178,6 +183,19 @@ const ProfileSetting = () => {
     setFileEditData(fileData);
   };
 
+  const handleSaveTimezone = async (timezone: string) => {
+    try {
+      const formData = { additionalProp1: timezone };
+      const res = await UpdateUserProfile(formData);
+      if (res.status === 200 || res.status === 201) {
+        setShowTimeZoneModal(false);
+        fetchUserDetails();
+      }
+    } catch (error) {
+      console.error("Error updating timezone:", error);
+    }
+  };
+
   return (
     <>
       {isLoading && <Loading />}
@@ -186,11 +204,28 @@ const ProfileSetting = () => {
         <SideBar />
         <div className="inner_content ">
           <div className="keyword_tool_content  generate_post create_content">
-            <div className="content_header mb-4">
+            <div
+              className="content_header mb-4"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <h2 className="font_25 font_600 mb-2">
                 <i className="bi bi-gear-fill heading_icon me-1 text_blue"></i>
                 Settings <span className="text_blue">/ {activeTab}</span>
               </h2>
+
+              <button className="primary_btn" onClick={()=>setShowTimeZoneModal(true)}>Change TimeZone</button>
+              <TimeZoneModal
+                message="profileSetting"
+                showModal={showTimeZoneModal}
+                selectedTimezone={selectedTimezone}
+                setSelectedTimezone={setSelectedTimezone}
+                onSave={handleSaveTimezone}
+                onClose={() => setShowTimeZoneModal(false)}
+              />
             </div>
             <div className="profile_settings_wrapper">
               <div className="row gy-3">
@@ -292,7 +327,14 @@ const ProfileSetting = () => {
                               )}
 
                               <p className="font_16 font_600 mb-2">
-                                Name: <span>{userDetails?.username ? capitalizeFirstLetter(userDetails.username.trim()) : "N/A"}</span>
+                                Name:{" "}
+                                <span>
+                                  {userDetails?.username
+                                    ? capitalizeFirstLetter(
+                                        userDetails.username.trim()
+                                      )
+                                    : "N/A"}
+                                </span>
                               </p>
                               <p className="font_16 font_600 mb-2">
                                 Email:{" "}
@@ -301,7 +343,14 @@ const ProfileSetting = () => {
                                 </span>
                               </p>
                               <p className="font_16 font_600 mb-2">
-                                User: <span>{userDetails?.role ? capitalizeFirstLetter(userDetails.role.trim()) : "N/A"}</span>
+                                User:{" "}
+                                <span>
+                                  {userDetails?.role
+                                    ? capitalizeFirstLetter(
+                                        userDetails.role.trim()
+                                      )
+                                    : "N/A"}
+                                </span>
                               </p>
                             </div>
                           </div>

@@ -137,6 +137,8 @@ const SeoAudit = () => {
         name: new Date(item.date).toLocaleDateString("en-GB"),
         value: item.count,
       }));
+     
+ 
 
       const latest = entries[entries.length - 1];
 

@@ -94,31 +94,10 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                             fill="#90CAF9"
                             fillOpacity={0.3}
                             strokeWidth={2}
-                            dot={true}
+                            dot={false}
                           />
 
-                          {/* <XAxis
-                            dataKey="name"
-                            tick={{ fontSize: 10 }}
-                            interval={0} // shows all labels
-                            angle={-30} // optional: rotate labels to avoid overlap
-                            height={50} // ensure enough space for rotated text
-                          />
-                          <YAxis allowDecimals={false} />
-                          <Tooltip
-                            cursor={{ stroke: "#ccc", strokeWidth: 1 }}
-                            formatter={(value: number) => [`${value}`, "Count"]}
-                            labelFormatter={(label: string) => `Date: ${label}`}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#1E88E5"
-                            fill="#90CAF9"
-                            fillOpacity={0.3}
-                            strokeWidth={2}
-                            dot={false}
-                          /> */}
+                       
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
