@@ -96,8 +96,6 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                             strokeWidth={2}
                             dot={false}
                           />
-
-                       
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
@@ -194,7 +192,21 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                                 ? row?.Title_1_Pixel_Width || "-"
                                 : isIndexability === "htags"
                                 ? row?.H1_1_Length || "-"
+                                : isIndexability === "internalLinks"
+                                ? row?.Status || "-"
                                 : row?.Title_1 || "-"}
+                            </td>
+
+                            <td>
+                              {isIndexability === "internalLinks"
+                                ? row?.Inlinks || "-"
+                                : ""}
+                            </td>
+
+                            <td>
+                              {isIndexability === "internalLinks"
+                                ? row?.Unique_Inlinks || "-"
+                                : ""}
                             </td>
                           </>
                         )}

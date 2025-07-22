@@ -21,7 +21,7 @@ const CreateCampaignKeywordResult = () => {
   const [generateKeywordDetails, setGenerateKeywordDetails] = useState<any[]>(
     []
   );
-  const [volume, setVolume] = useState<number>(0);
+  const [volume, setVolume] = useState<number>(500);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingSuggestion, setLoadingSuggestion] = useState<boolean>(false);
@@ -388,7 +388,7 @@ const CreateCampaignKeywordResult = () => {
                       </label>
                       <input
                         type="range"
-                        className="form-range"
+                     // className="form-range"
                         id="keyword_volume"
                         min={0}
                         step={10}

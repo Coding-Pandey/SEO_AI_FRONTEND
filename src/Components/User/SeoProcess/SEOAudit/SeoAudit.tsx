@@ -35,6 +35,8 @@ const tableHeadersMeta = ["URL Address", "Meta Description"];
 
 const tableHeadersHTags = ["URL Address", "Status", "H1", "H1 char. length"];
 
+const tableHeadersinternalLinks = ["URL Address", "Indexability", "Status Code", "Status", "Links","Unique Links"];
+
 export interface CrawlSite {
   uuid: string;
   crawl_url: string;
@@ -98,6 +100,14 @@ const SeoAudit = () => {
   });
 
   const [hTags, setHTags] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
+
+    const [internalLinks, setInternalLinks] = useState<IndexabilityState>({
     data: null,
     filters: [],
     cards: [],
@@ -225,6 +235,18 @@ const SeoAudit = () => {
           activeFilter: firstHTagsFilter,
           tableData: data.h_tags?.tables?.[firstHTagsFilter] || [],
           cards: generateCards(data.h_tags?.kpis?.h_tags_kpis || {}),
+        });
+
+        //InternalLinks
+        const internalFilters = Object.keys(data?.internal_links?.tables || {});
+        const firstinternalFilter = internalFilters[0] || "";
+
+        setInternalLinks({
+          data: data.internal_links,
+          filters: internalFilters,
+          activeFilter: firstinternalFilter,
+          tableData: data.internal_links?.tables?.[firstinternalFilter] || [],
+          cards: generateCards(data.internal_links?.kpis?.internal_links_kpis || {}),
         });
 
         setShowAddDomainModal(false);
@@ -562,6 +584,29 @@ const SeoAudit = () => {
                             }));
                           }}
                           isIndexability="htags"
+                        />
+                      </div>
+
+                      <div
+                        className="tab-pane fade"
+                        id="audit-internal"
+                        role="tabpanel"
+                        aria-labelledby="audit-internal-tab"
+                      >
+                        <AuditSectionModal
+                          cards={internalLinks.cards}
+                          filters={internalLinks.filters}
+                          tableHeaders={tableHeadersinternalLinks}
+                          tableRows={internalLinks.tableData}
+                          activeFilter={internalLinks.activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setInternalLinks((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
+                          }}
+                          isIndexability="internalLinks"
                         />
                       </div>
                     </div>
