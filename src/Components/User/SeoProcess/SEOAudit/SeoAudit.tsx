@@ -35,8 +35,18 @@ const tableHeadersMeta = ["URL Address", "Meta Description"];
 
 const tableHeadersHTags = ["URL Address", "Status", "H1", "H1 char. length"];
 
-const tableHeadersinternalLinks = ["URL Address", "Indexability", "Status Code", "Status", "Links","Unique Links"];
-
+const tableHeadersinternalLinks = [
+  "URL Address",
+  "Indexability",
+  "Status Code",
+  "Status",
+  "Inlinks",
+  "Unique Inlinks",
+  "Outlinks",
+  "Unique Outlinks",
+  "External Outlinks",
+  "Unique External Outlinks",
+];
 export interface CrawlSite {
   uuid: string;
   crawl_url: string;
@@ -107,7 +117,7 @@ const SeoAudit = () => {
     tableData: [],
   });
 
-    const [internalLinks, setInternalLinks] = useState<IndexabilityState>({
+  const [internalLinks, setInternalLinks] = useState<IndexabilityState>({
     data: null,
     filters: [],
     cards: [],
@@ -147,8 +157,6 @@ const SeoAudit = () => {
         name: new Date(item.date).toLocaleDateString("en-GB"),
         value: item.count,
       }));
-     
- 
 
       const latest = entries[entries.length - 1];
 
@@ -162,7 +170,6 @@ const SeoAudit = () => {
     });
   };
 
- 
   const handleCloseModal = async (site: Site) => {
     try {
       setIsNewLoading(true);
@@ -246,7 +253,9 @@ const SeoAudit = () => {
           filters: internalFilters,
           activeFilter: firstinternalFilter,
           tableData: data.internal_links?.tables?.[firstinternalFilter] || [],
-          cards: generateCards(data.internal_links?.kpis?.internal_links_kpis || {}),
+          cards: generateCards(
+            data.internal_links?.kpis?.internal_links_kpis || {}
+          ),
         });
 
         setShowAddDomainModal(false);

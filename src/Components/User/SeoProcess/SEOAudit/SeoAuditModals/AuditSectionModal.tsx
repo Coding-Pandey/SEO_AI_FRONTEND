@@ -158,7 +158,9 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                       <tr key={rowIdx}>
                         <td>{row?.Address || "-"}</td>
                         <td>
-                          {isIndexability === "pagetitle"
+                          {isIndexability === "internalLinks"
+                            ? row?.Indexability || "-"
+                            : isIndexability === "pagetitle"
                             ? row?.Title_1 || "-"
                             : isIndexability === "htags"
                             ? row?.Status_Code || "-"
@@ -171,9 +173,10 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                             : row?.Status
                             ? row.Status
                             : row?.Meta_Description_1
-                            ? row?.Meta_Description_1
+                            ? row.Meta_Description_1
                             : "-"}
                         </td>
+
                         {isIndexability !== "metadescription" && (
                           <>
                             <td>
@@ -206,6 +209,26 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Unique_Inlinks || "-"
+                                : ""}
+                            </td>
+                            <td>
+                              {isIndexability === "internalLinks"
+                                ? row?.Outlinks || "-"
+                                : ""}
+                            </td>
+                            <td>
+                              {isIndexability === "internalLinks"
+                                ? row?.Unique_Outlinks || "-"
+                                : ""}
+                            </td>
+                            <td>
+                              {isIndexability === "internalLinks"
+                                ? row?.External_Outlinks || "-"
+                                : ""}
+                            </td>
+                            <td>
+                              {isIndexability === "internalLinks"
+                                ? row?.Unique_External_Outlinks || "-"
                                 : ""}
                             </td>
                           </>
