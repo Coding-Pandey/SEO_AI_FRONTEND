@@ -35,10 +35,9 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const [selectedTimezone, setSelectedTimezone] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
-
- 
 
   useEffect(() => {
     fetchUserDetails();
@@ -46,7 +45,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
   const fetchUserDetails = async () => {
     try {
- 
+      setIsLoading(true);
       const response = await GetUserDetails();
       if (response.status === 200 || response.status === 201) {
         if (response.data.timezone !== null) {
@@ -57,10 +56,12 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
       }
     } catch (error: any) {
       console.error("Error fetchUserDetails:", error);
-    }  
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-   if (!show) return null;
+  if (!show) return null;
 
   const renderHeader = () => {
     return (
@@ -199,6 +200,8 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   };
 
   return (
+    <>
+    
     <div
       style={{
         position: "fixed",
@@ -223,7 +226,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
         <div
           style={{ marginBottom: 10, fontWeight: "bold", textAlign: "center" }}
         >
-          Schedule Your Post
+          Schedule Your Post 
         </div>
 
         <button
@@ -314,10 +317,11 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
             float: "right",
           }}
         >
-          Schedule
+           {isLoading ? "Please Wait" : "Schedule"}
         </button>
       </div>
     </div>
+    </>
   );
 };
 

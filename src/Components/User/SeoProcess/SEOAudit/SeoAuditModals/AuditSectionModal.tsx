@@ -198,11 +198,17 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                                 : isIndexability === "internalLinks"
                                 ? row?.Status || "-"
                                 : row?.Title_1 || "-"}
+                              {isIndexability === "content"
+                                ? row?.Word_Count || "-"
+                                : ""}
                             </td>
 
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Inlinks || "-"
+                                : ""}
+                              {isIndexability === "content"
+                                ? row?.Readability || "-"
                                 : ""}
                             </td>
 
@@ -210,25 +216,41 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                               {isIndexability === "internalLinks"
                                 ? row?.Unique_Inlinks || "-"
                                 : ""}
+                              {isIndexability === "content"
+                                ? row?.Sentence_Count || "-"
+                                : ""}
                             </td>
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Outlinks || "-"
+                                : ""}
+                              {isIndexability === "content"
+                                ? row?.Average_Words_Per_Sentence || "-"
                                 : ""}
                             </td>
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Unique_Outlinks || "-"
                                 : ""}
+                              {isIndexability === "content"
+                                ? row?.Flesch_Reading_Ease_Score || "-"
+                                : ""}
                             </td>
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.External_Outlinks || "-"
                                 : ""}
+                              {isIndexability === "content"
+                                ? row?.Closest_Near_Duplicate_Match || "-"
+                                : ""}
                             </td>
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Unique_External_Outlinks || "-"
+                                : ""}
+                              {isIndexability === "content"
+                                ? row?.Closest_Semantically_Similar_Address ||
+                                  "-"
                                 : ""}
                             </td>
                           </>

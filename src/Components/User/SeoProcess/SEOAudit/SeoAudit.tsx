@@ -47,6 +47,20 @@ const tableHeadersinternalLinks = [
   "External Outlinks",
   "Unique External Outlinks",
 ];
+
+const tableHeaderscontent = [
+  "URL Address",
+  "Status Code",
+  "Status",
+  "Word Count",
+  "Readability",
+  "Sentence Count",
+  "Average Words Per Sentence",
+  "Flesch Reading Ease Score",
+  "Closest Near Duplicate Match",
+  "Closest Semantically Similar Address",
+];
+
 export interface CrawlSite {
   uuid: string;
   crawl_url: string;
@@ -118,6 +132,14 @@ const SeoAudit = () => {
   });
 
   const [internalLinks, setInternalLinks] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
+
+  const [content, setContent] = useState<IndexabilityState>({
     data: null,
     filters: [],
     cards: [],
@@ -256,6 +278,18 @@ const SeoAudit = () => {
           cards: generateCards(
             data.internal_links?.kpis?.internal_links_kpis || {}
           ),
+        });
+
+        //content
+        const contentFilters = Object.keys(data?.content?.tables || {});
+        const firstcontentFilter = contentFilters[0] || "";
+
+        setContent({
+          data: data.content,
+          filters: contentFilters,
+          activeFilter: firstcontentFilter,
+          tableData: data.content?.tables?.[firstcontentFilter] || [],
+          cards: generateCards(data.content?.kpis?.content_kpis || {}),
         });
 
         setShowAddDomainModal(false);
@@ -616,6 +650,29 @@ const SeoAudit = () => {
                             }));
                           }}
                           isIndexability="internalLinks"
+                        />
+                      </div>
+
+                      <div
+                        className="tab-pane fade"
+                        id="audit-content"
+                        role="tabpanel"
+                        aria-labelledby="audit-content-tab"
+                      >
+                        <AuditSectionModal
+                          cards={content.cards}
+                          filters={content.filters}
+                          tableHeaders={tableHeaderscontent}
+                          tableRows={content.tableData}
+                          activeFilter={content.activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setContent((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
+                          }}
+                          isIndexability="content"
                         />
                       </div>
                     </div>
