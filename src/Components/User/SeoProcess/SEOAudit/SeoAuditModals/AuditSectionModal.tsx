@@ -156,7 +156,10 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                   {tableRows && tableRows.length > 0 ? (
                     tableRows.map((row, rowIdx) => (
                       <tr key={rowIdx}>
+                        {/* Address */}
                         <td>{row?.Address || "-"}</td>
+
+                        {/* First Column */}
                         <td>
                           {isIndexability === "internalLinks"
                             ? row?.Indexability || "-"
@@ -164,21 +167,17 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                             ? row?.Title_1 || "-"
                             : isIndexability === "htags"
                             ? row?.Status_Code || "-"
-                            : row?.Indexability
-                            ? row.Indexability
-                            : row?.Canonical_Link_Element_1
-                            ? row.Canonical_Link_Element_1
-                            : row?.Meta_Robots_1
-                            ? row.Meta_Robots_1
-                            : row?.Status
-                            ? row.Status
-                            : row?.Meta_Description_1
-                            ? row.Meta_Description_1
-                            : "-"}
+                            : row?.Indexability ||
+                              row?.Canonical_Link_Element_1 ||
+                              row?.Meta_Robots_1 ||
+                              row?.Status ||
+                              row?.Meta_Description_1 ||
+                              "-"}
                         </td>
 
                         {isIndexability !== "metadescription" && (
                           <>
+                            {/* Second Column */}
                             <td>
                               {isIndexability === "pagetitle"
                                 ? row?.Title_1_Length || "-"
@@ -190,65 +189,87 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                                 ? row?.H1_1 || "-"
                                 : row?.Status_Code || "-"}
                             </td>
+
+                            {/* Third Column */}
                             <td>
-                              {isIndexability === "pagetitle"
-                                ? row?.Title_1_Pixel_Width || "-"
-                                : isIndexability === "htags"
-                                ? row?.H1_1_Length || "-"
-                                : isIndexability === "internalLinks"
-                                ? row?.Status || "-"
-                                : row?.Title_1 || "-"}
-                              {isIndexability === "content"
-                                ? row?.Word_Count || "-"
-                                : ""}
+                              {(() => {
+                                switch (isIndexability) {
+                                  case "pagetitle":
+                                    return row?.Title_1_Pixel_Width || "-";
+                                  case "htags":
+                                    return row?.H1_1_Length || "-";
+                                  case "internalLinks":
+                                    return row?.Status || "-";
+                                  case "content":
+                                    return row?.Word_Count || "-";
+                                  case "Urls":
+                                    return row?.Multiple_Slashes || "-";
+                                  default:
+                                    return row?.Title_1 || "-";
+                                }
+                              })()}
                             </td>
 
+                            {/* Fourth Column */}
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Inlinks || "-"
-                                : ""}
-                              {isIndexability === "content"
+                                : isIndexability === "content"
                                 ? row?.Readability || "-"
+                                : isIndexability === "Urls"
+                                ? row?.Non_ASCII_Characters || "-"
                                 : ""}
                             </td>
 
+                            {/* Fifth Column */}
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Unique_Inlinks || "-"
-                                : ""}
-                              {isIndexability === "content"
+                                : isIndexability === "content"
                                 ? row?.Sentence_Count || "-"
+                                : isIndexability === "Urls"
+                                ? row?.Over_115_Characters || "-"
                                 : ""}
                             </td>
+
+                            {/* Sixth Column */}
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Outlinks || "-"
-                                : ""}
-                              {isIndexability === "content"
+                                : isIndexability === "content"
                                 ? row?.Average_Words_Per_Sentence || "-"
+                                : isIndexability === "Urls"
+                                ? row?.Parameters || "-"
                                 : ""}
                             </td>
+
+                            {/* Seventh Column */}
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Unique_Outlinks || "-"
-                                : ""}
-                              {isIndexability === "content"
+                                : isIndexability === "content"
                                 ? row?.Flesch_Reading_Ease_Score || "-"
+                                : isIndexability === "Urls"
+                                ? row?.Underscores || "-"
                                 : ""}
                             </td>
+
+                            {/* Eighth Column */}
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.External_Outlinks || "-"
-                                : ""}
-                              {isIndexability === "content"
+                                : isIndexability === "content"
                                 ? row?.Closest_Near_Duplicate_Match || "-"
+                                : isIndexability === "Urls"
+                                ? row?.Uppercase || "-"
                                 : ""}
                             </td>
+
+                            {/* Ninth Column */}
                             <td>
                               {isIndexability === "internalLinks"
                                 ? row?.Unique_External_Outlinks || "-"
-                                : ""}
-                              {isIndexability === "content"
+                                : isIndexability === "content"
                                 ? row?.Closest_Semantically_Similar_Address ||
                                   "-"
                                 : ""}
@@ -259,7 +280,7 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="text-center">
+                      <td colSpan={10} className="text-center">
                         Data not found
                       </td>
                     </tr>

@@ -61,6 +61,20 @@ const tableHeaderscontent = [
   "Closest Semantically Similar Address",
 ];
 
+const tableHeadersUrl = [
+  "URL Address",
+  "Status Code",
+  "Status",
+  "Multiple Slashes",
+  "Non ASCII Characters",
+  "Over 115 Characters",
+  "Parameters",
+  "Underscores",
+  "Uppercase",
+];
+
+
+
 export interface CrawlSite {
   uuid: string;
   crawl_url: string;
@@ -140,6 +154,14 @@ const SeoAudit = () => {
   });
 
   const [content, setContent] = useState<IndexabilityState>({
+    data: null,
+    filters: [],
+    cards: [],
+    activeFilter: "",
+    tableData: [],
+  });
+
+   const [URLS, setURLS] = useState<IndexabilityState>({
     data: null,
     filters: [],
     cards: [],
@@ -290,6 +312,19 @@ const SeoAudit = () => {
           activeFilter: firstcontentFilter,
           tableData: data.content?.tables?.[firstcontentFilter] || [],
           cards: generateCards(data.content?.kpis?.content_kpis || {}),
+        });
+
+
+         //URLS
+        const URLSFilters = Object.keys(data?.url_structure?.tables || {});
+        const firstURLSFilter = URLSFilters[0] || "";
+
+        setURLS({
+          data: data.url_structure,
+          filters: URLSFilters,
+          activeFilter: firstURLSFilter,
+          tableData: data.url_structure?.tables?.[firstURLSFilter] || [],
+          cards: generateCards(data.url_structure?.kpis?.url_structure_kpis || {}),
         });
 
         setShowAddDomainModal(false);
@@ -673,6 +708,29 @@ const SeoAudit = () => {
                             }));
                           }}
                           isIndexability="content"
+                        />
+                      </div>
+
+                       <div
+                        className="tab-pane fade"
+                        id="audit-url"
+                        role="tabpanel"
+                        aria-labelledby="audit-url-tab"
+                      >
+                        <AuditSectionModal
+                          cards={URLS.cards}
+                          filters={URLS.filters}
+                          tableHeaders={tableHeadersUrl}
+                          tableRows={URLS.tableData}
+                          activeFilter={URLS.activeFilter}
+                          setActiveFilter={(filter: string) => {
+                            setURLS((prev) => ({
+                              ...prev,
+                              activeFilter: filter,
+                              tableData: prev.data?.tables?.[filter] || [],
+                            }));
+                          }}
+                          isIndexability="Urls"
                         />
                       </div>
                     </div>
