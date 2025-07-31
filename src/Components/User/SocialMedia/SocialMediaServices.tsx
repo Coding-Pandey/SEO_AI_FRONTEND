@@ -1,6 +1,5 @@
 import axiosInstance from "../../../Interceptor/Interceptor";
 
-
 export const GeneratePostService = async (formdata: any) => {
   try {
     const response = await axiosInstance.post(
@@ -50,6 +49,24 @@ export const GetGeneratedPostById = async (uuid: string) => {
     const response = await axiosInstance.get(
       `/api/socialmedia_post_data/${uuid}`
     );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const GetFacebookPages = async () => {
+  try {
+    const response = await axiosInstance.get(`/api/fetch_facebook_pages`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const UpdatePlateFormList = async () => {
+  try {
+    const response = await axiosInstance.post(`/api/update_page_details`);
     return response;
   } catch (error) {
     throw error;

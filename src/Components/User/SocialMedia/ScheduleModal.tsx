@@ -14,12 +14,15 @@ import {
   startOfDay,
 } from "date-fns";
 import TimezoneSelect from "react-timezone-select";
+import Select from "react-select";
 import { GetUserDetails } from "../Services/Services";
+import { GetFacebookPages, UpdatePlateFormList } from "./SocialMediaServices";
 
 interface ScheduleModalProps {
   show: boolean;
   onClose: () => void;
-  onSchedule: (date: string, timeZone: any) => void;
+  onSchedule: (date: string, timeZone: any, selectedFacebookList: any) => void;
+  platform: string;
 }
 
 const suggestedTimes = ["07:47", "10:36", "13:19", "15:18", "18:03"];
@@ -28,6 +31,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   show,
   onClose,
   onSchedule,
+  platform,
 }) => {
   const today = startOfDay(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -35,9 +39,12 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const [selectedTimezone, setSelectedTimezone] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [facebookList, setFacebookList] = useState<any>([]);
+  const [selectedFacebookList, setSelectedFacebookList] = useState<any[]>([]);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hour, setHour] = useState("");
-  const [minute, setMinute] = useState("");
+  const [hour, setHour] = useState<string>("");
+  const [minute, setMinute] = useState<string>("");
 
   useEffect(() => {
     fetchUserDetails();
@@ -47,12 +54,15 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
     try {
       setIsLoading(true);
       const response = await GetUserDetails();
+      const resFacebook = await GetFacebookPages();
+
       if (response.status === 200 || response.status === 201) {
         if (response.data.timezone !== null) {
           setSelectedTimezone(
             response?.data?.timezone?.formData?.additionalProp1
           );
         }
+        setFacebookList(resFacebook.data.pages);
       }
     } catch (error: any) {
       console.error("Error fetchUserDetails:", error);
@@ -60,6 +70,28 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
       setIsLoading(false);
     }
   };
+
+  const handleRefreshList = async () => {
+    try {
+      setIsLoading(true);
+      const response = await UpdatePlateFormList();
+      if (response.status === 200 || response.status === 201) {
+        const resFacebook = await GetFacebookPages();
+        if (response.status === 200 || response.status === 201) {
+          setFacebookList(resFacebook.data.pages);
+        }
+      }
+    } catch (error: any) {
+      console.error("Error handleRefreshList:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const facebookOptions = facebookList.map((page: any) => ({
+    value: page.page_id,
+    label: page.name,
+  }));
 
   if (!show) return null;
 
@@ -191,7 +223,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
     scheduledDate.setHours(h, m, 0, 0);
     const isoString = scheduledDate.toISOString();
     const timeZone = selectedTimezone;
-    onSchedule(isoString, timeZone);
+    onSchedule(isoString, timeZone, selectedFacebookList);
     setSelectedTime("");
     setHour("");
     setMinute("");
@@ -201,126 +233,159 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
   return (
     <>
-    
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.3)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
-    >
       <div
-        className="calendar_modal"
         style={{
-          backgroundColor: "white",
-          padding: 20,
-          borderRadius: 8,
-          boxShadow: "0 0 10px rgba(0,0,0,0.15)",
-          userSelect: "none",
+          position: "fixed",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
         }}
       >
         <div
-          style={{ marginBottom: 10, fontWeight: "bold", textAlign: "center" }}
-        >
-          Schedule Your Post 
-        </div>
-
-        <button
-          className="text_orange"
-          onClick={onClose}
+          className="calendar_modal"
           style={{
-            position: "absolute",
-            right: 30,
-            top: 20,
-
-            border: "none",
-            background: "none",
-            fontSize: 18,
-            cursor: "pointer",
+            backgroundColor: "white",
+            padding: 20,
+            borderRadius: 8,
+            boxShadow: "0 0 10px rgba(0,0,0,0.15)",
+            userSelect: "none",
           }}
-          aria-label="Close modal"
         >
-          &times;
-        </button>
+          <div
+            style={{
+              marginBottom: 10,
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            Schedule Your Post
+          </div>
 
-        {renderHeader()}
-        {renderDays()}
-        {renderCells()}
+          <button
+            className="text_orange"
+            onClick={onClose}
+            style={{
+              position: "absolute",
+              right: 30,
+              top: 20,
 
-        <div className="suggest_time_wrapper">
-          Suggested Time:{" "}
-          {suggestedTimes.map((time) => (
-            <button
-              key={time}
-              className={selectedTime === time ? "active" : ""}
-              onClick={() => handleSuggestedTimeClick(time)}
-            >
-              {time}
-            </button>
-          ))}
-        </div>
+              border: "none",
+              background: "none",
+              fontSize: 18,
+              cursor: "pointer",
+            }}
+            aria-label="Close modal"
+          >
+            &times;
+          </button>
 
-        <div className="select_time_wrapper">
-          <p className="font_16">Select Time:</p>
-          <div className="select_time">
-            <div className="select_hour">
-              <label htmlFor="hour">Hours</label>
-              <select value={hour} onChange={handleHourChange}>
-                {Array.from({ length: 24 }).map((_, i) => {
-                  const val = i.toString().padStart(2, "0");
-                  return (
-                    <option key={val} value={val}>
-                      {val}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+          {renderHeader()}
+          {renderDays()}
+          {renderCells()}
 
-            <div className="select_hour minutes">
-              <label htmlFor="minutes">Minutes</label>
-              <select value={minute} onChange={handleMinuteChange}>
-                {Array.from({ length: 60 }).map((_, i) => {
-                  const val = i.toString().padStart(2, "0");
-                  return (
-                    <option key={val} value={val}>
-                      {val}
-                    </option>
-                  );
-                })}
-              </select>
+          <div className="suggest_time_wrapper">
+            Suggested Time:{" "}
+            {suggestedTimes.map((time) => (
+              <button
+                key={time}
+                className={selectedTime === time ? "active" : ""}
+                onClick={() => handleSuggestedTimeClick(time)}
+              >
+                {time}
+              </button>
+            ))}
+          </div>
+
+          <div className="select_time_wrapper">
+            <p className="font_16">Select Time:</p>
+            <div className="select_time">
+              <div className="select_hour">
+                <label htmlFor="hour">Hours</label>
+                <select value={hour} onChange={handleHourChange}>
+                  {Array.from({ length: 24 }).map((_, i) => {
+                    const val = i.toString().padStart(2, "0");
+                    return (
+                      <option key={val} value={val}>
+                        {val}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className="select_hour minutes">
+                <label htmlFor="minutes">Minutes</label>
+                <select value={minute} onChange={handleMinuteChange}>
+                  {Array.from({ length: 60 }).map((_, i) => {
+                    const val = i.toString().padStart(2, "0");
+                    return (
+                      <option key={val} value={val}>
+                        {val}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div style={{ marginTop: 20 }}>
-          <label style={{ marginBottom: "10px" }}>Select Timezone :</label>
-          <TimezoneSelect
-            value={selectedTimezone}
-            onChange={setSelectedTimezone}
-          />
+          <div style={{ marginTop: 20 }}>
+            <label style={{ marginBottom: "10px" }}>Select Timezone :</label>
+            <TimezoneSelect
+              value={selectedTimezone}
+              onChange={setSelectedTimezone}
+            />
+          </div>
+          {platform === "facebook" && (
+            <div style={{ marginTop: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}
+              >
+                <label style={{ margin: 0 }}>Select Facebook Pages:</label>
+                <span
+                  style={{ cursor: "pointer", fontSize: 16 }}
+                  onClick={handleRefreshList}
+                >
+                  🔄
+                </span>
+              </div>
+              <Select
+                isMulti
+                options={facebookOptions}
+                value={selectedFacebookList}
+                onChange={(selected) =>
+                  setSelectedFacebookList(selected as any[])
+                }
+                placeholder="Select one or more pages"
+              />
+            </div>
+          )}
+
+          <button
+            onClick={handleSchedule}
+            style={{
+              marginTop: 20,
+              backgroundColor: "#357edd",
+              color: "white",
+              border: "none",
+              borderRadius: 4,
+              padding: "8px 20px",
+              cursor: "pointer",
+              float: "right",
+            }}
+          >
+            {isLoading ? "Please Wait" : "Schedule"}
+          </button>
         </div>
-        <button
-          onClick={handleSchedule}
-          style={{
-            marginTop: 20,
-            backgroundColor: "#357edd",
-            color: "white",
-            border: "none",
-            borderRadius: 4,
-            padding: "8px 20px",
-            cursor: "pointer",
-            float: "right",
-          }}
-        >
-           {isLoading ? "Please Wait" : "Schedule"}
-        </button>
       </div>
-    </div>
     </>
   );
 };

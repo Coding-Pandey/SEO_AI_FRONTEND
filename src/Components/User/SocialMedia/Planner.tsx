@@ -58,7 +58,8 @@ const Planner = () => {
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [fileData, setFileData] = useState<any>(null);
   const [LoadingApi, setLoadingApi] = useState<boolean>(false);
-  console.log(plannerData, "plannerData");
+
+  const platformName = CollectPlatform.replace("_posts", "");
 
   useEffect(() => {
     fetchPlannerData();
@@ -196,14 +197,23 @@ const Planner = () => {
     setREScheduleDateAndTime("");
   };
 
-  const handleSchedule = async (scheduledDate: string, timeZone: any) => {
-    setREScheduleDateAndTime(scheduledDate);
-    let formData = new FormData();
-    formData.append("id", PlatformId);
-    formData.append("reschedule_time", scheduledDate);
-    formData.append("timezone", JSON.stringify(timeZone));
-
+  const handleSchedule = async (
+    scheduledDate: string,
+    timeZone: any,
+    selectedFacebookList: any
+  ) => {
     try {
+      setREScheduleDateAndTime(scheduledDate);
+      const selectedFacebookListIds =
+        selectedFacebookList?.length > 0
+          ? selectedFacebookList.map((list: any) => list.value)
+          : [];
+      let formData = new FormData();
+      formData.append("id", PlatformId);
+      formData.append("reschedule_time", scheduledDate);
+      formData.append("timezone", JSON.stringify(timeZone));
+      formData.append("page_details", JSON.stringify(selectedFacebookListIds));
+
       const response = await UpdateScheduleSocialMediaPlanner(
         CollectPlatform,
         UUIDS,
@@ -566,6 +576,7 @@ const Planner = () => {
             setPlatformId("");
           }}
           onSchedule={handleSchedule}
+          platform={platformName}
         />
 
         <DynamicConfirmModal

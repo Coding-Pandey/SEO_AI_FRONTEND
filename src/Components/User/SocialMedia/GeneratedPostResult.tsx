@@ -20,21 +20,20 @@ import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
 const GeneratedPostResult = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [generatedPostDetails, setGeneratedPostDetails] = useState<any>({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [fileData, setFileData] = useState<any>(null);
-  const [platform, setPlatform] = useState("");
-  const [content, setContent] = useState("");
-  const [uuid, setUuid] = useState("");
+  const [platform, setPlatform] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [uuid, setUuid] = useState<string>("");
   const [localImage, setLocalImage] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [successSchedule, setSuccessSchedule] = useState(false);
-  const [scheduleTime, setScheduleTime] = useState("");
-  const [loadingApi, setLoadingApi] = useState(false);
-  const [showFileModal, setShowFileModal] = useState(false);
-
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [successSchedule, setSuccessSchedule] = useState<boolean>(false);
+  const [scheduleTime, setScheduleTime] = useState<string>("");
+  const [loadingApi, setLoadingApi] = useState<boolean>(false);
+  const [showFileModal, setShowFileModal] = useState<boolean>(false);
 
   const handleScheduleClick = (uuid: string, post: any, platform: string) => {
     setUuid(uuid);
@@ -46,7 +45,7 @@ const GeneratedPostResult = () => {
 
   const handlePublishSocialMedia = async (
     uuid: string,
-    id:string,
+    id: string,
     post: any,
     platform: string
   ) => {
@@ -58,10 +57,10 @@ const GeneratedPostResult = () => {
       });
       if (response.status === 201 || response.status === 200) {
         toast.success(`${platform} Post Publish successfully`);
-     const response = await deleteSocialMediaPost(uuid, id, platform);
-      if (response.status === 200 || response.status === 201) {
-        removePostFromState(platform, id);
-      }
+        const response = await deleteSocialMediaPost(uuid, id, platform);
+        if (response.status === 200 || response.status === 201) {
+          removePostFromState(platform, id);
+        }
       }
     } catch (error) {
       console.log("Error during Publish Social Media", error);
@@ -155,7 +154,7 @@ const GeneratedPostResult = () => {
   };
 
   const removePostFromState = (platform: string, postId: string) => {
-    console.log(platform,postId,"postId")
+    console.log(platform, postId, "postId");
     setGeneratedPostDetails((prev: any) => ({
       ...prev,
       data: {
@@ -240,14 +239,25 @@ const GeneratedPostResult = () => {
     });
   };
 
-  const handleSchedule = async (scheduledDate: string, timeZone: string) => {
-    setScheduleTime(scheduledDate);
+  const handleSchedule = async (
+    scheduledDate: string,
+    timeZone: string,
+    selectedFacebookList: any
+  ) => {
     try {
+      setScheduleTime(scheduledDate);
+
+      const selectedFacebookListIds =
+        selectedFacebookList?.length > 0
+          ? selectedFacebookList.map((list: any) => list.value)
+          : [];
+
       const response = await AddScheduleSocialMedia({
         uuid,
         schedule_time: scheduledDate,
         content: [selectedPost],
         timezone: timeZone,
+        page_details: selectedFacebookListIds,
       });
 
       if (response.status === 201 || response.status === 200) {
@@ -606,6 +616,7 @@ const GeneratedPostResult = () => {
               show={showModal}
               onClose={() => setShowModal(false)}
               onSchedule={handleSchedule}
+              platform={platform}
             />
 
             {successSchedule && (
