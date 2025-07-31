@@ -249,7 +249,10 @@ const GeneratedPostResult = () => {
 
       const selectedFacebookListIds =
         selectedFacebookList?.length > 0
-          ? selectedFacebookList.map((list: any) => list.value)
+          ? selectedFacebookList.map((list: any) => ({
+              name: list.label,
+              page_id: list.value,
+            }))
           : [];
 
       const response = await AddScheduleSocialMedia({

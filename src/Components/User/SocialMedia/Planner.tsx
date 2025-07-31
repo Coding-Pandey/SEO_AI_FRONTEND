@@ -204,10 +204,16 @@ const Planner = () => {
   ) => {
     try {
       setREScheduleDateAndTime(scheduledDate);
+  
+
       const selectedFacebookListIds =
         selectedFacebookList?.length > 0
-          ? selectedFacebookList.map((list: any) => list.value)
+          ? selectedFacebookList.map((list: any) => ({
+              name: list.label,
+              page_id: list.value,
+            }))
           : [];
+
       let formData = new FormData();
       formData.append("id", PlatformId);
       formData.append("reschedule_time", scheduledDate);
