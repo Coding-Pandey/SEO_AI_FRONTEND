@@ -66,10 +66,17 @@ const GeneratedPostResult = () => {
       console.log(uuid, id, post, platform, "checklist");
       try {
         setLoadingApi(true);
+        const selectedFacebookListIds =
+          selectedFacebookList?.length > 0
+            ? selectedFacebookList.map((list: any) => ({
+                name: list.label,
+                page_id: list.value,
+              }))
+            : [];
         const response = await PostPublicSocialMedia({
           uuid,
           content: [post],
-          page_details: selectedFacebookList,
+          page_details: selectedFacebookListIds,
         });
         if (response.status === 201 || response.status === 200) {
           toast.success(`${platform} Post Publish successfully`);
@@ -77,7 +84,7 @@ const GeneratedPostResult = () => {
           if (response.status === 200 || response.status === 201) {
             setFacebookPostPayload({ uuid: "", id: "", post: {} });
             removePostFromState(platform, id);
-            setPlatform("")
+            setPlatform("");
           }
         }
       } catch (error) {
