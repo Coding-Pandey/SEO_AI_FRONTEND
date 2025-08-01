@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import Header from "../Header/Header";
-import SideBar from "../SideBar/SideBar";
-import Loading from "../../Page/Loading/Loading";
+import Header from "../../Header/Header";
+import SideBar from "../../SideBar/SideBar";
+import Loading from "../../../Page/Loading/Loading";
 import { toast } from "react-toastify";
-import ScheduleModal from "./ScheduleModal";
+import ScheduleModal from "../Common/ScheduleModal";
 import {
   deletePlannerSocialMediaData,
   GetPlannerSocialMediaData,
   UpdateScheduleSocialMediaPlanner,
-} from "./SocialMediaServices";
-import DynamicConfirmModal from "./DynamicConfirmModal";
+} from "../Common/SocialMediaServices";
+import DynamicConfirmModal from "../Common/DynamicConfirmModal";
 
 const platforms = [
   "linkedin_posts",
@@ -58,7 +58,7 @@ const Planner = () => {
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [fileData, setFileData] = useState<any>(null);
   const [LoadingApi, setLoadingApi] = useState<boolean>(false);
-
+  const [selectedFacebookList, setSelectedFacebookList] = useState<any[]>([]);
   const platformName = CollectPlatform.replace("_posts", "");
 
   useEffect(() => {
@@ -185,6 +185,7 @@ const Planner = () => {
     postPlatformId: string
   ) => {
     // console.log(postPlatformId,uuid,platform,"hfgshghdsf")
+    setSelectedFacebookList([])
     setUUIDS(uuid);
     setShowModal(true);
     setCollectPlatform(platform);
@@ -583,6 +584,8 @@ const Planner = () => {
           }}
           onSchedule={handleSchedule}
           platform={platformName}
+          selectedFacebookList={selectedFacebookList}
+          setSelectedFacebookList={setSelectedFacebookList}
         />
 
         <DynamicConfirmModal

@@ -1,4 +1,4 @@
-import axiosInstance from "../../../Interceptor/Interceptor";
+import axiosInstance from "../../../../Interceptor/Interceptor";
 
 export const GeneratePostService = async (formdata: any) => {
   try {

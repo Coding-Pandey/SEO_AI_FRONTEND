@@ -18,9 +18,9 @@ const KeywordToolResult = lazy(() => import("./Components/User/SeoProcess/SEOKey
 const SuggestionsResultById = lazy(() => import("./Components/User/SeoProcess/SEOKeywordTool/SuggestionsResultById"));
 const Reports = lazy(() => import("./Components/User/SeoProcess/SEOReport/Reports")); 
 
-const GeneratePost = lazy(() => import("./Components/User/SocialMedia/GeneratePost"));
-const Planner = lazy(() => import("./Components/User/SocialMedia/Planner")); 
-const GeneratedPostResult = lazy(() => import("./Components/User/SocialMedia/GeneratedPostResult")); 
+const GeneratePost = lazy(() => import("./Components/User/SocialMedia/GeneratePostSocialMedia/GeneratePost"));
+const Planner = lazy(() => import("./Components/User/SocialMedia/PlannerSocialMedia/Planner")); 
+const GeneratedPostResult = lazy(() => import("./Components/User/SocialMedia/GeneratePostSocialMedia/GeneratedPostResult")); 
 
 const CreateCampaign = lazy(() => import("./Components/User/PPC/CreateCampaign"));
 const CreateCampaignKeywordResult = lazy(() => import("./Components/User/PPC/CreateCampaignKeywordResult")); 

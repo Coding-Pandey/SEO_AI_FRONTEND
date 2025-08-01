@@ -18,7 +18,7 @@ import {
   GetFormDetails,
   MoreGenerateSuggestion,
 } from "./ContentServices";
-import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
+import { GetUploadedSourcefiles } from "../SocialMedia/Common/SocialMediaServices";
 import ContentFormForSeo from "./ContentFormForSeo";
 import { language_options, location_options } from "../../Page/store";
 

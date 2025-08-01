@@ -15,7 +15,7 @@ import {
 } from "date-fns";
 import TimezoneSelect from "react-timezone-select";
 import Select from "react-select";
-import { GetUserDetails } from "../Services/Services";
+import { GetUserDetails } from "../../Services/Services";
 import { GetFacebookPages, UpdatePlateFormList } from "./SocialMediaServices";
 
 interface ScheduleModalProps {
@@ -23,6 +23,8 @@ interface ScheduleModalProps {
   onClose: () => void;
   onSchedule: (date: string, timeZone: any, selectedFacebookList: any) => void;
   platform: string;
+  selectedFacebookList:any,
+  setSelectedFacebookList:any;
 }
 
 const suggestedTimes = ["07:47", "10:36", "13:19", "15:18", "18:03"];
@@ -32,6 +34,8 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   onClose,
   onSchedule,
   platform,
+  selectedFacebookList,
+  setSelectedFacebookList
 }) => {
   const today = startOfDay(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -40,12 +44,10 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [facebookList, setFacebookList] = useState<any>([]);
-  const [selectedFacebookList, setSelectedFacebookList] = useState<any[]>([]);
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hour, setHour] = useState<string>("");
   const [minute, setMinute] = useState<string>("");
-
+ 
   useEffect(() => {
     fetchUserDetails();
   }, []);
@@ -73,6 +75,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
   const handleRefreshList = async () => {
     try {
+      setSelectedFacebookList([])
       setIsLoading(true);
       const response = await UpdatePlateFormList();
       if (response.status === 200 || response.status === 201) {

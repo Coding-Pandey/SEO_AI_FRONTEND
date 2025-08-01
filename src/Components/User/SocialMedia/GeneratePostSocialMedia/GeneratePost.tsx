@@ -1,16 +1,16 @@
 import { useState, ChangeEvent, useEffect } from "react";
-import Header from "../Header/Header";
-import SideBar from "../SideBar/SideBar";
-import Loading from "../../Page/Loading/Loading";
+import Header from "../../Header/Header";
+import SideBar from "../../SideBar/SideBar";
+import Loading from "../../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import PreviouslyCreatedPosts from "../../Page/PreviouslyCreatedPosts";
+import PreviouslyCreatedPosts from "../../../Page/PreviouslyCreatedPosts";
 import {
   GeneratePostService,
   deleteSocialMediaData,
   GetSocialMediaData,
   GetUploadedSourcefiles,
-} from "./SocialMediaServices";
+} from "../Common/SocialMediaServices";
 
 interface GeneratePostCluster {
   uuid: string;

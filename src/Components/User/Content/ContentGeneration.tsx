@@ -19,7 +19,7 @@ import {
   GetFormDetails,
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
-import { GetUploadedSourcefiles } from "../SocialMedia/SocialMediaServices";
+import { GetUploadedSourcefiles } from "../SocialMedia/Common/SocialMediaServices";
 import { language_options, location_options } from "../../Page/store";
 
 interface contentData {

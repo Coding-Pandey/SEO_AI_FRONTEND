@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../Header/Header";
-import SideBar from "../SideBar/SideBar";
+import Header from "../../Header/Header";
+import SideBar from "../../SideBar/SideBar";
 import { useEffect, useState } from "react";
-import Loading from "../../Page/Loading/Loading";
+import Loading from "../../../Page/Loading/Loading";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
-import ScheduleModal from "./ScheduleModal";
+import ScheduleModal from "../Common/ScheduleModal";
 import {
   AddScheduleSocialMedia,
   deleteSocialMediaData,
@@ -14,8 +14,10 @@ import {
   PostPublicSocialMedia,
   UpdateFileNameSocialMedia,
   UpdateImageSocialMedia,
-} from "./SocialMediaServices";
-import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
+} from "../Common/SocialMediaServices";
+import FileNameUpdateModal from "../../../Page/FileNameUpdateModal";
+import DynamicConfirmModal from "../Common/DynamicConfirmModal";
+import FaceBookListModal from "../Common/FaceBookListModal";
 
 const GeneratedPostResult = () => {
   const { id } = useParams();
@@ -34,8 +36,15 @@ const GeneratedPostResult = () => {
   const [scheduleTime, setScheduleTime] = useState<string>("");
   const [loadingApi, setLoadingApi] = useState<boolean>(false);
   const [showFileModal, setShowFileModal] = useState<boolean>(false);
-
+  const [selectedFacebookList, setSelectedFacebookList] = useState<any[]>([]);
+  const [ShowListModal, setShowListModal] = useState<boolean>(false);
+  const [facebookPostPayload, setFacebookPostPayload] = useState({
+    uuid: "",
+    id: "",
+    post: {},
+  });
   const handleScheduleClick = (uuid: string, post: any, platform: string) => {
+    setSelectedFacebookList([]);
     setUuid(uuid);
     setSelectedPost(post);
     setShowModal(true);
@@ -49,24 +58,44 @@ const GeneratedPostResult = () => {
     post: any,
     platform: string
   ) => {
-    try {
-      setLoadingApi(true);
-      const response = await PostPublicSocialMedia({
-        uuid,
-        content: [post],
-      });
-      if (response.status === 201 || response.status === 200) {
-        toast.success(`${platform} Post Publish successfully`);
-        const response = await deleteSocialMediaPost(uuid, id, platform);
-        if (response.status === 200 || response.status === 201) {
-          removePostFromState(platform, id);
+    if (platform === "facebook" && ShowListModal === false) {
+      setSelectedFacebookList([]);
+      setFacebookPostPayload({ uuid, id, post });
+      setShowListModal(true);
+    } else {
+      console.log(uuid, id, post, platform, "checklist");
+      try {
+        setLoadingApi(true);
+        const response = await PostPublicSocialMedia({
+          uuid,
+          content: [post],
+          page_details: selectedFacebookList,
+        });
+        if (response.status === 201 || response.status === 200) {
+          toast.success(`${platform} Post Publish successfully`);
+          const response = await deleteSocialMediaPost(uuid, id, platform);
+          if (response.status === 200 || response.status === 201) {
+            setFacebookPostPayload({ uuid: "", id: "", post: {} });
+            removePostFromState(platform, id);
+            setPlatform("")
+          }
         }
+      } catch (error) {
+        console.log("Error during Publish Social Media", error);
+      } finally {
+        setLoadingApi(false);
       }
-    } catch (error) {
-      console.log("Error during Publish Social Media", error);
-    } finally {
-      setLoadingApi(false);
     }
+  };
+
+  const handleCloseListModal = () => {
+    setShowListModal(false);
+    handlePublishSocialMedia(
+      facebookPostPayload.uuid,
+      facebookPostPayload.id,
+      facebookPostPayload.post,
+      platform
+    );
   };
 
   useEffect(() => {
@@ -268,6 +297,7 @@ const GeneratedPostResult = () => {
         markPostAsScheduled(platform, selectedPost[`${platform}_id`]);
         setShowModal(false);
         setSuccessSchedule(true);
+        setSelectedFacebookList([]);
       }
     } catch (error) {
       console.error("Error scheduling post", error);
@@ -620,26 +650,23 @@ const GeneratedPostResult = () => {
               onClose={() => setShowModal(false)}
               onSchedule={handleSchedule}
               platform={platform}
+              selectedFacebookList={selectedFacebookList}
+              setSelectedFacebookList={setSelectedFacebookList}
             />
 
-            {successSchedule && (
-              <div className="custom-modal-overlay">
-                <div className="custom-modal-content">
-                  <div className="schedule_box">
-                    <p className="font_16 mb-1">Your post has been scheduled</p>
-                    <p className="font_14 text_blue">
-                      {formatScheduledDate(scheduleTime)}
-                    </p>
-                    <button
-                      className="btn primary_btn ok_btn"
-                      onClick={() => setSuccessSchedule(false)}
-                    >
-                      OK
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            <DynamicConfirmModal
+              isOpen={successSchedule}
+              title="Your post has been scheduled"
+              dateText={formatScheduledDate(scheduleTime)}
+              onClose={() => setSuccessSchedule(false)}
+            />
+            <FaceBookListModal
+              isOpen={ShowListModal}
+              selectedFacebookList={selectedFacebookList}
+              setSelectedFacebookList={setSelectedFacebookList}
+              onClose={handleCloseListModal}
+              handleCancel={() => setShowListModal(false)}
+            />
           </div>
         </div>
       </main>
