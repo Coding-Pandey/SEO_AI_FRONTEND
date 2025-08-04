@@ -1,14 +1,19 @@
- 
-const ConnectModal = ({ onConnect ,  isConnected}: { onConnect: () => void;  isConnected: boolean; }) => {
+const ConnectModal = ({
+  onConnect,
+  isConnected,
+  onClose,
+}: {
+  onConnect: () => void;
+  isConnected: boolean;
+  onClose: () => void;
+}) => {
   return (
     <div
-      className="modal fade integrated_modal"
-      id="integratedCard"
+      className="modal show"
+      style={{ display: "block", background: "rgba(0, 0, 0, 0.5)" }}
       tabIndex={-1}
-      aria-labelledby="integrationTabLabel"
-      aria-hidden="true"
-      data-bs-backdrop="static"
-      data-bs-keyboard="false"
+      aria-modal="true"
+      role="dialog"
     >
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
@@ -28,6 +33,7 @@ const ConnectModal = ({ onConnect ,  isConnected}: { onConnect: () => void;  isC
             className="btn modal_close"
             data-bs-dismiss="modal"
             aria-label="Close"
+            onClick={onClose}
           >
             <i className="bi-x-circle-fill"></i>
           </button>

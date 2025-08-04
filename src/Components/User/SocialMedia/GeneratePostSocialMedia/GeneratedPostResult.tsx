@@ -42,6 +42,7 @@ const GeneratedPostResult = () => {
     uuid: "",
     id: "",
     post: {},
+    platform:""
   });
   const handleScheduleClick = (uuid: string, post: any, platform: string) => {
     setSelectedFacebookList([]);
@@ -60,12 +61,13 @@ const GeneratedPostResult = () => {
   ) => {
     if (platform === "facebook" && ShowListModal === false) {
       setSelectedFacebookList([]);
-      setFacebookPostPayload({ uuid, id, post });
+      setFacebookPostPayload({ uuid, id, post,platform});
       setShowListModal(true);
     } else {
-      console.log(uuid, id, post, platform, "checklist");
       try {
+        setShowListModal(false);
         setLoadingApi(true);
+        setLoading(true)
         const selectedFacebookListIds =
           selectedFacebookList?.length > 0
             ? selectedFacebookList.map((list: any) => ({
@@ -82,26 +84,27 @@ const GeneratedPostResult = () => {
           toast.success(`${platform} Post Publish successfully`);
           const response = await deleteSocialMediaPost(uuid, id, platform);
           if (response.status === 200 || response.status === 201) {
-            setFacebookPostPayload({ uuid: "", id: "", post: {} });
+            setFacebookPostPayload({ uuid: "", id: "", post: {},platform:"" });
             removePostFromState(platform, id);
             setPlatform("");
+            setShowListModal(false);
           }
         }
       } catch (error) {
         console.log("Error during Publish Social Media", error);
       } finally {
         setLoadingApi(false);
+        setLoading(false)
       }
     }
   };
 
   const handleCloseListModal = () => {
-    setShowListModal(false);
     handlePublishSocialMedia(
       facebookPostPayload.uuid,
       facebookPostPayload.id,
       facebookPostPayload.post,
-      platform
+      facebookPostPayload.platform
     );
   };
 

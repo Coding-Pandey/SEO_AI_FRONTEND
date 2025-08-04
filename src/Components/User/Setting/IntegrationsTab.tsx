@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ConnectModal from "./ConnectModal ";
+import MultiIntegrationModal from "./Common/MultiIntegrationModal";
 
 const integrationsList = [
   {
@@ -54,19 +55,37 @@ const integrationsList = [
   },
 ];
 
+const linkedInOptions = [
+  {
+    name: "LinkedIn",
+    img: "linkedin.png",
+    category: "linkedin",
+  },
+  {
+    name: "LinkedIn_2",
+    img: "linkedin.png",
+    category: "linkedin_2",
+  },
+];
+
 const IntegrationsTab = ({
   IntegratedData,
   setSelectedCategory,
   handleConnect,
-}:{
+}: {
   IntegratedData: any;
   setSelectedCategory: (category: string) => void;
   handleConnect: () => void;
 }) => {
-  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(null);
-
+  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(
+    null
+  );
+  const [showLinkedInOptions, setShowLinkedInOptions] = useState(false);
+  const [showConnectModal, setShowConnectModal] = useState(false);
   const getIsConnected = (category: string) =>
-    IntegratedData?.find((integration: any) => integration.provider === category)?.connected || false;
+    IntegratedData?.find(
+      (integration: any) => integration.provider === category
+    )?.connected || false;
 
   return (
     <div
@@ -86,24 +105,21 @@ const IntegrationsTab = ({
 
             <ul className="list-unstyled integration_card_wrapper row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4 g-3">
               {integrationsList.map((item, index) => {
-               const isConnected = getIsConnected(item.category);
+                const isConnected = getIsConnected(item.category);
 
                 return (
                   <li className="col" key={index}>
                     <div
                       className="intergration_card card_box"
-                       onClick={() => {
-                        setSelectedCategory(item.category);
-                        setSelectedIntegration(item.category);  
+                      onClick={() => {
+                        if (item.category === "linkedin") {
+                          setShowLinkedInOptions(true);
+                        } else {
+                          setSelectedCategory(item.category);
+                          setSelectedIntegration(item.category);
+                          setShowConnectModal(true);
+                        }
                       }}
-                      data-bs-toggle={"modal"}
-                      data-bs-target={"#integratedCard"}
-                      // data-bs-toggle={
-                      //   item.name === "Search console" ? "modal" : ""
-                      // }
-                      // data-bs-target={
-                      //   item.name === "Search console" ? "#integratedCard" : ""
-                      // }
                     >
                       <div className="left_part">
                         <img
@@ -122,13 +138,17 @@ const IntegrationsTab = ({
                       </div>
                       <button type="button" className="integrate_btn">
                         <span>
-                          <i
-                            className={`bi bi-${
-                              isConnected ? "check" : "x"
-                            }-circle-fill ${
-                              isConnected ? "text-success" : "text-danger"
-                            }`}
-                          ></i>
+                          {item.category !== "linkedin" ? (
+                            <i
+                              className={`bi bi-${
+                                isConnected ? "check" : "x"
+                              }-circle-fill ${
+                                isConnected ? "text-success" : "text-danger"
+                              }`}
+                            ></i>
+                          ) : (
+                            <i className="bi bi-grid-fill text-primary"></i>
+                          )}
                         </span>
                       </button>
                     </div>
@@ -139,7 +159,31 @@ const IntegrationsTab = ({
           </div>
         </div>
       </div>
-       <ConnectModal onConnect={handleConnect} isConnected={selectedIntegration ? getIsConnected(selectedIntegration) : false} />
+      {showConnectModal && (
+        <ConnectModal
+          onConnect={() => {
+            handleConnect();
+            setShowConnectModal(false);
+          }}
+          isConnected={
+            selectedIntegration ? getIsConnected(selectedIntegration) : false
+          }
+          onClose={() => setShowConnectModal(false)}
+        />
+      )}
+
+      <MultiIntegrationModal
+        title="Select LinkedIn Account"
+        options={linkedInOptions}
+        isOpen={showLinkedInOptions}
+        onClose={() => setShowLinkedInOptions(false)}
+        onSelect={(category) => {
+          setSelectedCategory(category);
+          setSelectedIntegration(category);
+          setShowConnectModal(true);
+        }}
+        getIsConnected={getIsConnected}
+      />
     </div>
   );
 };
