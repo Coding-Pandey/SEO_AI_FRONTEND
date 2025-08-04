@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   AddDomainCrawlURL,
-  DeleteOldDomain,
+  // DeleteOldDomain,
 } from "../User/SeoProcess/SeoServices";
 
 export interface NewSearchSite {
@@ -28,36 +28,83 @@ const DomainModal: React.FC<DomainModalProps> = ({
 }) => {
   const [NewLoading, setNewLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
-
+  console.log(AddAlreadySelectSite);
   const isValidDomain = (url: string) => {
     return url.startsWith("http://") || url.startsWith("https://");
   };
 
+  // const handleSubmitDomain = async () => {
+  //   setErrorMsg("");
+  //   if (content.trim() === "") {
+  //     setErrorMsg("⚠️ Domain is required.");
+  //     return;
+  //   }
+
+  //   if (!isValidDomain(content.trim())) {
+  //     setErrorMsg("⚠️ Domain must start with http:// or https://");
+  //     return;
+  //   }
+  //   setNewLoading(true);
+  //   try {
+  //     const formData = {
+  //       domain: content,
+  //     };
+  //     const response = await AddDomainCrawlURL(formData);
+  //     if (response.status === 201 || response.status === 200) {
+  //       const domainSite = response.data;
+  //         onSelect(domainSite);
+  //       // const res = await DeleteOldDomain(AddAlreadySelectSite?.uuid);
+  //       // if (res.status === 201 || res.status === 200) {
+  //         // const domainSite = response.data;
+  //         // onSelect(domainSite);
+  //       // }
+  //     }
+  //   } catch (error) {
+  //   } finally {
+  //     setNewLoading(false);
+  //   }
+  // };
+
   const handleSubmitDomain = async () => {
     setErrorMsg("");
-    if (content.trim() === "") {
-      setErrorMsg("⚠️ Domain is required.");
+
+    const trimmedInput = content.trim();
+
+    if (trimmedInput.includes(",") || trimmedInput.includes(" ")) {
+      setErrorMsg("⚠️ Please enter only one domain (no commas or spaces).");
       return;
     }
 
-    if (!isValidDomain(content.trim())) {
+    const httpMatches = trimmedInput.match(/https?:\/\//g);
+    if (!httpMatches || httpMatches.length !== 1) {
+      setErrorMsg("⚠️ Please enter only one valid domain.");
+      return;
+    }
+
+    if (!isValidDomain(trimmedInput)) {
       setErrorMsg("⚠️ Domain must start with http:// or https://");
       return;
     }
+
     setNewLoading(true);
+
     try {
+      const url = new URL(trimmedInput);
+      console.log(url, "url");
+      const baseDomain = `${url.protocol}//${url.hostname}`;
+
       const formData = {
-        domain: content,
+        domain: baseDomain,
       };
+
       const response = await AddDomainCrawlURL(formData);
-      if (response.status === 201 || response.status === 200) {
-        const res = await DeleteOldDomain(AddAlreadySelectSite?.uuid);
-        if (res.status === 201 || res.status === 200) {
-          const domainSite = response.data;
-          onSelect(domainSite);
-        }
+
+      if (response.status === 200 || response.status === 201) {
+        onSelect(response.data);
       }
     } catch (error) {
+      console.error("Error submitting domain:", error);
+      setErrorMsg("⚠️ Failed to submit domain.");
     } finally {
       setNewLoading(false);
     }
