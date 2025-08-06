@@ -61,7 +61,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
       if (response.status === 200 || response.status === 201) {
         if (response.data.timezone !== null) {
           setSelectedTimezone(
-            response?.data?.timezone?.formData?.additionalProp1
+            response?.data?.timezone
           );
         }
         setFacebookList(resFacebook.data.pages);

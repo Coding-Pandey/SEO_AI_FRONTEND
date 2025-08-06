@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AddDomainCrawlURL } from "../../SeoServices";
+import { GetUserDetails } from "../../../Services/Services";
 
 export interface Site {
   uuid: string;
@@ -24,9 +25,27 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
   const [domainInput, setDomainInput] = useState<string>("");
   const [NewLoading, setNewLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [SelectedTimezone, setSelectedTimezone] = useState<any>();
 
   useEffect(() => {
-    if (isOpen && AlreadySelectedCrawl === "True" ) {
+    GetTimeZone();
+  }, []);
+
+  const GetTimeZone = async () => {
+    try {
+      const responseData = await GetUserDetails();
+      if (responseData?.status === 200 || responseData?.status === 201) {
+        if (responseData.data.timezone !== null) {
+          setSelectedTimezone(responseData?.data?.timezone);
+        }
+      }
+    } catch (error: any) {
+      console.error("Error GetTimeZone:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && AlreadySelectedCrawl === "True") {
       const matched = AllData?.find(
         (site: any) => site.selected_site === "True"
       );
@@ -38,7 +57,7 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
         onSelect(matchedSite);
       }
     }
-  }, [isOpen, onSelect,AlreadySelectedCrawl]);
+  }, [isOpen, onSelect, AlreadySelectedCrawl]);
 
   const isValidDomain = (url: string) => {
     return url.startsWith("http://") || url.startsWith("https://");
@@ -59,6 +78,7 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
     try {
       const formData = {
         domain: domainInput,
+        timezone: SelectedTimezone,
       };
       const response = await AddDomainCrawlURL(formData);
       if (response.status === 201) {

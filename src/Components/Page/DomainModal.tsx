@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AddDomainCrawlURL,
   // DeleteOldDomain,
 } from "../User/SeoProcess/SeoServices";
+import { GetUserDetails } from "../User/Services/Services";
 
 export interface NewSearchSite {
   uuid: string;
@@ -29,6 +30,25 @@ const DomainModal: React.FC<DomainModalProps> = ({
   const [NewLoading, setNewLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   console.log(AddAlreadySelectSite);
+  const [SelectedTimezone, setSelectedTimezone] = useState<any>();
+
+  useEffect(() => {
+    GetTimeZone();
+  }, []);
+
+  const GetTimeZone = async () => {
+    try {
+      const responseData = await GetUserDetails();
+      if (responseData?.status === 200 || responseData?.status === 201) {
+        if (responseData.data.timezone !== null) {
+          setSelectedTimezone(responseData?.data?.timezone);
+        }
+      }
+    } catch (error: any) {
+      console.error("Error GetTimeZone:", error);
+    }
+  };
+
   const isValidDomain = (url: string) => {
     return url.startsWith("http://") || url.startsWith("https://");
   };
@@ -90,11 +110,11 @@ const DomainModal: React.FC<DomainModalProps> = ({
 
     try {
       const url = new URL(trimmedInput);
-      console.log(url, "url");
       const baseDomain = `${url.protocol}//${url.hostname}`;
 
       const formData = {
         domain: baseDomain,
+        timezone: SelectedTimezone,
       };
 
       const response = await AddDomainCrawlURL(formData);

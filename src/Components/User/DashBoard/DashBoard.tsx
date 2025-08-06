@@ -35,8 +35,7 @@ const DashBoard = () => {
 
   const handleSaveTimezone = async (timezone: string) => {
     try {
-      const formData = { additionalProp1: timezone };
-      const res = await UpdateUserProfile(formData);
+      const res = await UpdateUserProfile(timezone);
       if (res.status === 200 || res.status === 201) {
         setShowModal(false);
         fetchUserDetails();

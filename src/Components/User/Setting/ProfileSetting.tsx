@@ -65,7 +65,7 @@ const ProfileSetting = () => {
         setIntegratedData(responseSuccess?.data?.integrations);
         setUserDetails(response?.data);
         setSelectedTimezone(
-          response?.data?.timezone?.formData?.additionalProp1
+          response?.data?.timezone
         );
         const sourceFileList: FileItem[] =
           responseUploadFile?.data?.uploaded_files;
@@ -185,8 +185,7 @@ const ProfileSetting = () => {
 
   const handleSaveTimezone = async (timezone: string) => {
     try {
-      const formData = { additionalProp1: timezone };
-      const res = await UpdateUserProfile(formData);
+      const res = await UpdateUserProfile(timezone);
       if (res.status === 200 || res.status === 201) {
         setShowTimeZoneModal(false);
         fetchUserDetails();
@@ -217,7 +216,12 @@ const ProfileSetting = () => {
                 Settings <span className="text_blue">/ {activeTab}</span>
               </h2>
 
-              <button className="primary_btn" onClick={()=>setShowTimeZoneModal(true)}>Change TimeZone</button>
+              <button
+                className="primary_btn"
+                onClick={() => setShowTimeZoneModal(true)}
+              >
+                Change TimeZone
+              </button>
               <TimeZoneModal
                 message="profileSetting"
                 showModal={showTimeZoneModal}

@@ -1,5 +1,4 @@
 import axiosInstance from "../../../Interceptor/Interceptor";
- 
 
 export const GetUserDetails = async () => {
   try {
@@ -10,13 +9,11 @@ export const GetUserDetails = async () => {
   }
 };
 
-
-export const UpdateUserProfile = async (formData:any) => {
+export const UpdateUserProfile = async (formData: any) => {
   try {
-    const response = await axiosInstance.patch("/api/profile/edit",{formData});
+    const response = await axiosInstance.patch("/api/profile/edit", formData);
     return response;
   } catch (error) {
     throw error;
   }
 };
- 
