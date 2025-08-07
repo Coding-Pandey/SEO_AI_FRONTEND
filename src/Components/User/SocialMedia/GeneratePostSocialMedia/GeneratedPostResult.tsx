@@ -18,6 +18,7 @@ import {
 import FileNameUpdateModal from "../../../Page/FileNameUpdateModal";
 import DynamicConfirmModal from "../Common/DynamicConfirmModal";
 import FaceBookListModal from "../Common/FaceBookListModal";
+import MultiAccountModal from "../Common/MultiAccountModal";
 
 const GeneratedPostResult = () => {
   const { id } = useParams();
@@ -38,11 +39,14 @@ const GeneratedPostResult = () => {
   const [showFileModal, setShowFileModal] = useState<boolean>(false);
   const [selectedFacebookList, setSelectedFacebookList] = useState<any[]>([]);
   const [ShowListModal, setShowListModal] = useState<boolean>(false);
+  const [ShowMultiAccountModal, setShowMultiAccountModal] =
+    useState<boolean>(false);
+  const [selectedLinkedIn, setSelectedLinkedIn] = useState<string>("");
   const [facebookPostPayload, setFacebookPostPayload] = useState({
     uuid: "",
     id: "",
     post: {},
-    platform:""
+    platform: "",
   });
   const handleScheduleClick = (uuid: string, post: any, platform: string) => {
     setSelectedFacebookList([]);
@@ -59,15 +63,21 @@ const GeneratedPostResult = () => {
     post: any,
     platform: string
   ) => {
+     setPlatform(platform);
     if (platform === "facebook" && ShowListModal === false) {
       setSelectedFacebookList([]);
-      setFacebookPostPayload({ uuid, id, post,platform});
+      setFacebookPostPayload({ uuid, id, post, platform });
       setShowListModal(true);
+    } else if (platform === "linkedin" && ShowMultiAccountModal === false) {
+      setSelectedFacebookList([]);
+      setFacebookPostPayload({ uuid, id, post, platform });
+      setShowMultiAccountModal(true);
     } else {
       try {
+        setShowMultiAccountModal(false);
         setShowListModal(false);
         setLoadingApi(true);
-        setLoading(true)
+        setLoading(true);
         const selectedFacebookListIds =
           selectedFacebookList?.length > 0
             ? selectedFacebookList.map((list: any) => ({
@@ -79,22 +89,29 @@ const GeneratedPostResult = () => {
           uuid,
           content: [post],
           page_details: selectedFacebookListIds,
+          // Account:selectedLinkedIn
         });
         if (response.status === 201 || response.status === 200) {
           toast.success(`${platform} Post Publish successfully`);
           const response = await deleteSocialMediaPost(uuid, id, platform);
           if (response.status === 200 || response.status === 201) {
-            setFacebookPostPayload({ uuid: "", id: "", post: {},platform:"" });
+            setFacebookPostPayload({
+              uuid: "",
+              id: "",
+              post: {},
+              platform: "",
+            });
             removePostFromState(platform, id);
             setPlatform("");
             setShowListModal(false);
+            setShowMultiAccountModal(false);
           }
         }
       } catch (error) {
         console.log("Error during Publish Social Media", error);
       } finally {
         setLoadingApi(false);
-        setLoading(false)
+        setLoading(false);
       }
     }
   };
@@ -676,6 +693,16 @@ const GeneratedPostResult = () => {
               setSelectedFacebookList={setSelectedFacebookList}
               onClose={handleCloseListModal}
               handleCancel={() => setShowListModal(false)}
+            />
+
+            <MultiAccountModal
+              title="Select LinkedIn Account"
+              platform={platform}
+              isOpen={ShowMultiAccountModal}
+              selectedLinkedIn={selectedLinkedIn}
+              setSelectedLinkedIn={setSelectedLinkedIn}
+              onSubmit={handleCloseListModal}
+              handleCancel={() => setShowMultiAccountModal(false)}
             />
           </div>
         </div>

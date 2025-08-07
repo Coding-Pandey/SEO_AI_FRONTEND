@@ -20,8 +20,6 @@ export const GetFilterData = async () => {
   }
 };
 
-
-
 const refreshToken = async () => {
   try {
     const response = await axiosInstance.get(
@@ -236,18 +234,16 @@ export const GetAuditListDetails = async () => {
   }
 };
 
- 
-
-export const  AddDomainCrawlURL = async (formData:{domain: string}) => {
+export const AddDomainCrawlURL = async (formData: { domain: string }) => {
   try {
-    const response = await axiosInstance.post(`/api/sheets/crawl`,formData);
+    const response = await axiosInstance.post(`/api/sheets/crawl`, formData);
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-export const  DeleteOldDomain = async (uuid: string) => {
+export const DeleteOldDomain = async (uuid: string) => {
   try {
     const response = await axiosInstance.delete(`/api/crawl_data/${uuid}`);
     return response;
@@ -256,11 +252,9 @@ export const  DeleteOldDomain = async (uuid: string) => {
   }
 };
 
-
-
-export const  GetCrawDataById = async (uuid: string) => {
+export const GetCrawDataById = async (uuid: string) => {
   try {
-    const response = await axiosInstance.get(`/api/crawl_data/${uuid}`,);
+    const response = await axiosInstance.get(`/api/crawl_data/${uuid}`);
     return response;
   } catch (error) {
     throw error;

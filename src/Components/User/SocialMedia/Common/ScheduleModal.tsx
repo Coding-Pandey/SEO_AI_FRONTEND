@@ -17,14 +17,15 @@ import TimezoneSelect from "react-timezone-select";
 import Select from "react-select";
 import { GetUserDetails } from "../../Services/Services";
 import { GetFacebookPages, UpdatePlateFormList } from "./SocialMediaServices";
+import { linkedInOptions } from "../../Setting/IntegrationsTab";
 
 interface ScheduleModalProps {
   show: boolean;
   onClose: () => void;
   onSchedule: (date: string, timeZone: any, selectedFacebookList: any) => void;
   platform: string;
-  selectedFacebookList:any,
-  setSelectedFacebookList:any;
+  selectedFacebookList: any;
+  setSelectedFacebookList: any;
 }
 
 const suggestedTimes = ["07:47", "10:36", "13:19", "15:18", "18:03"];
@@ -35,7 +36,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   onSchedule,
   platform,
   selectedFacebookList,
-  setSelectedFacebookList
+  setSelectedFacebookList,
 }) => {
   const today = startOfDay(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -47,7 +48,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hour, setHour] = useState<string>("");
   const [minute, setMinute] = useState<string>("");
- 
+  const [selectedLinkedIn, setSelectedLinkedIn] = useState<string>("");
   useEffect(() => {
     fetchUserDetails();
   }, []);
@@ -60,9 +61,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
       if (response.status === 200 || response.status === 201) {
         if (response.data.timezone !== null) {
-          setSelectedTimezone(
-            response?.data?.timezone
-          );
+          setSelectedTimezone(response?.data?.timezone);
         }
         setFacebookList(resFacebook.data.pages);
       }
@@ -75,7 +74,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
   const handleRefreshList = async () => {
     try {
-      setSelectedFacebookList([])
+      setSelectedFacebookList([]);
       setIsLoading(true);
       const response = await UpdatePlateFormList();
       if (response.status === 200 || response.status === 201) {
@@ -218,6 +217,19 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
     if (!selectedTimezone || !selectedTimezone.value) {
       alert("Please select a timezone");
+      return;
+    }
+
+    if (
+      platform === "facebook" &&
+      (!selectedFacebookList || selectedFacebookList.length === 0)
+    ) {
+      alert("Please select at least one Facebook page");
+      return;
+    }
+
+    if (platform === "linkedin" && selectedLinkedIn === "") {
+      alert("Please select a LinkedIn account");
       return;
     }
 
@@ -369,6 +381,38 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 }
                 placeholder="Select one or more pages"
               />
+            </div>
+          )}
+
+          {platform === "linkedin" && (
+            <div style={{ marginTop: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}
+              >
+                <label style={{ margin: 0 }}>Select LinkedIn Account:</label>
+              </div>
+              <select
+                value={selectedLinkedIn}
+                onChange={(e) => setSelectedLinkedIn(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">Select LinkedIn account</option>
+                {linkedInOptions.map((option) => (
+                  <option key={option.category} value={option.category}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 

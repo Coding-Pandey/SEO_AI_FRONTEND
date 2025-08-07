@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-import { GetFacebookPages, UpdatePlateFormList } from "./SocialMediaServices";
+import {
+  GetFacebookPages,
+  UpdatePlateFormList,
+} from "./SocialMediaServices";
+ 
 
 interface DynamicModalProps {
   isOpen: boolean;
@@ -20,6 +24,7 @@ const FaceBookListModal: React.FC<DynamicModalProps> = ({
   const [facebookList, setFacebookList] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
   useEffect(() => {
     fetchUserDetails();
   }, []);
@@ -27,9 +32,7 @@ const FaceBookListModal: React.FC<DynamicModalProps> = ({
   const fetchUserDetails = async () => {
     try {
       setIsLoading(true);
-
       const resFacebook = await GetFacebookPages();
-
       if (resFacebook.status === 200 || resFacebook.status === 201) {
         setFacebookList(resFacebook.data.pages);
       }
@@ -47,7 +50,7 @@ const FaceBookListModal: React.FC<DynamicModalProps> = ({
       const response = await UpdatePlateFormList();
       if (response.status === 200 || response.status === 201) {
         const resFacebook = await GetFacebookPages();
-        if (response.status === 200 || response.status === 201) {
+        if (resFacebook.status === 200 || resFacebook.status === 201) {
           setFacebookList(resFacebook.data.pages);
         }
       }
@@ -75,59 +78,35 @@ const FaceBookListModal: React.FC<DynamicModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="custom-modal-overlay">
-      <div className="custom-modal-content">
-        <div className="schedule_box">
-          <div style={{ marginTop: 20 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
-              <label style={{ margin: 0 }}>Select Facebook Pages:</label>
-              <span
-                style={{ cursor: "pointer", fontSize: 16 }}
-                onClick={handleRefreshList}
-              >
-                🔄
-              </span>
-            </div>
-            <Select
-              isMulti
-              options={facebookOptions}
-              value={selectedFacebookList}
-              onChange={(selected) => {
-                setSelectedFacebookList(selected as any[]);
-                if ((selected as any[])?.length > 0) {
-                  setError("");
-                }
-              }}
-              placeholder="Select one or more pages"
-            />
-            {error && (
-              <div style={{ color: "red", marginTop: 5, fontSize: 14 }}>
-                {error}
-              </div>
-            )}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "20px",
-            }}
-          >
-            <button className="btn primary_btn" onClick={handleSubmit}>
-              {isLoading ? "Please Wait.." : "Submit"}
-            </button>
-            <button className="btn secondary_btn" onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3 className="modal-title">Select Facebook Pages</h3>
+        <div className="form-group">
+          <label>Select Facebook Pages:</label>
+          <span className="refresh-icon" onClick={handleRefreshList}>
+            🔄
+          </span>
+        </div>
+        <Select
+          isMulti
+          options={facebookOptions}
+          value={selectedFacebookList}
+          onChange={(selected) => {
+            setSelectedFacebookList(selected as any[]);
+            if ((selected as any[])?.length > 0) {
+              setError("");
+            }
+          }}
+          placeholder="Select one or more pages"
+        />
+        {error && <div className="error">{error}</div>}
+        <div className="modal-buttons">
+          <button className="btn primary_btn" onClick={handleSubmit}>
+            {isLoading ? "Please Wait..." : "Submit"}
+          </button>
+          <button className="btn secondary_btn" onClick={handleCancel}>
+            Cancel
+          </button>
         </div>
       </div>
     </div>

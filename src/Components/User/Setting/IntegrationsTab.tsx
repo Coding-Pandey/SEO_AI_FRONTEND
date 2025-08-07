@@ -2,7 +2,7 @@ import { useState } from "react";
 import ConnectModal from "./ConnectModal ";
 import MultiIntegrationModal from "./Common/MultiIntegrationModal";
 
-const integrationsList = [
+ const integrationsList = [
   {
     name: "Search console",
     img: "search-console.png",
@@ -55,7 +55,7 @@ const integrationsList = [
   },
 ];
 
-const linkedInOptions = [
+export const linkedInOptions = [
   {
     name: "LinkedIn",
     img: "linkedin.png",
