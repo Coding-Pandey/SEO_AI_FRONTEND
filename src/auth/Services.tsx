@@ -11,9 +11,28 @@ export const loginUser = async (formData: LoginFormData) => {
   }
 };
 
+
+export const SignUpUser = async (formData: any) => {
+  try {
+    const response = await axiosInstance.post('/api/register', formData); 
+    return response;   
+  } catch (error) {
+    throw error;  
+  }
+};
+
 export const googleLoginService = async (formData: GoogleUserDetails) => {
   try {
     const response = await axiosInstance.post('/api/google_login', formData);
+    return response;  
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const LogoutUserAndAdmin = async () => {
+  try {
+    const response = await axiosInstance.post('/api/logout');
     return response;  
   } catch (error) {
     throw error;

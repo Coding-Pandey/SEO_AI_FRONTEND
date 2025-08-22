@@ -463,7 +463,7 @@ const ContentGeneratBySeo = () => {
         formData.append("file", file);
         newFileUpload = file.name;
       }
-      // if (FileUrl.length > 0) {
+      // if (FileUrl.length > 0){
       //   const tempFile = FileUrl[0];
       //   formData.append("temp_file_path", tempFile);
       // }

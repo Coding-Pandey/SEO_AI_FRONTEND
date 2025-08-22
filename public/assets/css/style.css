@@ -756,8 +756,20 @@ form .row {
     display: flex;
     align-items: center;
     justify-content: center;
+    max-width: 438px;
+    width: 100%;
+    margin: auto;
 }
 
+
+.sign_wrapper .sign_body form{
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.sign_wrapper .sign_body form::-webkit-scrollbar{
+    display: none;
+}
 .signin_option {
     display: flex;
     align-items: center;
@@ -2812,6 +2824,9 @@ font-weight: 500;
         font-size: 14px;
         line-height: 18px;
     }
+    header .navbar-brand {
+        margin: 0;
+    }
 
     header .navbar-nav {
         margin-left: 0px !important;
@@ -2819,6 +2834,7 @@ font-weight: 500;
         flex-direction: row;
         align-items: center;
         column-gap: 15px;
+        margin-bottom: 0px !important;
     }
 
     header .dropdown-menu.show {

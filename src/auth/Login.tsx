@@ -19,11 +19,19 @@ const Login = () => {
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const { setUsers } = useAuth();
-  const userData = localStorage.getItem("user_Data");
+  const storedData = localStorage.getItem("user_Data");
+  const userData = storedData ? JSON.parse(storedData) : null;
 
   useEffect(() => {
     if (userData) {
-      navigate("/dashBoard");
+      if (
+        userData.user?.role === "user" ||
+        userData.user?.role === "moderator"
+      ) {
+        navigate("/dashBoard", { replace: true });
+      } else if (userData.user?.role === "admin") {
+        navigate("/adminDashBoard", { replace: true });
+      }
     }
   }, [navigate, userData]);
 
@@ -40,14 +48,20 @@ const Login = () => {
       try {
         const response = await loginUser(formData);
         if (response.status === 201 || response.status === 200) {
-          console.log("user Login Successfully",response.data);
-          const { access_token, user } = response.data;
-          const combinedData = { access_token, user };
+
+          const { access_token, user, refresh_token } = response.data;
+          const combinedData = { access_token, user, refresh_token };
           localStorage.setItem("user_Data", JSON.stringify(combinedData));
           setUsers(combinedData);
-          setTimeout(() => {
-            navigate("/dashBoard");
-          }, 100);
+
+          if (user.role === "user" || user.role === "moderator") {
+            setTimeout(() => navigate("/dashBoard", { replace: true }), 100);
+          } else if (user.role === "admin") {
+            setTimeout(
+              () => navigate("/adminDashBoard", { replace: true }),
+              100
+            );
+          }
           setFormData({ email: "", password: "" });
         }
       } catch (error) {
@@ -59,32 +73,34 @@ const Login = () => {
   };
 
   const handleGoogleSubmit = async (profile: any) => {
- 
     try {
       const userDetails = {
         username: profile.name,
         email: profile.email,
         oAuthId: profile.sub,
         role: "user",
-        image_url:profile.picture
+        image_url: profile.picture,
       };
-  
+
       const response = await googleLoginService(userDetails);
-      const { access_token, user } = response.data;
+      const { access_token, user, refresh_token } = response.data;
       if (response.status === 201 || response.status === 200) {
-        const combinedData = { access_token, user };
+        const combinedData = { access_token, user, refresh_token };
         localStorage.setItem("user_Data", JSON.stringify(combinedData));
-        setTimeout(() => {
-          navigate("/dashBoard");
-        }, 100);
         setUsers(combinedData);
+
+        if (user.role === "user" || user.role === "moderator") {
+          setTimeout(() => navigate("/dashBoard", { replace: true }), 100);
+        } else if (user.role === "admin") {
+          setTimeout(() => navigate("/adminDashBoard", { replace: true }), 100);
+        }
       }
     } catch (error) {
-        console.error("Google Login failed:", error);
+      console.error("Google Login failed:", error);
     }
   };
 
-  const Login = useGoogleLogin({
+  const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
         const res = await axios.get(
@@ -103,46 +119,42 @@ const Login = () => {
     onError: (error) => console.log("Google Login Failed:", error),
   });
 
- const handleMicrosoftLogin = async () => {
-  // try {
-  //   const loginResponse = await msalInstance.loginPopup({
-  //     scopes: ["user.read"],  
-  //   });
-  //   const account = loginResponse.account;
-  //   const tokenResponse = await msalInstance.acquireTokenSilent({
-  //     scopes: ["user.read"],
-  //     account,
-  //   });
-  //   const userInfoResponse = await axios.get("https://graph.microsoft.com/v1.0/me", {
-  //     headers: {
-  //       Authorization: `Bearer ${tokenResponse.accessToken}`,
-  //     },
-  //   });
-
-  //   const profile = userInfoResponse.data;
-  //   const userDetails = {
-  //     username: profile.displayName,
-  //     email: profile.userPrincipalName,
-  //     oAuthId: profile.id,
-  //     role: "user", 
-  //   };
-
-   
-  //   const response = await googleLoginService(userDetails); 
-  //   const { access_token, user } = response.data;
-
-  //   if (response.status === 200 || response.status === 201) {
-  //     const combinedData = { access_token, user };
-  //     localStorage.setItem("user_Data", JSON.stringify(combinedData));
-  //     setUsers(combinedData); 
-  //     setTimeout(() => {
-  //       navigate("/dashBoard");
-  //     }, 100);
-  //   }
-  // } catch (err) {
-  //   console.error("Microsoft login failed", err);
-  // }
-};
+  const handleMicrosoftLogin = async () => {
+    // try {
+    //   const loginResponse = await msalInstance.loginPopup({
+    //     scopes: ["user.read"],
+    //   });
+    //   const account = loginResponse.account;
+    //   const tokenResponse = await msalInstance.acquireTokenSilent({
+    //     scopes: ["user.read"],
+    //     account,
+    //   });
+    //   const userInfoResponse = await axios.get("https://graph.microsoft.com/v1.0/me", {
+    //     headers: {
+    //       Authorization: `Bearer ${tokenResponse.accessToken}`,
+    //     },
+    //   });
+    //   const profile = userInfoResponse.data;
+    //   const userDetails = {
+    //     username: profile.displayName,
+    //     email: profile.userPrincipalName,
+    //     oAuthId: profile.id,
+    //     role: "user",
+    //   };
+    //   const response = await googleLoginService(userDetails);
+    //   const { access_token, user } = response.data;
+    //   if (response.status === 200 || response.status === 201) {
+    //     const combinedData = { access_token, user };
+    //     localStorage.setItem("user_Data", JSON.stringify(combinedData));
+    //     setUsers(combinedData);
+    //     setTimeout(() => {
+    //       navigate("/dashBoard");
+    //     }, 100);
+    //   }
+    // } catch (err) {
+    //   console.error("Microsoft login failed", err);
+    // }
+  };
 
   return (
     <div className="sign_wrapper">
@@ -150,7 +162,11 @@ const Login = () => {
         <div className="col-12 col-sm-4 col-lg-3 bg_blue">
           <div className="sign_sidebar">
             <div className="sign_logo_wrapper">
-              <img src="/assets/images/logo-white.svg" className="img-fluid sign-logo" alt="logo" />
+              <img
+                src="/assets/images/logo-white.svg"
+                className="img-fluid sign-logo"
+                alt="logo"
+              />
             </div>
             <div className="sign_plan">
               <h3 className="font_25 font_600 mb-3">Plan includes</h3>
@@ -193,13 +209,17 @@ const Login = () => {
                 <div className="signin_option">
                   <button
                     type="button"
-                    onClick={() => Login()}
+                    onClick={() => googleLogin()}
                     className="btn primary_btn_outline"
                   >
                     <i className="bi bi-google"></i>
                     <span>Google</span>
                   </button>
-                  <button type="button"  onClick={handleMicrosoftLogin} className="btn primary_btn_outline">
+                  <button
+                    type="button"
+                    onClick={handleMicrosoftLogin}
+                    className="btn primary_btn_outline"
+                  >
                     <i className="bi bi-windows"></i>
                     <span>Microsoft</span>
                   </button>
@@ -248,6 +268,21 @@ const Login = () => {
                 <p className="font_14 gray_clr my-2">
                   The site is protected by reCAPTCHA and the Google Privacy
                   Policy.
+                </p>
+
+                <p className="font_14 gray_clr my-4 text-center">
+                  Need an account?{" "}
+                  <span
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: "600",
+                      textDecoration: "underline",
+                      color: "rgb(250, 122, 78)",
+                    }}
+                    onClick={() => navigate("/signUp")}
+                  >
+                    SIGN UP
+                  </span>
                 </p>
               </div>
             </form>
