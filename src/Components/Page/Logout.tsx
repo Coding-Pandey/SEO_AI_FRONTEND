@@ -5,24 +5,28 @@ import { LogoutUserAndAdmin } from "../../auth/Services";
 import Loading from "./Loading/Loading";
 
 const Logout: React.FC = () => {
-  const { setUsers } = useAuth();
+  const { users, setUsers } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handleLogout = async () => {
+      if (!users) {
+        navigate("/", { replace: true });
+        return;
+      }
       try {
         const res = await LogoutUserAndAdmin();
         if (res.status === 200 || res.status === 201 || res.status === 204) {
           localStorage.clear();
           setUsers(null);
-          navigate("/");
+          navigate("/", { replace: true });
         }
       } catch (error) {
         console.error("Logout failed:", error);
         localStorage.clear();
         setUsers(null);
-        navigate("/");
+        navigate("/", { replace: true });
       } finally {
         setLoading(false);
       }
@@ -32,9 +36,7 @@ const Logout: React.FC = () => {
   }, [navigate, setUsers]);
 
   if (loading) {
-    return (
-       <Loading/>
-    );
+    return <Loading />;
   }
 
   return null;
