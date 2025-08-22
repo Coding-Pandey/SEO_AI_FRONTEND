@@ -22,7 +22,7 @@ const ConformModal: React.FC<ConformModalProps> = ({
       <div className="custom-modal-content">
         <div className="schedule_box">
           <p className="font_16 mb-1">{title}</p>
-          {message && <p className="font_30 mb-1">{message}</p>}
+          {message && <p className="font_25 mb-1">{message}</p>}
 
           <div className="modal-actions">
             <button className="btn primary_btn ok_btn" onClick={onClose}>

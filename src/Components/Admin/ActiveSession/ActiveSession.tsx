@@ -279,7 +279,7 @@ const ActiveSession = () => {
       <ConformModal
         isOpen={isDeleteAllModalOpen}
         title="Delete All Confirmation"
-        message="Are you sure you want to delete ALL sessions?"
+        message="Are you sure you want to delete ALL Expired sessions?"
         onClose={handleConfirmDeleteAll}
         onCancel={() => setIsDeleteAllModalOpen(false)}
       />
