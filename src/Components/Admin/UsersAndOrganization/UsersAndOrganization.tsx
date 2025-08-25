@@ -108,9 +108,6 @@ const UsersAndOrganization = () => {
     setDeleteId(null);
   };
 
-  // Generate pagination numbers
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-
   return (
     <>
       {isLoading && <Loading />}
@@ -120,7 +117,7 @@ const UsersAndOrganization = () => {
         {!isCreateModalOpen ? (
           <div className="inner_content">
             <div className="keyword_tool_content">
-              <div className="d-flex justify-content-between align-items-center mb-3">
+              <div className="d-flex flex-wrap justify-content-between align-items-center mb-3">
                 <h5>Manage Users and Organizations</h5>
                 <button
                   className="btn primary_btn"
@@ -131,7 +128,7 @@ const UsersAndOrganization = () => {
               </div>
 
               {/* Search & Role */}
-              <div className="d-flex justify-content-between mb-3">
+              <div className="d-flex flex-wrap justify-content-between mb-3 gap-3 organization_btn">
                 {/* Role filter on the left */}
                 <div className="w-20">
                   <select
@@ -207,16 +204,15 @@ const UsersAndOrganization = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="d-flex justify-content-between align-items-center mt-3">
-                {/* Left side: showing entries */}
-                <p className="mb-0">
+              <div className="d-flex flex-wrap justify-content-between align-items-center mt-3">
+                <p className="mb-2 mb-md-0">
                   Showing {Math.min(currentPage * perPage, totalRows)} of{" "}
                   {totalRows} entries
                 </p>
 
-                {/* Right side: pagination */}
                 <nav>
-                  <ul className="pagination mb-0">
+                  <ul className="pagination mb-0 flex-wrap">
+                    {/* Previous button */}
                     <li
                       className={`page-item ${
                         currentPage === 1 ? "disabled" : ""
@@ -226,26 +222,79 @@ const UsersAndOrganization = () => {
                         className="page-link"
                         onClick={() => setCurrentPage((prev) => prev - 1)}
                       >
-                        <i className="bi bi-arrow-left"></i> Previous
+                        <i className="bi bi-arrow-left"></i>
                       </button>
                     </li>
 
-                    {pageNumbers.map((num) => (
-                      <li
-                        key={num}
-                        className={`page-item ${
-                          currentPage === num ? "active" : ""
-                        }`}
-                      >
-                        <button
-                          className="page-link"
-                          onClick={() => setCurrentPage(num)}
+                    {/* First page */}
+                    {currentPage > 3 && (
+                      <>
+                        <li
+                          className={`page-item ${
+                            currentPage === 1 ? "active" : ""
+                          }`}
                         >
-                          {num}
-                        </button>
-                      </li>
-                    ))}
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage(1)}
+                          >
+                            1
+                          </button>
+                        </li>
+                        {currentPage > 4 && (
+                          <li className="page-item disabled">
+                            <span className="page-link">...</span>
+                          </li>
+                        )}
+                      </>
+                    )}
 
+                    {/* Middle pages */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(
+                        (num) =>
+                          num >= currentPage - 2 && num <= currentPage + 2
+                      )
+                      .map((num) => (
+                        <li
+                          key={num}
+                          className={`page-item ${
+                            currentPage === num ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage(num)}
+                          >
+                            {num}
+                          </button>
+                        </li>
+                      ))}
+
+                    {/* Last page */}
+                    {currentPage < totalPages - 2 && (
+                      <>
+                        {currentPage < totalPages - 3 && (
+                          <li className="page-item disabled">
+                            <span className="page-link">...</span>
+                          </li>
+                        )}
+                        <li
+                          className={`page-item ${
+                            currentPage === totalPages ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage(totalPages)}
+                          >
+                            {totalPages}
+                          </button>
+                        </li>
+                      </>
+                    )}
+
+                    {/* Next button */}
                     <li
                       className={`page-item ${
                         currentPage === totalPages ? "disabled" : ""
@@ -255,7 +304,7 @@ const UsersAndOrganization = () => {
                         className="page-link"
                         onClick={() => setCurrentPage((prev) => prev + 1)}
                       >
-                        Next <i className="bi bi-arrow-right"></i>
+                        <i className="bi bi-arrow-right"></i>
                       </button>
                     </li>
                   </ul>

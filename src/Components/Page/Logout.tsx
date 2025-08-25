@@ -12,6 +12,7 @@ const Logout: React.FC = () => {
   useEffect(() => {
     const handleLogout = async () => {
       if (!users) {
+        localStorage.clear();
         navigate("/", { replace: true });
         return;
       }

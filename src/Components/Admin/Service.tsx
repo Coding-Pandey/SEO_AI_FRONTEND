@@ -8,7 +8,12 @@ interface GetUserAndOrganizationParams {
 }
 
 interface GetActiveSessionStatusParams {
-  is_expired?: string;  // "true" | "false" | ""
+  is_expired?: string; // "true" | "false" | ""
+  page?: number;
+  per_page?: number;
+}
+
+interface GetSecurityLogsParams {
   page?: number;
   per_page?: number;
 }
@@ -35,9 +40,8 @@ export const GetActiveSession = async (
   params: GetActiveSessionStatusParams = {}
 ) => {
   try {
-  
     const queryParams = new URLSearchParams({
-       is_expired: params.is_expired || "null",   // ✅ add here
+      is_expired: params.is_expired || "null", // ✅ add here
       page: params.page?.toString() || "1",
       per_page: params.per_page?.toString() || "10",
     }).toString();
@@ -60,17 +64,14 @@ export const DeleteActiveSession = async (id: string) => {
   }
 };
 
-
 export const DeleteAllActiveSessions = async () => {
   try {
-    const response = await axiosInstance.post("/api/admin/sessions/cleanup"); 
+    const response = await axiosInstance.post("/api/admin/sessions/cleanup");
     return response;
   } catch (error) {
     throw error;
   }
 };
-
-
 
 export const DeleteUserAndOrganizationUser = async (id: number) => {
   try {
@@ -84,6 +85,22 @@ export const DeleteUserAndOrganizationUser = async (id: number) => {
 export const AdminCreateUser = async (formData: any) => {
   try {
     const response = await axiosInstance.post("/api/admin/register", formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const GetSecurityLogs = async (params: GetSecurityLogsParams = {}) => {
+  try {
+    const queryParams = new URLSearchParams({
+      page: params.page?.toString() || "1",
+      per_page: params.per_page?.toString() || "10",
+    }).toString();
+
+    const response = await axiosInstance.get(
+      `/api/admin/security_logs?${queryParams}`
+    );
     return response;
   } catch (error) {
     throw error;

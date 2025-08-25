@@ -2610,6 +2610,7 @@ font-weight: 500;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
+ 
 .modal-title {
   margin-bottom: 20px;
   font-size: 1.4rem;
@@ -2622,6 +2623,32 @@ font-weight: 500;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+}
+
+
+.security_modal .modal-content {
+    max-height: 100%;
+    overflow: hidden;
+    justify-content: center;
+    width: 100%;
+    max-width: max-content;
+    padding: 0px;
+}
+
+.security_modal .modal-dialog {
+    display: flex;
+    align-items: center;
+}
+.security_modal .modal-title {
+    margin-bottom: 0px;
+}
+.pagination .page-link {
+    padding: 5px 10px;
+}
+
+
+.organization_btn .w-20 {
+    width: 160px;
 }
 
 .refresh-icon {

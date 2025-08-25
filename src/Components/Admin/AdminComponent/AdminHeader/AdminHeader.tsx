@@ -27,6 +27,11 @@ const menuItems: MenuItem[] = [
   },
 
   {
+    title: "Security Logs",
+    icon: "bi-shield-lock",
+    to: "/security_logs",
+  },
+  {
     title: "Settings",
     icon: "bi-gear",
     to: "/Admin-Profile",

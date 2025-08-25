@@ -7,7 +7,7 @@ const AdminSideBar = () => {
     {
       title: "Admin Dashboard",
       icon: "bi-grid",
-      to: "/adminDashBoard",  
+      to: "/adminDashBoard",
     },
     {
       title: "User Management",
@@ -15,10 +15,15 @@ const AdminSideBar = () => {
       to: "/users-organization",
     },
     {
-    title: "Active Session",
-    icon: "bi-people-fill",
-    to: "/active-session",
-  },
+      title: "Active Session",
+      icon: "bi-people-fill",
+      to: "/active-session",
+    },
+    {
+      title: "Security Logs",
+      icon: "bi-shield-lock",
+      to: "/security_logs",
+    },
   ];
 
   const isActive = (to: string) => pathname.startsWith(to);

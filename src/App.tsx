@@ -24,6 +24,10 @@ const ActiveSession = lazy(
 const AdminProfile = lazy(
   () => import("./Components/Admin/AdminComponent/AdminProfile/AdminProfile")
 );
+
+const SecurityLogs = lazy(
+  () => import("./Components/Admin/SecurityLogs/SecurityLogs")
+);
 //User
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
 
@@ -109,6 +113,7 @@ function App() {
               element={<UsersAndOrganization />}
             />
             <Route path="/active-session" element={<ActiveSession />} />
+            <Route path="/security_logs" element={<SecurityLogs />} />
           </Route>
           {/* Protected Routes User */}
           <Route

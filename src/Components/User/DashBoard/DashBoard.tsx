@@ -9,9 +9,7 @@ import Loading from "../../Page/Loading/Loading";
 const DashBoard = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedTimezone, setSelectedTimezone] = useState<any>(
-    Intl.DateTimeFormat().resolvedOptions().timeZone
-  );
+  const [selectedTimezone, setSelectedTimezone] = useState<any>();
 
   useEffect(() => {
     fetchUserDetails();
