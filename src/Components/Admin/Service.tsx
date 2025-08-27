@@ -14,6 +14,7 @@ interface GetActiveSessionStatusParams {
 }
 
 interface GetSecurityLogsParams {
+  is_expired?: string;
   page?: number;
   per_page?: number;
 }
@@ -94,6 +95,7 @@ export const AdminCreateUser = async (formData: any) => {
 export const GetSecurityLogs = async (params: GetSecurityLogsParams = {}) => {
   try {
     const queryParams = new URLSearchParams({
+      risk_level: params.is_expired || "",
       page: params.page?.toString() || "1",
       per_page: params.per_page?.toString() || "10",
     }).toString();

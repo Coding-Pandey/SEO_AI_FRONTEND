@@ -12,7 +12,7 @@ const SecurityLogs = () => {
   const [perPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
-
+  const [statusFilter, setStatusFilter] = useState<string>("");
   // For modal
   const [showModal, setShowModal] = useState(false);
   const [selectedLog, setSelectedLog] = useState<any>(null);
@@ -21,6 +21,7 @@ const SecurityLogs = () => {
     try {
       setIsLoading(true);
       const response = await GetSecurityLogs({
+        is_expired: statusFilter || "",
         page: currentPage,
         per_page: perPage,
       });
@@ -39,7 +40,7 @@ const SecurityLogs = () => {
 
   useEffect(() => {
     fetchSessions();
-  }, [currentPage]);
+  }, [currentPage,statusFilter]);
 
   const formatDateTime = (dateString: string) => {
     if (!dateString) return "-";
@@ -71,6 +72,22 @@ const SecurityLogs = () => {
           <div className="keyword_tool_content">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="mb-0 font_20 font_600">Manage Security Logs</h5>
+                <div className="d-flex flex-wrap align-items-center gap-2">
+                <select
+                  className="form-select"
+                  style={{ width: "150px" }}
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setCurrentPage(1);
+                    setStatusFilter(e.target.value);
+                  }}
+                >
+                  <option value="">All Risk Level</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                 </div>
             </div>
 
             {/* Table */}
