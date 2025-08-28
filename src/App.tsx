@@ -5,6 +5,7 @@ import Loading from "./Components/Page/Loading/Loading";
 import PageNotFound from "./Components/Page/PageNotFound";
 import ProtectedRoutes from "./ProtectedRoutes/ProtectedRoutes";
 import Logout from "./Components/Page/Logout";
+ 
 
 const Login = lazy(() => import("./auth/Login"));
 const SignUp = lazy(() => import("./auth/SignUp"));
@@ -94,6 +95,11 @@ const ProfileSettingSuccess = lazy(
   () => import("./Components/User/Setting/ProfileSettingSuccess")
 );
 
+//Organization
+const ManageModerator = lazy(
+  () => import("./Components/User/Moderator/ManageByModerator/ManageModerator")
+);
+
 function App() {
   return (
     <>
@@ -176,6 +182,11 @@ function App() {
               element={<ProfileSettingSuccess />}
             />
           </Route>
+          {/* Protected Routes moderator */}
+          <Route element={<ProtectedRoutes allowedRoles={["moderator"]} />}>
+            <Route path="/moderator/manage-moderator" element={<ManageModerator />} />
+          </Route>
+
           {/* 404 Route */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>

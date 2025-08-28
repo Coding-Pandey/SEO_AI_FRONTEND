@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../ContextApi/AuthContext/AuthContext';
 
 const SideBar = () => {
   const { pathname } = useLocation();
-
+  const { users } = useAuth();
   const menuItems = [
     {
       title: 'Dashboard',
@@ -54,6 +55,17 @@ const SideBar = () => {
         { title: 'Comment', to: '#' },
       ],
     },
+    ...(users?.user?.role === "moderator"
+    ? [
+        {
+          title: 'Organization',
+          icon: 'bi-people',
+          submenu: [
+            { title: 'Manage Users', to: '/moderator/manage-moderator' },
+          ],
+        },
+      ]
+    : []),
   ];
 
   const isActive = (to: string) => pathname.startsWith(to);

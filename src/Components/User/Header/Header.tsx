@@ -1,12 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { GetUserDetails } from "../Services/Services";
+import { useAuth } from "../../../ContextApi/AuthContext/AuthContext";
 
 const Header = () => {
   const [userDetails, setUserDetails] = useState<any>({});
   const location = useLocation(); 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  
+  const { users } = useAuth();
 
   useEffect(() => {
     fetchUserDetails();
@@ -404,6 +405,37 @@ const Header = () => {
                         </li>
                       </ul>
                     </li>
+                     {/* Moderator */}
+
+                    { users?.user?.role === "moderator" &&
+                     <li className="nav-item dropdown">
+                      <Link
+                        className="nav-link dropdown-toggle"
+                        to="#"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        <i className="bi bi-people"></i> Organization{" "}
+                        <i className="bi bi-chevron-down dropdown_icon"></i>
+                      </Link>
+                      <ul className="dropdown-menu">
+                       
+                        <li className="dropdown-item">
+                          <Link
+                            className={`submenu-link ${
+                              isActive("/moderator/manage-moderator")
+                                ? "active"
+                                : ""
+                            }`}
+                            to="/moderator/manage-moderator"
+                          >
+                            Manage Users
+                          </Link>
+                        </li>
+                        
+                      </ul>
+                    </li>}
                   </ul>
 
                   <ul className="nav flex-column sidebar-bottom">

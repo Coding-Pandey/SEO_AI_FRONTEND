@@ -199,13 +199,13 @@ const KeywordToolResult = () => {
       (lang) => lang.ID === Number(language)
     );
 
-    const limitedData = filteredKeywords.slice(0, 200);
+    // const limitedData = filteredKeywords.slice(0, 200);
 
     setLoadingSuggestion(true);
 
     const newData = {
       file_name: FileNameData?.fileName,
-      keywords: limitedData,
+      keywords: filteredKeywords,
       delete_word: {
         include: [],
         exlude: [],

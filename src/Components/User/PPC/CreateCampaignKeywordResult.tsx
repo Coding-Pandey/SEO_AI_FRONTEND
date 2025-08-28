@@ -199,9 +199,9 @@ const CreateCampaignKeywordResult = () => {
       (lang) => lang.ID === Number(language)
     );
 
-    const limitedData = filteredKeywords.slice(0, 200);
+    // const limitedData = filteredKeywords.slice(0, 200);
 
-    const cleanedData = limitedData.map(({ isNew, ...rest }) => rest);
+    const cleanedData = filteredKeywords.map(({ isNew, ...rest }) => rest);
 
     const newData = {
       file_name: FileNameData?.fileName,

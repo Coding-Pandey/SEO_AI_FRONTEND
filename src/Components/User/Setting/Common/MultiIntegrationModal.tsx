@@ -37,7 +37,6 @@ const MultiIntegrationModal = ({
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{title}</h5>
-            <button type="button" className="btn-close" onClick={onClose} />
           </div>
           <div className="modal-body">
             <ul className="list-unstyled integration_card_wrapper row row-cols-1 row-cols-sm-2 row-cols-lg-2 row-cols-xxl-2 g-3">
@@ -84,6 +83,14 @@ const MultiIntegrationModal = ({
               })}
             </ul>
           </div>
+          <button
+            className="btn modal_close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            onClick={onClose}
+          >
+            <i className="bi-x-circle-fill"></i>
+          </button>
         </div>
       </div>
     </div>

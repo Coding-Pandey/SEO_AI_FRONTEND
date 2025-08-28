@@ -19,6 +19,7 @@ export interface SignUpFormData {
     allow_public_signup: boolean;
   };
 }
+
 export interface ValidationErrorsSingUp {
   [key: string]: string;
 }
