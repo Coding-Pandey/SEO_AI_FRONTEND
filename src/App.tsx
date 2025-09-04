@@ -5,8 +5,6 @@ import Loading from "./Components/Page/Loading/Loading";
 import PageNotFound from "./Components/Page/PageNotFound";
 import ProtectedRoutes from "./ProtectedRoutes/ProtectedRoutes";
 import Logout from "./Components/Page/Logout";
- 
-
 const Login = lazy(() => import("./auth/Login"));
 const SignUp = lazy(() => import("./auth/SignUp"));
 
@@ -28,6 +26,10 @@ const AdminProfile = lazy(
 
 const SecurityLogs = lazy(
   () => import("./Components/Admin/SecurityLogs/SecurityLogs")
+);
+
+const Organizations = lazy(
+  () => import("./Components/Admin/Organizations/Organizations")
 );
 //User
 const DashBoard = lazy(() => import("./Components/User/DashBoard/DashBoard"));
@@ -95,10 +97,7 @@ const ProfileSettingSuccess = lazy(
   () => import("./Components/User/Setting/ProfileSettingSuccess")
 );
 
-//Organization
-const ManageModerator = lazy(
-  () => import("./Components/User/Moderator/ManageByModerator/ManageModerator")
-);
+ 
 
 function App() {
   return (
@@ -120,6 +119,7 @@ function App() {
             />
             <Route path="/active-session" element={<ActiveSession />} />
             <Route path="/security_logs" element={<SecurityLogs />} />
+            <Route path="/organization-management" element={<Organizations />} />
           </Route>
           {/* Protected Routes User */}
           <Route
@@ -182,11 +182,7 @@ function App() {
               element={<ProfileSettingSuccess />}
             />
           </Route>
-          {/* Protected Routes moderator */}
-          <Route element={<ProtectedRoutes allowedRoles={["moderator"]} />}>
-            <Route path="/moderator/manage-moderator" element={<ManageModerator />} />
-          </Route>
-
+        
           {/* 404 Route */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>

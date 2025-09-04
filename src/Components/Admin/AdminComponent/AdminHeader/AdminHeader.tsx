@@ -2,6 +2,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { GetUserDetails } from "../../../User/Services/Services";
 
+export const capitalizeFirstLetter = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
+
 type MenuItem = {
   title: string;
   icon: string;
@@ -19,7 +22,11 @@ const menuItems: MenuItem[] = [
     icon: "bi-people",
     to: "/users-organization",
   },
-
+  {
+      title: "Organizations",
+      icon: "bi-people",
+      to: "/organization-management",
+  },
   {
     title: "Active Session",
     icon: "bi-people-fill",
@@ -30,16 +37,6 @@ const menuItems: MenuItem[] = [
     title: "Security Logs",
     icon: "bi-shield-lock",
     to: "/security_logs",
-  },
-  {
-    title: "Settings",
-    icon: "bi-gear",
-    to: "/Admin-Profile",
-  },
-  {
-    title: "Logout",
-    icon: "bi bi-box-arrow-in-right",
-    to: "/Logout",
   },
 ];
 
@@ -88,6 +85,20 @@ const AdminHeader = () => {
                 <span className="navbar-toggler-icon"></span>
               </button>
             </li>
+            {userDetails?.role && (
+              <li className="nav-item hide-on-mobile">
+                <button
+                  className="primary_btn"
+                  style={{
+                    backgroundColor: "rgb(72, 114, 183)",
+                    border: "none",
+                  }}
+                >
+                  {capitalizeFirstLetter(userDetails.role)}
+                </button>
+              </li>
+            )}
+
             <li className="nav-item">
               <Link className="nav-link" to="#">
                 <i className="bi bi-envelope"></i>

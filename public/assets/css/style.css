@@ -2604,12 +2604,15 @@ font-weight: 500;
 .modal-content {
   background: #fff;
   width: 90%;
-  max-width: 400px;
+  max-width: 450px;
   border-radius: 10px;
   padding: 25px 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   margin-inline: auto;
 }
+
+
+ 
 
  
 .modal-title {
@@ -2673,7 +2676,40 @@ font-weight: 500;
 }
 
  
- 
+ .view-more-btn {
+  background-color: rgb(72, 114, 183);  
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 50px; 
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.view-more-btn span {
+  font-weight: 700;
+}
+
+.view-more-btn .arrow {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.view-more-btn:hover {
+  background-color: rgb(8, 63, 151); 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.view-more-btn:hover .arrow {
+  transform: translateX(5px);
+}
+
  
 /* Responsive css */
 @media only screen and (max-width:1599px) {
@@ -3033,6 +3069,8 @@ font-weight: 500;
     align-items: stretch;
   }
 
+
+
   
 }
 
@@ -3172,6 +3210,10 @@ font-weight: 500;
     .brand_select  .brand_content_box {
         width: 100%;
     }
+    
+        .hide-on-mobile {
+    display: none;
+  }
 }
 
 @media only screen and (max-width:480px) {

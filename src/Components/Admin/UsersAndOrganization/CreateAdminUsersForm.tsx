@@ -111,7 +111,7 @@ const CreateAdminUsersForm = ({ onClose, onHandleSubmit }: Props) => {
                     checked={role === "user"}
                     onChange={() => handleRoleChange("user")}
                   />{" "}
-                  Normal User
+                  User
                 </label>
                 <label>
                   <input

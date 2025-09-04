@@ -18,7 +18,7 @@ const ConformModal: React.FC<ConformModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="custom-modal-overlay">
+    <div className="custom-modal-overlay ">
       <div className="custom-modal-content">
         <div className="schedule_box">
           <p className="font_16 mb-1">{title}</p>

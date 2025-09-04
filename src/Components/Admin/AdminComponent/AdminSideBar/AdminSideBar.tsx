@@ -15,6 +15,11 @@ const AdminSideBar = () => {
       to: "/users-organization",
     },
     {
+      title: "Organizations",
+      icon: "bi-people",
+      to: "/organization-management",
+    },
+    {
       title: "Active Session",
       icon: "bi-people-fill",
       to: "/active-session",
@@ -43,19 +48,7 @@ const AdminSideBar = () => {
         ))}
       </ul>
 
-      <ul className="nav flex-column sidebar-bottom">
-        <li className="sidebar-item">
-          <Link className="nav-link" to="/Admin-Profile">
-            <i className="bi bi-gear"></i> Settings
-          </Link>
-        </li>
-
-        <li className="sidebar-item">
-          <Link className="nav-link" to="/Logout">
-            <i className="bi bi-box-arrow-in-right"></i> Logout
-          </Link>
-        </li>
-      </ul>
+    
     </div>
   );
 };

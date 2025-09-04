@@ -118,7 +118,7 @@ const UsersAndOrganization = () => {
           <div className="inner_content">
             <div className="keyword_tool_content">
               <div className="d-flex flex-wrap justify-content-between align-items-center mb-3">
-                <h5>Manage Users and Organizations</h5>
+                <h5>Manage Admin and Users and Organizations</h5>
                 <button
                   className="btn primary_btn"
                   onClick={() => setIsCreateModalOpen(true)}

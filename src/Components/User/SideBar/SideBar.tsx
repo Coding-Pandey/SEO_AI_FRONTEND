@@ -1,9 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../../ContextApi/AuthContext/AuthContext';
-
+ 
 const SideBar = () => {
   const { pathname } = useLocation();
-  const { users } = useAuth();
+
   const menuItems = [
     {
       title: 'Dashboard',
@@ -55,17 +54,7 @@ const SideBar = () => {
         { title: 'Comment', to: '#' },
       ],
     },
-    ...(users?.user?.role === "moderator"
-    ? [
-        {
-          title: 'Organization',
-          icon: 'bi-people',
-          submenu: [
-            { title: 'Manage Users', to: '/moderator/manage-moderator' },
-          ],
-        },
-      ]
-    : []),
+    
   ];
 
   const isActive = (to: string) => pathname.startsWith(to);
@@ -116,20 +105,6 @@ const SideBar = () => {
             <i className="bi bi-cloud-arrow-up"></i> Upload Document
           </Link>
         </li> */}
-      </ul>
-
-      <ul className="nav flex-column sidebar-bottom">
-        <li className="sidebar-item">
-          <Link className="nav-link" to="/ProfileSetting">
-            <i className="bi bi-gear"></i> Settings
-          </Link>
-        </li>
-
-        <li className="sidebar-item">
-          <Link className="nav-link" to="/Logout">
-            <i className="bi bi-box-arrow-in-right"></i> Logout
-          </Link>
-        </li>
       </ul>
     </div>
   );

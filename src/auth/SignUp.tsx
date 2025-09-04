@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 const SignUp = () => {
   const navigate = useNavigate();
 
-  const [role, setRole] = useState<"user" | "moderator">("user");  
+  const [role, setRole] = useState<"user" | "moderator">("moderator");  
   const [formData, setFormData] = useState<SignUpFormData>({
     username: "",
     email: "",
@@ -154,15 +154,15 @@ const SignUp = () => {
 
                 {/* Role Selection */}
                 <div className="mb-3 d-flex gap-4">
-                  <label>
+                  {/* <label>
                     <input
                       type="radio"
                       name="role"
                       checked={role === "user"}
                       onChange={() => handleRoleChange("user")}
                     />{" "}
-                    Normal User
-                  </label>
+                    User
+                  </label> */}
                   <label>
                     <input
                       type="radio"

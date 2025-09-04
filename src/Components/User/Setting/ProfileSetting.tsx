@@ -15,6 +15,8 @@ import { toast } from "react-toastify";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { capitalizeFirstLetter } from "../SeoProcess/SEOReport/Reports";
 import TimeZoneModal from "../../Page/TimeZoneModal";
+import ManageModerator from "../Moderator/ManageByModerator/ManageModerator";
+import { useAuth } from "../../../ContextApi/AuthContext/AuthContext";
 // import BuyerPersonaModal from "./BuyerPersonaModal";
 
 interface FileItem {
@@ -25,6 +27,7 @@ interface FileItem {
 }
 
 const ProfileSetting = () => {
+  const { users } = useAuth();
   const [userDetails, setUserDetails] = useState<any>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [IntegratedData, setIntegratedData] = useState<any>([]);
@@ -64,9 +67,7 @@ const ProfileSetting = () => {
       if (response.status === 200 || response.status === 201) {
         setIntegratedData(responseSuccess?.data?.integrations);
         setUserDetails(response?.data);
-        setSelectedTimezone(
-          response?.data?.timezone
-        );
+        setSelectedTimezone(response?.data?.timezone);
         const sourceFileList: FileItem[] =
           responseUploadFile?.data?.uploaded_files;
         console.log(sourceFileList, "sourceFileList");
@@ -294,6 +295,26 @@ const ProfileSetting = () => {
                           </span>
                         </button>
                       </li>
+                      {users?.user.role === "moderator" && (
+                        <li className="nav-item" role="presentation">
+                          <button
+                            className="nav-link"
+                            id="pills-ManageUsers-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#pills-ManageUsers"
+                            type="button"
+                            role="tab"
+                            aria-controls="pills-ManageUsers"
+                            aria-selected="false"
+                            onClick={() => setActiveTab("Manage Users")}
+                          >
+                            Manage Users{" "}
+                            <span>
+                              <i className="bi bi-chevron-right"></i>
+                            </span>
+                          </button>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -381,6 +402,7 @@ const ProfileSetting = () => {
                         </div>
                       </div>
                     </div>
+
                     <IntegrationsTab
                       IntegratedData={IntegratedData}
                       setSelectedCategory={setSelectedCategory}
@@ -865,6 +887,28 @@ const ProfileSetting = () => {
                         onClose={() => setIsBuyerModalOpen(false)}
                         fileList={["https://domain.com/file_name.pdf"]}
                       /> */}
+                    </div>
+
+                    <div
+                      className={`tab-pane fade ${
+                        activeTab === "Manage Users" ? "show active" : ""
+                      }`}
+                      id="pills-ManageUsers"
+                      role="tabpanel"
+                      aria-labelledby="pills-ManageUsers-tab"
+                    >
+                      <div className="profile_content">
+                        <div className="row">
+                          <div className="col-12">
+                            <h3 className="font_20 font_600 mb-2">
+                              Manage Users
+                            </h3>
+                            <div className="card_box box-shadow">
+                              <ManageModerator />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

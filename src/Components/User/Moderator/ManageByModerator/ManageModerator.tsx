@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Loading from "../../../Page/Loading/Loading";
-import Header from "../../Header/Header";
-import SideBar from "../../SideBar/SideBar";
 import { useAuth } from "../../../../ContextApi/AuthContext/AuthContext";
 import {
   DeleteUserByModerator,
@@ -77,19 +75,19 @@ const ManageModerator = () => {
   return (
     <>
       {isLoading && <Loading />}
-      <Header />
-      <main className="main_wrapper">
-        <SideBar />
+    
+      <main className="profile_content Integrations_settings">
+  
         {!isCreateModalOpen ? (
-          <div className="inner_content">
+          <div className="row">
             <div className="keyword_tool_content">
               <div className="d-flex flex-wrap justify-content-between align-items-center mb-3">
-                <h5 className="font_25 font_600">Manage Users</h5>
+                <h5 className="font_25 font_600"> </h5>
                 <button
                   className="btn primary_btn"
                   onClick={() => setIsCreateModalOpen(true)}
                 >
-                  Create User
+                  Invite User
                 </button>
               </div>
 

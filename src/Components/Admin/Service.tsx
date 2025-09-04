@@ -19,6 +19,19 @@ interface GetSecurityLogsParams {
   per_page?: number;
 }
 
+interface GetAllOrganizationParams {
+  username?:string;
+  page?: number;
+  per_page?: number;
+}
+
+interface GetOrganizationAndItsUserParams {
+  username?:string;
+  page?: number;
+  per_page?: number;
+}
+
+
 export const GetUserAndOrganization = async (
   params: GetUserAndOrganizationParams = {}
 ) => {
@@ -103,6 +116,41 @@ export const GetSecurityLogs = async (params: GetSecurityLogsParams = {}) => {
     const response = await axiosInstance.get(
       `/api/admin/security_logs?${queryParams}`
     );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const GetAllOrganization = async (
+  params: GetAllOrganizationParams = {}
+) => {
+  try {
+    const queryParams = new URLSearchParams({
+      name: params.username || "",
+      page: params.page?.toString() || "1",
+      limit: params.per_page?.toString() || "10",
+    }).toString();
+
+    const response = await axiosInstance.get(`/api/admin/organizations?${queryParams}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const GetOrganizationAndItsUser = async (
+  params: GetOrganizationAndItsUserParams = {}
+) => {
+  try {
+    const queryParams = new URLSearchParams({
+      name: params.username || "",
+      page: params.page?.toString() || "1",
+      limit: params.per_page?.toString() || "10",
+    }).toString();
+
+    const response = await axiosInstance.get(`/api/admin/moderators-with-users?${queryParams}`);
     return response;
   } catch (error) {
     throw error;

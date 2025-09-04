@@ -1,13 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { GetUserDetails } from "../Services/Services";
-import { useAuth } from "../../../ContextApi/AuthContext/AuthContext";
+ 
 
 const Header = () => {
   const [userDetails, setUserDetails] = useState<any>({});
   const location = useLocation(); 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const { users } = useAuth();
+ 
 
   useEffect(() => {
     fetchUserDetails();
@@ -39,6 +39,7 @@ const Header = () => {
           </Link>
 
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+
             <li>
               <button
                 className="navbar-toggler"
@@ -49,6 +50,7 @@ const Header = () => {
                 <span className="navbar-toggler-icon"></span>
               </button>
             </li>
+            
             <li className="nav-item">
               <Link className="nav-link" to="#">
                 <i className="bi bi-envelope"></i>
@@ -405,56 +407,10 @@ const Header = () => {
                         </li>
                       </ul>
                     </li>
-                     {/* Moderator */}
-
-                    { users?.user?.role === "moderator" &&
-                     <li className="nav-item dropdown">
-                      <Link
-                        className="nav-link dropdown-toggle"
-                        to="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        <i className="bi bi-people"></i> Organization{" "}
-                        <i className="bi bi-chevron-down dropdown_icon"></i>
-                      </Link>
-                      <ul className="dropdown-menu">
-                       
-                        <li className="dropdown-item">
-                          <Link
-                            className={`submenu-link ${
-                              isActive("/moderator/manage-moderator")
-                                ? "active"
-                                : ""
-                            }`}
-                            to="/moderator/manage-moderator"
-                          >
-                            Manage Users
-                          </Link>
-                        </li>
-                        
-                      </ul>
-                    </li>}
+                  
                   </ul>
 
-                  <ul className="nav flex-column sidebar-bottom">
-                    <li className="sidebar-item">
-                      <Link
-                        className={`nav-link ${
-                          isActive("/ProfileSetting") ? "active" : ""
-                        }`}
-                        to="/ProfileSetting"
-                      >
-                        <i className="bi bi-gear"></i> Settings
-                      </Link>
-                    </li>
-                    <li className="sidebar-item">
-                      <Link className="nav-link" to="/Logout">
-                        <i className="bi bi-box-arrow-in-right"></i> Logout
-                      </Link>
-                    </li>
-                  </ul>
+                  
                 </div>
               </div>
             </div>
