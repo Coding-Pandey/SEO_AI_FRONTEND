@@ -2,10 +2,12 @@ import { useEffect, useState, useCallback } from "react";
 import Loading from "../../Page/Loading/Loading";
 import AdminHeader from "../AdminComponent/AdminHeader/AdminHeader";
 import AdminSideBar from "../AdminComponent/AdminSideBar/AdminSideBar";
-import { GetAllOrganization } from "../Service";
+import { GetAllOrganization, SwitchORGAccountLoginByAdmin } from "../Service";
 import { capitalizeFirstLetter } from "../../User/SeoProcess/SEOReport/Reports";
 
 import debounce from "lodash/debounce";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../ContextApi/AuthContext/AuthContext";
 
 interface UserData {
   id: number;
@@ -18,9 +20,10 @@ const AdminDashBoard = () => {
   const [AllUsers, SetAllUsers] = useState<UserData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(10);
+  const navigate = useNavigate();
   const [totalPages, setTotalPages] = useState(1);
   const [searchUsername, setSearchUsername] = useState("");
-
+  const { setUsers } = useAuth();
   const fetchUserDetails = async () => {
     try {
       setIsLoading(true);
@@ -61,6 +64,27 @@ const AdminDashBoard = () => {
     fetchUserDetails();
   }, [currentPage, searchUsername]);
 
+  const handleSwitchOrg = async (orgId: number) => {
+    try {
+      setIsLoading(true);
+      const formData = { user_id: orgId };
+      const response = await SwitchORGAccountLoginByAdmin(formData);
+      if (response.status === 200 || response.status === 201) {
+        const { access_token, user, refresh_token } = response.data;
+        const combinedData = { access_token, user, refresh_token };
+        localStorage.setItem("user_Data", JSON.stringify(combinedData));
+        setUsers(combinedData);
+        if (user.role === "moderator") {
+          navigate("/dashBoard", { replace: true }) 
+        }
+      }
+    } catch (error) {
+      console.error("Error switching organization", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       {isLoading && <Loading />}
@@ -95,6 +119,7 @@ const AdminDashBoard = () => {
                     key={org.id}
                     className="border border-2 rounded p-3 d-flex align-items-center"
                     style={{ width: "300px", cursor: "pointer" }}
+                    onClick={() => handleSwitchOrg(org.id)}
                   >
                     <div
                       className="me-3 d-flex align-items-center justify-content-center"

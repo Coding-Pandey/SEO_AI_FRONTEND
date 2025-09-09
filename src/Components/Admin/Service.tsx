@@ -156,3 +156,12 @@ export const GetOrganizationAndItsUser = async (
     throw error;
   }
 };
+
+export const SwitchORGAccountLoginByAdmin = async (formData: any) => {
+  try {
+    const response = await axiosInstance.post("/api/admin/impersonate", formData);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

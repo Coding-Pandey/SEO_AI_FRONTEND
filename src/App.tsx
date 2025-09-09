@@ -7,7 +7,7 @@ import ProtectedRoutes from "./ProtectedRoutes/ProtectedRoutes";
 import Logout from "./Components/Page/Logout";
 const Login = lazy(() => import("./auth/Login"));
 const SignUp = lazy(() => import("./auth/SignUp"));
-
+const EmailVerification = lazy(() => import("./auth/EmailVerification"));
 //Admin
 const AdminDashBoard = lazy(
   () => import("./Components/Admin/AdminDashboard/AdminDashBoard")
@@ -107,6 +107,7 @@ function App() {
         <Routes>
           {/* Public Route */}
           <Route path="/" element={<Login />} />
+          <Route path="/email-verify/register" element={<EmailVerification />} />
           <Route path="/signUp" element={<SignUp />} />
           <Route path="/Logout" element={<Logout />} />
           {/* Protected Routes Admin*/}

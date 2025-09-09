@@ -23,9 +23,9 @@ const menuItems: MenuItem[] = [
     to: "/users-organization",
   },
   {
-      title: "Organizations",
-      icon: "bi-people",
-      to: "/organization-management",
+    title: "Organizations",
+    icon: "bi-people",
+    to: "/organization-management",
   },
   {
     title: "Active Session",

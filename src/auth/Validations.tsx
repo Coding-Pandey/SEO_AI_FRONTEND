@@ -3,7 +3,19 @@ export interface LoginFormData {
   password: string;
 }
 
+export interface VerifyEmailFormData {
+  username: string;
+  email: string;
+  password: string;
+}
+
 export interface ValidationErrors {
+  email?: string;
+  password?: string;
+}
+
+export interface ValidationEmailErrors {
+  username?: string;
   email?: string;
   password?: string;
 }
@@ -94,6 +106,37 @@ export const validateSignUpForm = (
     if (!data.organization.domain) {
       errors["organization.domain"] = "Organization domain is required.";
     }
+  }
+
+  return errors;
+};
+
+
+
+export const validateVerifyEmailForm = (data: VerifyEmailFormData): ValidationEmailErrors => {
+  const errors: ValidationEmailErrors = {};
+
+    if (!data.username) {
+    errors.username = "Username is required.";
+  } else {
+    if (data.username.length < 3) {
+      errors.username = "Username must be at least 3 characters long.";
+    } else if (!/^[A-Za-z0-9_-]+$/.test(data.username)) {
+      errors.username =
+        "Username can only contain letters, numbers, hyphens, and underscores.";
+    }
+  }
+
+  if (!data.email) {
+    errors.email = "Email is required.";
+  } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+    errors.email = "Email is not valid.";
+  }
+
+  if (!data.password) {
+    errors.password = "Password is required.";
+  } else if (data.password.length < 8) {
+    errors.password = "Password must be at least 8 characters.";
   }
 
   return errors;

@@ -12,7 +12,7 @@ export const GetModeratorUserList = async () => {
 
 export const ModeratorCreateUser = async (formData: any) => {
   try {
-    const response = await axiosInstance.post("/api/moderator/register", formData);
+    const response = await axiosInstance.post("/api/moderator/send-invitation", formData);
     return response;
   } catch (error) {
     throw error;

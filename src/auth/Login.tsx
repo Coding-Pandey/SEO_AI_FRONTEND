@@ -81,14 +81,12 @@ const Login = () => {
         role: "user",
         image_url: profile.picture,
       };
-
       const response = await googleLoginService(userDetails);
       const { access_token, user, refresh_token } = response.data;
       if (response.status === 201 || response.status === 200) {
         const combinedData = { access_token, user, refresh_token };
         localStorage.setItem("user_Data", JSON.stringify(combinedData));
         setUsers(combinedData);
-
         if (user.role === "user" || user.role === "moderator") {
           setTimeout(() => navigate("/dashBoard", { replace: true }), 100);
         } else if (user.role === "admin") {

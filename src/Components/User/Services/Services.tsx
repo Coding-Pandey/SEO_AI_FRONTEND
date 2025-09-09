@@ -17,3 +17,13 @@ export const UpdateUserProfile = async (formData: any) => {
     throw error;
   }
 };
+
+
+export const SwitchToAdminAccount = async () => {
+  try {
+    const response = await axiosInstance.post("/api/admin/end-impersonation");
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

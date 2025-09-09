@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { ModeratorCreateUser } from "../ModeratorService";
-import { capitalizeFirstLetter } from "../../SeoProcess/SEOReport/Reports";
-
+ 
 interface Props {
   onClose: () => void;
   onHandleSubmit: () => void;
@@ -33,15 +32,15 @@ const ModeratorCreateUsersForms = ({ onClose, onHandleSubmit }: Props) => {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        const payload = { email: formData.email, role };
+        const payload = { email: formData.email,invited_role:role };
         const response = await ModeratorCreateUser(payload);
 
         if (response.status === 201 || response.status === 200) {
           toast.success(
-            `${capitalizeFirstLetter(role)} Created Successfully!`,
+            `✅ Email sent for verification. Please check your inbox.`,
             {
               position: "top-right",
-              autoClose: 2000,
+              autoClose: 3000,
             }
           );
           onHandleSubmit();

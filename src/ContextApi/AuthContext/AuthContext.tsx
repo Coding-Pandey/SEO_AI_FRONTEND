@@ -21,10 +21,10 @@ const AuthContextComponent = ({ children }: AuthContextProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadUser = () => {
       try {
-        const userData = await localStorage.getItem('user_Data');
-        // console.log('User data from localStorage:', userData);
+        const userData = localStorage.getItem('user_Data');
+      
         if (userData) {
           setUsers(JSON.parse(userData));
         }
