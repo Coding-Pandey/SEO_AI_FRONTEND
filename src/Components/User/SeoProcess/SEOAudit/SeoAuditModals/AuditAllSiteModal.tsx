@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AddDomainCrawlURL } from "../../SeoServices";
 import { GetUserDetails } from "../../../Services/Services";
+import CrawlingLoader from "../../../../Page/Loading/CrawlingLoader";
 
 export interface Site {
   uuid: string;
@@ -59,8 +60,8 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
     }
   }, [isOpen, onSelect, AlreadySelectedCrawl]);
 
-  const isValidDomain = (url: string) => {
-    return url.startsWith("http://") || url.startsWith("https://");
+  const sanitizeDomain = (value: string) => {
+    return value.replace(/^https?:\/\//i, "").trim();
   };
 
   const handleSubmitDomain = async () => {
@@ -70,22 +71,19 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
       return;
     }
 
-    if (!isValidDomain(domainInput.trim())) {
-      setErrorMsg("⚠️ Domain must start with http:// or https://");
-      return;
-    }
     setNewLoading(true);
     try {
       const formData = {
-        domain: domainInput,
+        domain: `https://${domainInput}`,
         timezone: SelectedTimezone,
       };
       const response = await AddDomainCrawlURL(formData);
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         const domainSite = response.data;
         onSelect(domainSite);
       }
     } catch (error) {
+      console.error("Error submitting domain:", error);
     } finally {
       setNewLoading(false);
     }
@@ -97,34 +95,34 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
         AlreadySelectedCrawl === null ||
         AlreadySelectedCrawl === undefined) &&
         !isLoading && (
-          <div className="modal-container">
-            <h2 className="font_25 font_600 mb-3">
-              🔗 Manage Your Crawl Sites
-            </h2>
-            <div className="form-container">
-              <h3 className="font_18 mb-2">🔍 Enter a New Domain</h3>
-              <div className="domain-input-container responsive-form">
+          <>
+            {NewLoading && <CrawlingLoader />}
+            <div className="crawl-container">
+              <div className="crawl-input-wrapper">
+                <span className="crawl-prefix">https://</span>
                 <input
                   type="text"
-                  placeholder="Enter domain e.g. https://example.com"
+                  placeholder="Enter your domain"
                   value={domainInput}
-                  onChange={(e) => setDomainInput(e.target.value)}
-                  className="form-control mb-2"
+                  onChange={(e) =>
+                    setDomainInput(sanitizeDomain(e.target.value))
+                  }
+                  className="crawl-input"
                 />
-                <button
-                  type="submit"
-                  onClick={handleSubmitDomain}
-                  className="primary_btn"
-                >
-                  {NewLoading ? "Please Wait..." : "Search & Crawl"}
-                </button>
               </div>
 
-              {errorMsg && (
-                <p style={{ color: "red", marginTop: "10px" }}>{errorMsg}</p>
-              )}
+              <button
+                type="submit"
+                onClick={handleSubmitDomain}
+                className="crawl-btn"
+                disabled={!domainInput.trim()}
+              >
+                Crawl
+              </button>
+
+              {errorMsg && <p className="crawl-error">{errorMsg}</p>}
             </div>
-          </div>
+          </>
         )}
     </>
   );

@@ -2233,7 +2233,7 @@ font-weight: 500;
 }
 
 .branded_keywords th {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 22px;
     color: var(--gray-color);
     font-weight: 500;
@@ -2250,7 +2250,7 @@ font-weight: 500;
 }
 
 .branded_keywords tr td {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 22px;
     font-weight: 300;
 }
@@ -2710,6 +2710,96 @@ font-weight: 500;
   transform: translateX(5px);
 }
 
+/* Container centers content */
+.crawl-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* Input group wrapper */
+.crawl-input-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Fixed prefix */
+.crawl-prefix {
+  background-color: #e5e7eb; /* light gray */
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  color: #333;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Input field */
+.crawl-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  outline: none;
+}
+
+.crawl-input:focus {
+  border-color: #1e88e5; /* blue highlight */
+}
+
+/* Button */
+.crawl-btn {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background-color: #1e88e5;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.crawl-btn:hover:not(:disabled) {
+  background-color: #1565c0;
+}
+
+.crawl-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error text */
+.crawl-error {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Loader spinner */
+.loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
  
 /* Responsive css */
 @media only screen and (max-width:1599px) {
@@ -3069,7 +3159,20 @@ font-weight: 500;
     align-items: stretch;
   }
 
+ 
+  .crawl-input-wrapper {
+    max-width: 100%;
+  }
 
+  .crawl-prefix {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .crawl-input {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
 
   
 }
@@ -3285,5 +3388,23 @@ font-weight: 500;
 
   .modal-buttons {
     flex-direction: column;
+  }
+
+
+  .crawl-input-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crawl-prefix {
+    border-radius: 6px 6px 0 0;
+    border-right: 1px solid #ccc;
+    width: 100%;
+    text-align: center;
+  }
+
+  .crawl-input {
+    border-radius: 0 0 6px 6px;
+    width: 100%;
   }
 }

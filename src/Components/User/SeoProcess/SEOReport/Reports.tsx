@@ -182,12 +182,12 @@ const Reports = () => {
         setSearchConsole(responseSearchConsole?.data);
         setRankingKeyword(responseRankingKeyword?.data);
         setBrandedWordAnalysis(responseBrandedWordanalysis?.data);
-        console.log(responseSearchConsole.data, "responseSearchConsole");
-        console.log(responseRankingKeyword.data, "responseRankingKeyword");
-        console.log(
-          responseBrandedWordanalysis.data,
-          "responseBrandedWordanalysis"
-        );
+        // console.log(responseSearchConsole.data, "responseSearchConsole");
+        // console.log(responseRankingKeyword.data, "responseRankingKeyword");
+        // console.log(
+        //   responseBrandedWordanalysis.data,
+        //   "responseBrandedWordanalysis"
+        // );
         setIsModalOpen(false);
       }
     } catch (error: any) {

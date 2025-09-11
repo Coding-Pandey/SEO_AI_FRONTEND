@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AreaChart,
   Area,
@@ -40,6 +40,189 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
   setActiveFilter,
   isIndexability,
 }) => {
+  const [visibleRows, setVisibleRows] = useState<number>(50);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const headerKeyMap: Record<string, string> = {
+    "URL Address": "Address",
+    Status: "Status",
+    "Status Type": "Status_Type",
+    Title: "Title_1",
+    Indexability: "Indexability",
+    "Indexability Status": "Indexability_Status",
+    "Page title": "Title_1",
+    "Title Length": "Title_1_Length",
+    "Pixel Width": "Title_1_Pixel_Width",
+    "Meta Description": "Meta_Description_1",
+    H1: "H1_1",
+    "H1 char. length": "H1_1_Length",
+    "Status Code": "Status_Code",
+    Inlinks: "Inlinks",
+    "Unique Inlinks": "Unique_Inlinks",
+    Outlinks: "Outlinks",
+    "Unique Outlinks": "Unique_Outlinks",
+    "External Outlinks": "External_Outlinks",
+    "Unique External Outlinks": "Unique_External_Outlinks",
+    "Word Count": "Word_Count",
+    Readability: "Readability",
+    "Sentence Count": "Sentence_Count",
+    "Average Words Per Sentence": "Average_Words_Per_Sentence",
+    "Flesch Reading Ease Score": "Flesch_Reading_Ease_Score",
+    "Closest Near Duplicate Match": "Closest_Near_Duplicate_Match",
+    "Closest Semantically Similar Address":
+      "Closest_Semantically_Similar_Address",
+    "Multiple Slashes": "Multiple_Slashes",
+    "Non ASCII Characters": "Non_ASCII_Characters",
+    "Over 115 Characters": "Over_115_Characters",
+    Parameters: "Parameters",
+    Underscores: "Underscores",
+    Uppercase: "Uppercase",
+  };
+
+  // ✅ Sorting logic
+  const sortedRows = [...tableRows].sort((a, b) => {
+    if (!sortColumn) return 0;
+
+    const key = headerKeyMap[sortColumn];
+    const valA = a[key] ?? "";
+    const valB = b[key] ?? "";
+
+    const isNumeric = !isNaN(Number(valA)) && !isNaN(Number(valB));
+
+    if (isNumeric) {
+      return sortOrder === "asc"
+        ? Number(valA) - Number(valB)
+        : Number(valB) - Number(valA);
+    }
+
+    return sortOrder === "asc"
+      ? String(valA).localeCompare(String(valB))
+      : String(valB).localeCompare(String(valA));
+  });
+
+  const handleSort = (header: string) => {
+    if (sortColumn === header) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(header);
+      setSortOrder("asc");
+    }
+  };
+
+  const renderRowCells = (row: any) => {
+    switch (isIndexability) {
+      case "statuscode":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Status || "-"}</td>
+            <td>{row?.Status_Type || "-"}</td>
+            <td>{row?.Title_1 || "-"}</td>
+          </>
+        );
+
+      case "indexability":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Indexability_Status || "-"}</td>
+            <td>{row?.Title_1 || "-"}</td>
+          </>
+        );
+
+      case "pagetitle":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Title_1 || "-"}</td>
+            <td>{row?.Title_1_Length || "-"}</td>
+            <td>{row?.Title_1_Pixel_Width || "-"}</td>
+          </>
+        );
+
+      case "metadescription":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Meta_Description_1 || "-"}</td>
+          </>
+        );
+
+      case "htags":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Status || "-"}</td>
+            <td>{row?.H1_1 || "-"}</td>
+            <td>{row?.H1_1_Length || "-"}</td>
+          </>
+        );
+
+      case "internalLinks":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Status || "-"}</td>
+            <td>{row?.Inlinks || "-"}</td>
+            <td>{row?.Unique_Inlinks || "-"}</td>
+            <td>{row?.Outlinks || "-"}</td>
+            <td>{row?.Unique_Outlinks || "-"}</td>
+            <td>{row?.External_Outlinks || "-"}</td>
+            <td>{row?.Unique_External_Outlinks || "-"}</td>
+          </>
+        );
+
+      case "content":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Status || "-"}</td>
+            <td>{row?.Word_Count || "-"}</td>
+            <td>{row?.Readability || "-"}</td>
+            <td>{row?.Sentence_Count || "-"}</td>
+            <td>{row?.Average_Words_Per_Sentence || "-"}</td>
+            <td>{row?.Flesch_Reading_Ease_Score || "-"}</td>
+            <td>{row?.Closest_Near_Duplicate_Match || "-"}</td>
+            <td>{row?.Closest_Semantically_Similar_Address || "-"}</td>
+          </>
+        );
+
+      case "Urls":
+        return (
+          <>
+            <td>{row?.Address || "-"}</td>
+            <td>{row?.Indexability || "-"}</td>
+            <td>{row?.Status_Code || "-"}</td>
+            <td>{row?.Status || "-"}</td>
+            <td>{row?.Multiple_Slashes || "-"}</td>
+            <td>{row?.Non_ASCII_Characters || "-"}</td>
+            <td>{row?.Over_115_Characters || "-"}</td>
+            <td>{row?.Parameters || "-"}</td>
+            <td>{row?.Underscores || "-"}</td>
+            <td>{row?.Uppercase || "-"}</td>
+          </>
+        );
+
+      default:
+        return <td colSpan={10}>Data not found</td>;
+    }
+  };
+
   return (
     <div className="seo_report_content brand_content">
       <form className="row">
@@ -142,140 +325,41 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
 
           <div className="card_box">
             <div className="branded_keywords table-responsive indexable_table">
-              <table className="table">
+              <table className="table table-striped">
                 <thead>
                   <tr>
                     {tableHeaders.map((header, idx) => (
-                      <th key={idx} scope="col">
-                        {header}
+                      <th
+                        key={idx}
+                        scope="col"
+                        onClick={() => handleSort(header)}
+                        className="cursor-pointer select-none"
+                        style={{ cursor: "pointer" }}
+                      >
+                        {header}{" "}
+                        <span>
+                          {sortColumn === header
+                            ? sortOrder === "asc"
+                              ? "▲"
+                              : "▼"
+                            : "⇅"}
+                        </span>
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {tableRows && tableRows.length > 0 ? (
-                    tableRows.map((row, rowIdx) => (
-                      <tr key={rowIdx}>
-                        {/* Address */}
-                        <td>{row?.Address || "-"}</td>
-
-                        {/* First Column */}
-                        <td>
-                          {isIndexability === "internalLinks"
-                            ? row?.Indexability || "-"
-                            : isIndexability === "pagetitle"
-                            ? row?.Title_1 || "-"
-                            : isIndexability === "htags"
-                            ? row?.Status_Code || "-"
-                            : row?.Indexability ||
-                              row?.Canonical_Link_Element_1 ||
-                              row?.Meta_Robots_1 ||
-                              row?.Status ||
-                              row?.Meta_Description_1 ||
-                              "-"}
-                        </td>
-
-                        {isIndexability !== "metadescription" && (
-                          <>
-                            {/* Second Column */}
-                            <td>
-                              {isIndexability === "pagetitle"
-                                ? row?.Title_1_Length || "-"
-                                : isIndexability === "indexability"
-                                ? row?.Indexability_Status ||
-                                  row?.Status_Code ||
-                                  "-"
-                                : isIndexability === "htags"
-                                ? row?.H1_1 || "-"
-                                : row?.Status_Code || "-"}
-                            </td>
-
-                            {/* Third Column */}
-                            <td>
-                              {(() => {
-                                switch (isIndexability) {
-                                  case "pagetitle":
-                                    return row?.Title_1_Pixel_Width || "-";
-                                  case "htags":
-                                    return row?.H1_1_Length || "-";
-                                  case "internalLinks":
-                                    return row?.Status || "-";
-                                  case "content":
-                                    return row?.Word_Count || "-";
-                                  case "Urls":
-                                    return row?.Multiple_Slashes || "-";
-                                  default:
-                                    return row?.Title_1 || "-";
-                                }
-                              })()}
-                            </td>
-
-                            {/* Fourth Column */}
-                            <td>
-                              {isIndexability === "internalLinks"
-                                ? row?.Inlinks || "-"
-                                : isIndexability === "content"
-                                ? row?.Readability || "-"
-                                : isIndexability === "Urls"
-                                ? row?.Non_ASCII_Characters || "-"
-                                : ""}
-                            </td>
-
-                            {/* Fifth Column */}
-                            <td>
-                              {isIndexability === "internalLinks"
-                                ? row?.Unique_Inlinks || "-"
-                                : isIndexability === "content"
-                                ? row?.Sentence_Count || "-"
-                                : isIndexability === "Urls"
-                                ? row?.Over_115_Characters || "-"
-                                : ""}
-                            </td>
-
-                            {/* Sixth Column */}
-                            <td>
-                              {isIndexability === "internalLinks"
-                                ? row?.Outlinks || "-"
-                                : isIndexability === "content"
-                                ? row?.Average_Words_Per_Sentence || "-"
-                                : isIndexability === "Urls"
-                                ? row?.Parameters || "-"
-                                : ""}
-                            </td>
-
-                            {/* Seventh Column */}
-                            <td>
-                              {isIndexability === "internalLinks"
-                                ? row?.Unique_Outlinks || "-"
-                                : isIndexability === "content"
-                                ? row?.Flesch_Reading_Ease_Score || "-"
-                                : isIndexability === "Urls"
-                                ? row?.Underscores || "-"
-                                : ""}
-                            </td>
-
-                            {/* Eighth Column */}
-                            <td>
-                              {isIndexability === "internalLinks"
-                                ? row?.External_Outlinks || "-"
-                                : isIndexability === "content"
-                                ? row?.Closest_Near_Duplicate_Match || "-"
-                                : isIndexability === "Urls"
-                                ? row?.Uppercase || "-"
-                                : ""}
-                            </td>
-
-                            {/* Ninth Column */}
-                            <td>
-                              {isIndexability === "internalLinks"
-                                ? row?.Unique_External_Outlinks || "-"
-                                : isIndexability === "content"
-                                ? row?.Closest_Semantically_Similar_Address ||
-                                  "-"
-                                : ""}
-                            </td>
-                          </>
-                        )}
+                  {sortedRows && sortedRows.length > 0 ? (
+                    sortedRows.slice(0, visibleRows).map((row, rowIdx) => (
+                      <tr
+                        key={rowIdx}
+                        style={{
+                          backgroundColor:
+                            rowIdx % 2 === 0 ? "#ffffff" : "#f9f9f9",
+                          fontSize: "13px",
+                        }}
+                      >
+                        {renderRowCells(row)}
                       </tr>
                     ))
                   ) : (
@@ -287,6 +371,35 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                   )}
                 </tbody>
               </table>
+
+              {/* Pagination buttons */}
+              {visibleRows < tableRows.length && (
+                <div className="text-center my-3">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setVisibleRows(visibleRows + 50);
+                    }}
+                    className="view-more-btn"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+
+              {visibleRows >= tableRows.length && visibleRows > 50 && (
+                <div className="text-center my-3">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setVisibleRows(50);
+                    }}
+                    className="view-more-btn"
+                  >
+                    View Less
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

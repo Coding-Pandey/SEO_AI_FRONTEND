@@ -18,11 +18,11 @@ interface UserData {
 const AdminDashBoard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [AllUsers, SetAllUsers] = useState<UserData[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage] = useState<number>(10);
   const navigate = useNavigate();
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchUsername, setSearchUsername] = useState("");
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [searchUsername, setSearchUsername] = useState<string>("");
   const { setUsers } = useAuth();
   const fetchUserDetails = async () => {
     try {
@@ -75,7 +75,7 @@ const AdminDashBoard = () => {
         localStorage.setItem("user_Data", JSON.stringify(combinedData));
         setUsers(combinedData);
         if (user.role === "moderator") {
-          navigate("/dashBoard", { replace: true }) 
+          navigate("/dashBoard", { replace: true });
         }
       }
     } catch (error) {

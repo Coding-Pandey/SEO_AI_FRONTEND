@@ -12,6 +12,8 @@ import DomainModal from "../../../Page/DomainModal";
 
 const tableStatusCodeHeaders = [
   "URL Address",
+  "Indexability",
+  "Status Code",
   "Status",
   "Status Type",
   "Title",
@@ -20,20 +22,35 @@ const tableStatusCodeHeaders = [
 const tableHeadersIndexability = [
   "URL Address",
   "Indexability",
+  "Status Code",
   "Indexability Status",
   "Page title",
 ];
 
 const tableHeadersPageTitle = [
   "URL Address",
+  "Indexability",
+  "Status Code",
   "Title",
   "Title Length",
   "Pixel Width",
 ];
 
-const tableHeadersMeta = ["URL Address", "Meta Description"];
+const tableHeadersMeta = [
+  "URL Address",
+  "Indexability",
+  "Status Code",
+  "Meta Description",
+];
 
-const tableHeadersHTags = ["URL Address", "Status", "H1", "H1 char. length"];
+const tableHeadersHTags = [
+  "URL Address",
+  "Indexability",
+  "Status Code",
+  "Status",
+  "H1",
+  "H1 char. length",
+];
 
 const tableHeadersinternalLinks = [
   "URL Address",
@@ -50,6 +67,7 @@ const tableHeadersinternalLinks = [
 
 const tableHeaderscontent = [
   "URL Address",
+  "Indexability",
   "Status Code",
   "Status",
   "Word Count",
@@ -63,6 +81,7 @@ const tableHeaderscontent = [
 
 const tableHeadersUrl = [
   "URL Address",
+  "Indexability",
   "Status Code",
   "Status",
   "Multiple Slashes",
@@ -72,8 +91,6 @@ const tableHeadersUrl = [
   "Underscores",
   "Uppercase",
 ];
-
-
 
 export interface CrawlSite {
   uuid: string;
@@ -101,6 +118,7 @@ const SeoAudit = () => {
     string | null
   >("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [CrownLoading, setCrownLoading] = useState<boolean>(false);
   const [isNewLoading, setIsNewLoading] = useState<boolean>(false);
   const [ActionConfirmModal, setActionConfirmModal] = useState(false);
   const [ShowAddDomainModal, setShowAddDomainModal] = useState(false);
@@ -161,7 +179,7 @@ const SeoAudit = () => {
     tableData: [],
   });
 
-   const [URLS, setURLS] = useState<IndexabilityState>({
+  const [URLS, setURLS] = useState<IndexabilityState>({
     data: null,
     filters: [],
     cards: [],
@@ -216,12 +234,14 @@ const SeoAudit = () => {
 
   const handleCloseModal = async (site: Site) => {
     try {
-      setIsNewLoading(true);
+      if (!CrownLoading) {
+        setIsNewLoading(true);
+      }
       const response = await GetCrawDataById(site?.uuid!);
 
       if (response.status === 200) {
         const data = response.data;
-        console.log(data, "data");
+        // console.log(data, "data");
         const indexFilters = Object.keys(data.indexability?.tables || {});
         const firstIndexFilter = indexFilters[0] || "";
 
@@ -314,8 +334,7 @@ const SeoAudit = () => {
           cards: generateCards(data.content?.kpis?.content_kpis || {}),
         });
 
-
-         //URLS
+        //URLS
         const URLSFilters = Object.keys(data?.url_structure?.tables || {});
         const firstURLSFilter = URLSFilters[0] || "";
 
@@ -324,7 +343,9 @@ const SeoAudit = () => {
           filters: URLSFilters,
           activeFilter: firstURLSFilter,
           tableData: data.url_structure?.tables?.[firstURLSFilter] || [],
-          cards: generateCards(data.url_structure?.kpis?.url_structure_kpis || {}),
+          cards: generateCards(
+            data.url_structure?.kpis?.url_structure_kpis || {}
+          ),
         });
 
         setShowAddDomainModal(false);
@@ -334,6 +355,7 @@ const SeoAudit = () => {
     } finally {
       setIsModalOpen(false);
       setIsNewLoading(false);
+      setCrownLoading(false);
     }
   };
 
@@ -351,6 +373,7 @@ const SeoAudit = () => {
   };
 
   const handleSelect = useCallback((site: Site) => {
+    setCrownLoading(true);
     setAddAlreadySelectSite(site);
     handleCloseModal(site);
     setShowAddDomainModal(false);
@@ -358,8 +381,9 @@ const SeoAudit = () => {
 
   return (
     <>
-      {isLoading && <Loading />}
+      {isLoading && !CrownLoading && <Loading />}
       {isNewLoading && <Loading />}
+
       <Header />
       <main className="main_wrapper">
         <SideBar />
@@ -398,16 +422,16 @@ const SeoAudit = () => {
                 onCancel={handleCancel}
               />
 
-              {ShowAddDomainModal && (
+              {/* {ShowAddDomainModal && (
                 <DomainModal
-                  title="🔍 Enter a New Domain"
+                  title=""
                   content={domainInput}
                   setContent={setDomainInput}
                   handleClose={handleCloseDomainModel}
                   onSelect={handleSelect}
                   AddAlreadySelectSite={AddAlreadySelectSite}
                 />
-              )}
+              )} */}
             </div>
             {isModalOpen ? (
               <>
@@ -416,9 +440,18 @@ const SeoAudit = () => {
                   onSelect={handleSelect}
                   AllData={AllData}
                   AlreadySelectedCrawl={AlreadySelectedCrawl}
-                  isLoading={isLoading}
+                  isLoading={CrownLoading}
                 />
               </>
+            ) : ShowAddDomainModal ? (
+              <DomainModal
+                title=""
+                content={domainInput}
+                setContent={setDomainInput}
+                handleClose={handleCloseDomainModel}
+                onSelect={handleSelect}
+                AddAlreadySelectSite={AddAlreadySelectSite}
+              />
             ) : (
               <div className="profile_settings_wrapper seo_audit_wrapper">
                 <div className="row gy-3">
@@ -711,7 +744,7 @@ const SeoAudit = () => {
                         />
                       </div>
 
-                       <div
+                      <div
                         className="tab-pane fade"
                         id="audit-url"
                         role="tabpanel"

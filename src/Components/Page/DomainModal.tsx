@@ -4,6 +4,7 @@ import {
   // DeleteOldDomain,
 } from "../User/SeoProcess/SeoServices";
 import { GetUserDetails } from "../User/Services/Services";
+import CrawlingLoader from "./Loading/CrawlingLoader";
 
 export interface NewSearchSite {
   uuid: string;
@@ -49,71 +50,25 @@ const DomainModal: React.FC<DomainModalProps> = ({
     }
   };
 
-  const isValidDomain = (url: string) => {
-    return url.startsWith("http://") || url.startsWith("https://");
+  const sanitizeDomain = (value: string) => {
+    return value.replace(/^https?:\/\//i, "").trim();
   };
-
-  // const handleSubmitDomain = async () => {
-  //   setErrorMsg("");
-  //   if (content.trim() === "") {
-  //     setErrorMsg("⚠️ Domain is required.");
-  //     return;
-  //   }
-
-  //   if (!isValidDomain(content.trim())) {
-  //     setErrorMsg("⚠️ Domain must start with http:// or https://");
-  //     return;
-  //   }
-  //   setNewLoading(true);
-  //   try {
-  //     const formData = {
-  //       domain: content,
-  //     };
-  //     const response = await AddDomainCrawlURL(formData);
-  //     if (response.status === 201 || response.status === 200) {
-  //       const domainSite = response.data;
-  //         onSelect(domainSite);
-  //       // const res = await DeleteOldDomain(AddAlreadySelectSite?.uuid);
-  //       // if (res.status === 201 || res.status === 200) {
-  //         // const domainSite = response.data;
-  //         // onSelect(domainSite);
-  //       // }
-  //     }
-  //   } catch (error) {
-  //   } finally {
-  //     setNewLoading(false);
-  //   }
-  // };
 
   const handleSubmitDomain = async () => {
     setErrorMsg("");
 
     const trimmedInput = content.trim();
 
-    if (trimmedInput.includes(",") || trimmedInput.includes(" ")) {
-      setErrorMsg("⚠️ Please enter only one domain (no commas or spaces).");
-      return;
-    }
-
-    const httpMatches = trimmedInput.match(/https?:\/\//g);
-    if (!httpMatches || httpMatches.length !== 1) {
-      setErrorMsg("⚠️ Please enter only one valid domain.");
-      return;
-    }
-
-    if (!isValidDomain(trimmedInput)) {
-      setErrorMsg("⚠️ Domain must start with http:// or https://");
+    if (trimmedInput.trim() === "") {
+      setErrorMsg("⚠️ Domain is required.");
       return;
     }
 
     setNewLoading(true);
 
     try {
-      const url = new URL(trimmedInput);
-      const baseDomain = `${url.protocol}//${url.hostname}`;
-
       const formData = {
-        domain: baseDomain,
+        domain: `https://${trimmedInput}`,
         timezone: SelectedTimezone,
       };
 
@@ -131,61 +86,56 @@ const DomainModal: React.FC<DomainModalProps> = ({
   };
 
   return (
-    <div className="modal-overlays">
-      <div className="modal-contents" style={{ position: "relative" }}>
-        <button
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            background: "transparent",
-            border: "none",
-            fontSize: "20px",
-            cursor: "pointer",
-          }}
-          onClick={handleClose}
-          aria-label="Close"
-        >
-          &times;
-        </button>
-
-        <h4>{title}</h4>
-
-        <textarea
-          className="form-control mb-3"
-          placeholder="Enter domain e.g. https://example.com"
-          rows={3}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-        {errorMsg && (
-          <p style={{ color: "red", marginTop: "10px" }}>{errorMsg}</p>
-        )}
-
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            justifyContent: "flex-end",
-          }}
-        >
+    <>
+      {NewLoading && <CrawlingLoader />}
+      <div className="crawl-container">
+        <div className="modal-contents" style={{ position: "relative" }}>
           <button
-            className="btn btn-success"
             style={{
-              backgroundColor: "rgb(250, 122, 78)",
-              color: "white",
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              background: "transparent",
               border: "none",
+              fontSize: "30px",
+              cursor: "pointer",
             }}
-            onClick={handleSubmitDomain}
+            onClick={handleClose}
+            aria-label="Close"
           >
-            {NewLoading ? "Please Wait..." : "Submit"}
+            &times;
           </button>
-          <button className="btn btn-secondary" onClick={handleClose}>
-            Cancel
-          </button>
+
+          <h4>{title}</h4>
+
+          <div className="crawl-input-wrapper mt-5">
+            <span className="crawl-prefix">https://</span>
+            <input
+              type="text"
+              placeholder="Enter your domain"
+              value={content}
+              onChange={(e) => setContent(sanitizeDomain(e.target.value))}
+              className="crawl-input"
+            />
+          </div>
+          {errorMsg && (
+            <p style={{ color: "red", marginTop: "10px" }}>{errorMsg}</p>
+          )}
+
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              justifyContent: "flex-end",
+            }}
+          >
+            <button className="crawl-btn" onClick={handleSubmitDomain}>
+              Crawl
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

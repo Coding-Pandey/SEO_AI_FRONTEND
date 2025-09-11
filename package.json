@@ -17,6 +17,7 @@
     "bootstrap": "^5.3.6",
     "date-fns": "^4.1.0",
     "lodash": "^4.17.21",
+    "lottie-react": "^2.4.1",
     "react": "^19.1.0",
     "react-date-range": "^2.0.1",
     "react-dom": "^19.0.0",
