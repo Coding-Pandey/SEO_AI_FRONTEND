@@ -23,7 +23,7 @@ export const SignUpUser = async (formData: any) => {
 
 export const VerifyUserByEmail = async (formData: any) => {
   try {
-    const response = await axiosInstance.post('/api/verify-user', formData); 
+    const response = await axiosInstance.post('/api/moderator/register', formData); 
     return response;   
   } catch (error) {
     throw error;  

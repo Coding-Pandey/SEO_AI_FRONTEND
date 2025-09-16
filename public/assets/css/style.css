@@ -2204,7 +2204,8 @@ font-weight: 500;
 }
 
 .branded_keywords {
-    max-height: 300px;
+    /* max-height: 300px; */
+  height: auto;
 }
 
 
@@ -2800,7 +2801,30 @@ font-weight: 500;
   }
 }
 
+
+.tooltip-icon:hover .tooltip-text {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
  
+
+.tooltip-icon_wrapper {
+    position: relative;
+    width: 100%;
+}
+.tooltip-icon_wrapper input{
+    padding-right: 30px;
+    width: 100%;
+}
+.tooltip-icon {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+}
+
+ 
+
 /* Responsive css */
 @media only screen and (max-width:1599px) {
     .brand_select  .brand_content_box {

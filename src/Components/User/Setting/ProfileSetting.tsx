@@ -897,18 +897,20 @@ const ProfileSetting = () => {
                       role="tabpanel"
                       aria-labelledby="pills-ManageUsers-tab"
                     >
-                      <div className="profile_content">
-                        <div className="row">
-                          <div className="col-12">
-                            <h3 className="font_20 font_600 mb-2">
-                              Manage Users
-                            </h3>
-                            <div className="card_box box-shadow">
-                              <ManageModerator />
+                      {users?.user.role === "moderator" && (
+                        <div className="profile_content">
+                          <div className="row">
+                            <div className="col-12">
+                              <h3 className="font_20 font_600 mb-2">
+                                Manage Users
+                              </h3>
+                              <div className="card_box box-shadow">
+                                <ManageModerator />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>

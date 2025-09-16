@@ -25,7 +25,7 @@ interface Props {
 
 const ImprovedAndDeclinedTable: React.FC<Props> = ({ data, selectedMetric }) => {
   const [visibleCount, setVisibleCount] = useState(50);
-
+ 
   const getMetricValues = (item: KeywordItem) => {
     switch (selectedMetric) {
       case "clicks":
@@ -64,7 +64,8 @@ const ImprovedAndDeclinedTable: React.FC<Props> = ({ data, selectedMetric }) => 
     };
 
   const visibleData = data.slice(0, visibleCount);
-
+console.log(visibleData.length)
+console.log(data.length,"data")
   return (
     <>
       <table className="table">

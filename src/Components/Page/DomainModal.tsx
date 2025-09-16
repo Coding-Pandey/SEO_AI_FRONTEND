@@ -74,8 +74,15 @@ const DomainModal: React.FC<DomainModalProps> = ({
 
       const response = await AddDomainCrawlURL(formData);
 
-      if (response.status === 200 || response.status === 201) {
-        onSelect(response.data);
+      if (
+        response.status === 200 ||
+        response.status === 201 ||
+        response.status === 202
+      ) {
+        const domainSite = response.data;
+        localStorage.setItem("crawlInProgress", "true");
+        localStorage.setItem("crawlId", domainSite.task_id);
+        onSelect(domainSite);
       }
     } catch (error) {
       console.error("Error submitting domain:", error);
@@ -110,14 +117,50 @@ const DomainModal: React.FC<DomainModalProps> = ({
 
           <div className="crawl-input-wrapper mt-5">
             <span className="crawl-prefix">https://</span>
+            <div className="tooltip-icon_wrapper">
             <input
               type="text"
               placeholder="Enter your domain"
               value={content}
               onChange={(e) => setContent(sanitizeDomain(e.target.value))}
               className="crawl-input"
-            />
+              />
+            <p
+              style={{
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#555",
+              }}
+              className="tooltip-icon"
+              >
+              ⓘ
+              <span
+                className="tooltip-text"
+                style={{
+                  visibility: "hidden",
+                  width: "240px",
+                  backgroundColor: "#333",
+                  color: "#fff",
+                  textAlign: "center",
+                  borderRadius: "6px",
+                  padding: "6px",
+                  position: "absolute",
+                  zIndex: 1,
+                  bottom: "125%",
+                  left: "50%",
+                  marginLeft: "-120px",
+                  fontSize: "12px",
+                  opacity: 0,
+                  transition: "opacity 0.3s",
+                }}
+                >
+                Use <b>www.example.com</b> if your site runs on "www".
+                Otherwise, enter <b>example.com</b>.
+              </span>
+            </p>
           </div>
+          </div>
+
           {errorMsg && (
             <p style={{ color: "red", marginTop: "10px" }}>{errorMsg}</p>
           )}

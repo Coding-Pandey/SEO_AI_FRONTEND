@@ -54,7 +54,7 @@ const GenericKeywordsTable: React.FC<Props> = ({
                 visibleKeywords.map((item, index) => {
                   const isPositive = item.change >= 0;
                   return (
-                    <tr key={index}>
+                    <tr key={index}  >
                       <td>{item.keyword}</td>
                       <td>{item.pos_last_30_days}</td>
                       <td>{item.pos_before_30_days}</td>

@@ -260,3 +260,13 @@ export const GetCrawDataById = async (uuid: string) => {
     throw error;
   }
 };
+
+
+export const GetCrawDataByTaskId = async (task_id: string) => {
+  try {
+    const response = await axiosInstance.get(`/api/crawl/status/${task_id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

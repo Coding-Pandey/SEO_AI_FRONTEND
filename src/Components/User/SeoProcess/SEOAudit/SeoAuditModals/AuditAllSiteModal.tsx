@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AddDomainCrawlURL } from "../../SeoServices";
 import { GetUserDetails } from "../../../Services/Services";
 import CrawlingLoader from "../../../../Page/Loading/CrawlingLoader";
@@ -10,6 +10,7 @@ export interface Site {
 
 interface AuditAllSiteModalProps {
   isOpen: boolean;
+  onAlreadySelect: (site: Site) => void;
   onSelect: (site: Site) => void;
   AllData: any;
   AlreadySelectedCrawl: string | null;
@@ -18,6 +19,7 @@ interface AuditAllSiteModalProps {
 
 const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
   isOpen,
+  onAlreadySelect,
   onSelect,
   AllData,
   AlreadySelectedCrawl,
@@ -27,7 +29,7 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
   const [NewLoading, setNewLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [SelectedTimezone, setSelectedTimezone] = useState<any>();
-
+  const hasRunAlreadySelect = useRef<boolean>(false);
   useEffect(() => {
     GetTimeZone();
   }, []);
@@ -46,19 +48,27 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
   };
 
   useEffect(() => {
-    if (isOpen && AlreadySelectedCrawl === "True") {
-      const matched = AllData?.find(
-        (site: any) => site.selected_site === "True"
-      );
-      if (matched) {
-        const matchedSite = {
-          uuid: matched.uuid,
-          crawl_url: matched.crawl_url,
-        };
-        onSelect(matchedSite);
+    const inProgress = localStorage.getItem("crawlInProgress");
+    const taskId = localStorage.getItem("crawlId");
+
+    if (!hasRunAlreadySelect.current) {
+      if (inProgress !== "true" && !taskId) {
+        if (isOpen && AlreadySelectedCrawl === "True") {
+          const matched = AllData?.find(
+            (site: any) => site.selected_site === "True"
+          );
+          if (matched) {
+            const matchedSite = {
+              uuid: matched.uuid,
+              crawl_url: matched.crawl_url,
+            };
+            onAlreadySelect(matchedSite);
+            hasRunAlreadySelect.current = true;
+          }
+        }
       }
     }
-  }, [isOpen, onSelect, AlreadySelectedCrawl]);
+  }, [isOpen, AlreadySelectedCrawl, AllData, onAlreadySelect]);
 
   const sanitizeDomain = (value: string) => {
     return value.replace(/^https?:\/\//i, "").trim();
@@ -78,8 +88,14 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
         timezone: SelectedTimezone,
       };
       const response = await AddDomainCrawlURL(formData);
-      if (response.status === 201 || response.status === 200) {
+      if (
+        response.status === 201 ||
+        response.status === 200 ||
+        response.status === 202
+      ) {
         const domainSite = response.data;
+        localStorage.setItem("crawlInProgress", "true");
+        localStorage.setItem("crawlId", domainSite.task_id);
         onSelect(domainSite);
       }
     } catch (error) {
@@ -98,17 +114,52 @@ const AuditAllSiteModal: React.FC<AuditAllSiteModalProps> = ({
           <>
             {NewLoading && <CrawlingLoader />}
             <div className="crawl-container">
-              <div className="crawl-input-wrapper">
+              <div className="crawl-input-wrapper mt-5">
                 <span className="crawl-prefix">https://</span>
-                <input
-                  type="text"
-                  placeholder="Enter your domain"
-                  value={domainInput}
-                  onChange={(e) =>
-                    setDomainInput(sanitizeDomain(e.target.value))
-                  }
-                  className="crawl-input"
-                />
+                <div className="tooltip-icon_wrapper">
+                  <input
+                    type="text"
+                    placeholder="Enter your domain"
+                    value={domainInput}
+                    onChange={(e) =>
+                      setDomainInput(sanitizeDomain(e.target.value))
+                    }
+                    className="crawl-input"
+                  />
+                  <p
+                    style={{
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      color: "#555",
+                    }}
+                    className="tooltip-icon"
+                  >
+                    ⓘ
+                    <span
+                      className="tooltip-text"
+                      style={{
+                        visibility: "hidden",
+                        width: "240px",
+                        backgroundColor: "#333",
+                        color: "#fff",
+                        textAlign: "center",
+                        borderRadius: "6px",
+                        padding: "6px",
+                        position: "absolute",
+                        zIndex: 1,
+                        bottom: "125%",
+                        left: "50%",
+                        marginLeft: "-120px",
+                        fontSize: "12px",
+                        opacity: 0,
+                        transition: "opacity 0.3s",
+                      }}
+                    >
+                      Use <b>www.example.com</b> if your site runs on "www".
+                      Otherwise, enter <b>example.com</b>.
+                    </span>
+                  </p>
+                </div>
               </div>
 
               <button

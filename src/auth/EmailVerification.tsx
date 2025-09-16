@@ -21,6 +21,7 @@ const EmailVerification = () => {
     email: "",
     password: "",
   });
+  const [organizationId,setOrganizationId]=useState<string>("")
 
   const [errors, setErrors] = useState<ValidationEmailErrors>({});
    const [isValidInvitation, setIsValidInvitation] = useState<boolean | null>(null); 
@@ -40,6 +41,7 @@ const EmailVerification = () => {
           if (email) {
             setFormData((prev) => ({ ...prev, email }));
           }
+          setOrganizationId(response?.data.organization_id)
         } else {
           setIsValidInvitation(false);
           toast.error("Invalid or expired invitation link.");
@@ -73,7 +75,7 @@ const EmailVerification = () => {
           email: formData.email,
           password: formData.password,
           role: "user",
-          OrganizerId: id,
+          organization_id: organizationId,
         };
 
         const response = await VerifyUserByEmail(payload);
@@ -84,6 +86,7 @@ const EmailVerification = () => {
             position: "top-right",
             autoClose: 2000,
           });
+          setOrganizationId("")
           if (role === "user") {
             setTimeout(() => {
               navigate("/");

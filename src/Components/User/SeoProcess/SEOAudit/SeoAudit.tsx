@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Header from "../../Header/Header";
 import SideBar from "../../SideBar/SideBar";
-import { GetAuditListDetails, GetCrawDataById } from "../SeoServices";
+import {
+  GetAuditListDetails,
+  GetCrawDataById,
+  GetCrawDataByTaskId,
+} from "../SeoServices";
 import Loading from "../../../Page/Loading/Loading";
 import AuditAllSiteModal, { Site } from "./SeoAuditModals/AuditAllSiteModal";
 import AuditSectionModal, {
@@ -9,6 +13,7 @@ import AuditSectionModal, {
 } from "./SeoAuditModals/AuditSectionModal";
 import ConfirmModal from "../../../Page/ConfirmModal";
 import DomainModal from "../../../Page/DomainModal";
+import CrawlingLoader from "../../../Page/Loading/CrawlingLoader";
 
 const tableStatusCodeHeaders = [
   "URL Address",
@@ -347,6 +352,8 @@ const SeoAudit = () => {
             data.url_structure?.kpis?.url_structure_kpis || {}
           ),
         });
+        localStorage.removeItem("crawlInProgress");
+        localStorage.removeItem("crawlId");
 
         setShowAddDomainModal(false);
       }
@@ -379,15 +386,54 @@ const SeoAudit = () => {
     setShowAddDomainModal(false);
   }, []);
 
+  const handleBackgroundApi = async (site: any) => {
+    try {
+      setIsNewLoading(true);
+      const response = await GetCrawDataByTaskId(site?.task_id!);
+      if (
+        response.status === 200 ||
+        response.status === 201 ||
+        response.status === 202
+      ) {
+        if (response?.data.status === "SUCCESS") {
+          const { uuid } = response.data;
+          console.log("UUID:", uuid);
+          const matchedSite = {
+            uuid: uuid,
+            crawl_url: "crawl_url",
+          };
+          setAddAlreadySelectSite(matchedSite);
+          handleCloseModal(matchedSite);
+          setShowAddDomainModal(false);
+        } else if (response?.data.status === "RUNNING") {
+          handleBackgroundApi(site);
+        } else {
+          handleBackgroundApi(site);
+        }
+      }
+    } catch (error: any) {
+      console.error("Error fetchWebList:", error);
+    }
+  };
+
+  useEffect(() => {
+    const inProgress = localStorage.getItem("crawlInProgress");
+    const taskId = localStorage.getItem("crawlId");
+
+    if (inProgress === "true" && taskId) {
+      handleBackgroundApi({ task_id: taskId });
+    }
+  }, []);
+
   return (
     <>
       {isLoading && !CrownLoading && <Loading />}
-      {isNewLoading && <Loading />}
 
       <Header />
       <main className="main_wrapper">
         <SideBar />
         <div className="inner_content">
+          {isNewLoading && <CrawlingLoader />}
           <div className="keyword_tool_content  generate_post create_content">
             <div
               className="content_header mb-4"
@@ -421,23 +467,13 @@ const SeoAudit = () => {
                 onClose={handleConfirmModal}
                 onCancel={handleCancel}
               />
-
-              {/* {ShowAddDomainModal && (
-                <DomainModal
-                  title=""
-                  content={domainInput}
-                  setContent={setDomainInput}
-                  handleClose={handleCloseDomainModel}
-                  onSelect={handleSelect}
-                  AddAlreadySelectSite={AddAlreadySelectSite}
-                />
-              )} */}
             </div>
             {isModalOpen ? (
               <>
                 <AuditAllSiteModal
                   isOpen={isModalOpen}
-                  onSelect={handleSelect}
+                  onAlreadySelect={handleSelect}
+                  onSelect={handleBackgroundApi}
                   AllData={AllData}
                   AlreadySelectedCrawl={AlreadySelectedCrawl}
                   isLoading={CrownLoading}
@@ -449,7 +485,7 @@ const SeoAudit = () => {
                 content={domainInput}
                 setContent={setDomainInput}
                 handleClose={handleCloseDomainModel}
-                onSelect={handleSelect}
+                onSelect={handleBackgroundApi}
                 AddAlreadySelectSite={AddAlreadySelectSite}
               />
             ) : (
