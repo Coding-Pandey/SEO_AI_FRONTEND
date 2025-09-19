@@ -12,8 +12,7 @@ interface CircleGraphProps {
   metric: "clicks" | "impressions" | "ctr" | "position";
 }
 
-const COLORS = ["#90CAF9", "#007bba"];  
-
+const COLORS = ["#90CAF9", "#007bba", "#FFB74D"];
 
 const metricKeyMap: { [key: string]: string } = {
   clicks: "Clicks",
@@ -25,30 +24,19 @@ const metricKeyMap: { [key: string]: string } = {
 const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
   const actualMetricKey = metricKeyMap[metric];
 
-  const chartData = Object.entries(data)
-    .map(([device, metrics]) => {
-      const metricData = metrics[actualMetricKey];
-      const value =
-        metricData?.["Relative_Change (%)"] ?? metricData?.["Change (%)"] ?? 0;
+  const chartData = Object.entries(data).map(([device, metrics]) => {
+    const metricData = metrics[actualMetricKey];
+    const value = metricData?.["Current"] ?? 0;
 
-      return {
-        name: device,
-        value: Math.abs(value),
-      };
-    })
-    .filter((entry) => entry.value > 0);
+    return {
+      name: device,
+      value,
+    };
+  });
 
-  const totalValue = chartData.reduce((sum, entry) => sum + entry.value, 0);
+  const total = chartData.reduce((sum, d) => sum + d.value, 0);
 
-  // Add "Other" if total < 100
-  if (totalValue < 100) {
-    chartData.push({
-      name: "Other",
-      value: 100 - totalValue,
-    });
-  }
-
-  if (chartData.length === 0) {
+  if (total === 0) {
     return <p className="text-center">No data available for {metric}</p>;
   }
 
@@ -80,48 +68,56 @@ const CircleGraph: React.FC<CircleGraphProps> = ({ data, metric }) => {
   };
 
   return (
- <div  className="graph-body  d-flex justify-content-center align-items-center">
-    <div style={{ width: 250, height: 200 }}  >
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={chartData}
-            dataKey="value"
-            nameKey="name"
-            stroke="none"
-            innerRadius={45}
-            outerRadius={90}
-            label={renderCustomizedLabel}
-            labelLine={false}
-          >
-            {chartData.map((_, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
-          <Tooltip />
-        </PieChart>
-      </ResponsiveContainer>
-    </div> 
-    <div className="ml-3">
-          {chartData.map((entry, index) => (
-            <div key={index} className="d-flex align-items-center mb-2">
+    <div className="graph-body d-flex flex-column align-items-center gap-3">
+      <div style={{ width: 250, height: 200 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              stroke="none"
+              innerRadius={45}
+              outerRadius={90}
+              label={renderCustomizedLabel}
+              labelLine={false}
+            >
+              {chartData.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="card-footer d-flex justify-content-around w-100 mt-3">
+        {chartData.map((entry, index) => {
+          const percent = ((entry.value / total) * 100).toFixed(1);
+          return (
+            <div key={index} className="text-center">
               <div
                 style={{
-                  width: 10,
-                  height: 10,
-                  backgroundColor: COLORS[index],
+                  width: 12,
+                  height: 12,
+                  backgroundColor: COLORS[index % COLORS.length],
                   borderRadius: "50%",
-                  marginRight: 8,
+                  margin: "0 auto 4px",
                 }}
               ></div>
-              <span style={{ fontSize: 13 }}>{entry.name}</span>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>
+                {entry.value.toLocaleString()}
+              </div>
+              <div style={{ fontSize: 12, color: "#888" }}>{percent}%</div>
+              <div style={{ fontSize: 12 }}>{entry.name}</div>
             </div>
-          ))}
-        </div>
-   </div>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 

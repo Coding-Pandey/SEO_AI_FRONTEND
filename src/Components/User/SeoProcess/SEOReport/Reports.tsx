@@ -123,6 +123,13 @@ const initialLoadRef = useRef(false);
         setWebList(response?.data?.sites || []);
         setWebListAllData(response?.data?.selected_site);
         setFilterData(responseFilterData.data);
+
+         const apiCountry = response?.data?.country;
+      if (apiCountry === null) {
+        setSelectedCountry("All");
+      } else {
+        setSelectedCountry(apiCountry);
+      }
       }
     } catch (error: any) {
       console.error("Error fetchWebList:", error);
@@ -151,55 +158,7 @@ const initialLoadRef = useRef(false);
     handleCloseModal(tags);
   };
 
-  // const handleCloseModal = async (BrandTags: any) => {
-  //   try {
-  //     setIsLoading(true);
-  //     const payload = {
-  //       site_url: selectedSite?.siteUrl,
-  //       search_type: selectedSearchType,
-  //       country: selectedCountry === "All" ? null : selectedCountry,
-  //       device_type: selectedDeviceType === "All" ? null : selectedDeviceType,
-  //       start_date: formatDateToYYYYMMDD(range[0]?.startDate),
-  //       end_date: formatDateToYYYYMMDD(range[0]?.endDate),
-  //     };
-  //     const payloadNewBranch = {
-  //       site_url: selectedSite?.siteUrl,
-  //       search_type: selectedSearchType,
-  //       country: selectedCountry === "All" ? null : selectedCountry,
-  //       device_type: selectedDeviceType === "All" ? null : selectedDeviceType,
-  //       start_date: formatDateToYYYYMMDD(range[0]?.startDate),
-  //       end_date: formatDateToYYYYMMDD(range[0]?.endDate),
-  //       branded_words: BrandTags,
-  //     };
-
-  //     const responseSearchConsole = await AddSearchConsole(payload);
-  //     const responseRankingKeyword = await AddRankingKeyword(payload);
-  //     const responseBrandedWordanalysis = await AddBrandedWordanalysis(
-  //       payloadNewBranch
-  //     );
-  //     if (
-  //       responseSearchConsole.status === 200 ||
-  //       responseRankingKeyword.status === 200 ||
-  //       responseBrandedWordanalysis.status === 200
-  //     ) {
-  //       setSearchConsole(responseSearchConsole?.data);
-  //       setRankingKeyword(responseRankingKeyword?.data);
-  //       setBrandedWordAnalysis(responseBrandedWordanalysis?.data);
-  //       // console.log(responseSearchConsole.data, "responseSearchConsole");
-  //       // console.log(responseRankingKeyword.data, "responseRankingKeyword");
-  //       // console.log(
-  //       //   responseBrandedWordanalysis.data,
-  //       //   "responseBrandedWordanalysis"
-  //       // );
-  //       setIsModalOpen(false);
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Error fetchWebList:", error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-  
+ 
   const handleCloseModal = async (BrandTags: any) => {
   try {
     setIsLoading(true);
@@ -325,8 +284,7 @@ const initialLoadRef = useRef(false);
 
               {webList?.length > 0 && !isModalOpen && (
                 <select
-                  className="form-select"
-                  style={{ width: "auto" }}
+                  className="form-select report-select-site-box"
                   value={selectedSite?.siteUrl || ""}
                   onChange={(e) => {
                     const selected = webList.find(
@@ -742,9 +700,7 @@ const initialLoadRef = useRef(false);
                                         metric={selectedMetric}
                                       />
                                     </div>
-                                    <div className="card-footer">
-                                      <div className="row"></div>
-                                    </div>
+                                  
                                   </div>
                                 </div>
                               </div>

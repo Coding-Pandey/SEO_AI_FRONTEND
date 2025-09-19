@@ -137,7 +137,7 @@ const FilterComponent: React.FC<FilterProps> = ({
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
           >
-            <option value="USA">Country: {selectedCountry}</option>
+            <option value="All">Country: {selectedCountry}</option>
             {FilterData.countries?.map((country: any, idx: number) => (
               <option key={idx} value={country.code}>
                 {country.name}
@@ -153,7 +153,7 @@ const FilterComponent: React.FC<FilterProps> = ({
             value={selectedDeviceType}
             onChange={(e) => setSelectedDeviceType(e.target.value)}
           >
-            <option value="mobile">Device type: {selectedDeviceType}</option>
+            <option value="All">Device type: {selectedDeviceType}</option>
             {FilterData.device_types?.map((device: string, idx: number) => (
               <option key={idx} value={device}>
                 {device}
