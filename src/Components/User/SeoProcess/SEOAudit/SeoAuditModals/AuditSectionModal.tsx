@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -43,6 +43,25 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
   const [visibleRows, setVisibleRows] = useState<number>(50);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!tableRows.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleRows((prev) => Math.min(prev + 50, tableRows.length));
+        }
+      },
+      { threshold: 1 }
+    );
+    const current = sentinelRef.current;
+    if (current) observer.observe(current);
+
+    return () => {
+      if (current) observer.unobserve(current);
+    };
+  }, [tableRows]);
 
   const headerKeyMap: Record<string, string> = {
     "URL Address": "Address",
@@ -234,16 +253,14 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                   <h3 className="font_18 font_300 mb-2">{card.title}</h3>
                   <h4 className="font_25 font_500 mb-1">{card.value}</h4>
                   <p
-                    className={`font_14 ${
-                      card.isDown ? "text-danger" : "text-success"
-                    }  mb-1`}
+                    className={`font_14 ${card.isDown ? "text-danger" : "text-success"
+                      }  mb-1`}
                   >
                     <i
-                      className={`bi ${
-                        card.isDown
+                      className={`bi ${card.isDown
                           ? "bi-arrow-down-short"
                           : "bi-arrow-up-short"
-                      }`}
+                        }`}
                     ></i>{" "}
                     {card.percent ?? card.value}
                   </p>
@@ -303,12 +320,11 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
               {filters.map((filter, idx) => (
                 <li key={idx}>
                   <button
-                    className={`indexable_btn primary_btn ${
-                      activeFilter.trim().toLowerCase() ===
-                      filter.trim().toLowerCase()
+                    className={`indexable_btn primary_btn ${activeFilter.trim().toLowerCase() ===
+                        filter.trim().toLowerCase()
                         ? "activeAudit"
                         : ""
-                    }`}
+                      }`}
                     onClick={(e) => {
                       e.preventDefault();
                       setActiveFilter(filter);
@@ -371,34 +387,8 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                   )}
                 </tbody>
               </table>
-
-              {/* Pagination buttons */}
               {visibleRows < tableRows.length && (
-                <div className="text-center my-3">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setVisibleRows(visibleRows + 50);
-                    }}
-                    className="view-more-btn"
-                  >
-                    Load More
-                  </button>
-                </div>
-              )}
-
-              {visibleRows >= tableRows.length && visibleRows > 50 && (
-                <div className="text-center my-3">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setVisibleRows(50);
-                    }}
-                    className="view-more-btn"
-                  >
-                    View Less
-                  </button>
-                </div>
+                <div ref={sentinelRef} style={{ height: "50px" }} />
               )}
             </div>
           </div>

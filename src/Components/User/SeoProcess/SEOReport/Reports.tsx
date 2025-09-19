@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../../Header/Header";
 import SideBar from "../../SideBar/SideBar";
 import {
@@ -85,9 +85,9 @@ const Reports = () => {
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [FilterData, setFilterData] = useState<any>({});
   const [selectedDeviceType, setSelectedDeviceType] =
-    useState<string>("mobile");
+    useState<string>("All");
   const [selectedSearchType, setSelectedSearchType] = useState<string>("web");
-  const [selectedCountry, setSelectedCountry] = useState<string>("USA");
+  const [selectedCountry, setSelectedCountry] = useState<string>("All");
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [SearchConsole, setSearchConsole] = useState<any>({});
   const [RankingKeyword, setRankingKeyword] = useState<any>({});
@@ -98,7 +98,7 @@ const Reports = () => {
   const [selectedMetric, setSelectedMetric] = useState<
     "clicks" | "impressions" | "ctr" | "position"
   >("clicks");
-
+const initialLoadRef = useRef(false);
   const today = new Date();
   const sixMonthsAgo = subMonths(today, 6);
   const threeMonthsAgo = subMonths(today, 3);
@@ -135,67 +135,129 @@ const Reports = () => {
     if (selectedSite) {
       handleCloseModal(BrandTags);
     }
+    initialLoadRef.current = true;
   }, [
     selectedSearchType,
     selectedCountry,
     selectedDeviceType,
     range,
     selectedSite,
+    BrandTags,
   ]);
 
   const setBrandTagsAndFetch = (tags: string[]) => {
     console.log(setBrandTags, "setBrandTags");
+    setBrandTags(tags)
     handleCloseModal(tags);
   };
 
-  const handleCloseModal = async (BrandTags: any) => {
-    try {
-      setIsLoading(true);
-      const payload = {
-        site_url: selectedSite?.siteUrl,
-        search_type: selectedSearchType,
-        country: selectedCountry,
-        device_type: selectedDeviceType,
-        start_date: formatDateToYYYYMMDD(range[0]?.startDate),
-        end_date: formatDateToYYYYMMDD(range[0]?.endDate),
-      };
-      const payloadNewBranch = {
-        site_url: selectedSite?.siteUrl,
-        search_type: selectedSearchType,
-        country: selectedCountry,
-        device_type: selectedDeviceType,
-        start_date: formatDateToYYYYMMDD(range[0]?.startDate),
-        end_date: formatDateToYYYYMMDD(range[0]?.endDate),
-        branded_words: BrandTags,
-      };
+  // const handleCloseModal = async (BrandTags: any) => {
+  //   try {
+  //     setIsLoading(true);
+  //     const payload = {
+  //       site_url: selectedSite?.siteUrl,
+  //       search_type: selectedSearchType,
+  //       country: selectedCountry === "All" ? null : selectedCountry,
+  //       device_type: selectedDeviceType === "All" ? null : selectedDeviceType,
+  //       start_date: formatDateToYYYYMMDD(range[0]?.startDate),
+  //       end_date: formatDateToYYYYMMDD(range[0]?.endDate),
+  //     };
+  //     const payloadNewBranch = {
+  //       site_url: selectedSite?.siteUrl,
+  //       search_type: selectedSearchType,
+  //       country: selectedCountry === "All" ? null : selectedCountry,
+  //       device_type: selectedDeviceType === "All" ? null : selectedDeviceType,
+  //       start_date: formatDateToYYYYMMDD(range[0]?.startDate),
+  //       end_date: formatDateToYYYYMMDD(range[0]?.endDate),
+  //       branded_words: BrandTags,
+  //     };
 
-      const responseSearchConsole = await AddSearchConsole(payload);
-      const responseRankingKeyword = await AddRankingKeyword(payload);
-      const responseBrandedWordanalysis = await AddBrandedWordanalysis(
-        payloadNewBranch
-      );
-      if (
-        responseSearchConsole.status === 200 ||
-        responseRankingKeyword.status === 200 ||
-        responseBrandedWordanalysis.status === 200
-      ) {
-        setSearchConsole(responseSearchConsole?.data);
-        setRankingKeyword(responseRankingKeyword?.data);
-        setBrandedWordAnalysis(responseBrandedWordanalysis?.data);
-        // console.log(responseSearchConsole.data, "responseSearchConsole");
-        // console.log(responseRankingKeyword.data, "responseRankingKeyword");
-        // console.log(
-        //   responseBrandedWordanalysis.data,
-        //   "responseBrandedWordanalysis"
-        // );
-        setIsModalOpen(false);
+  //     const responseSearchConsole = await AddSearchConsole(payload);
+  //     const responseRankingKeyword = await AddRankingKeyword(payload);
+  //     const responseBrandedWordanalysis = await AddBrandedWordanalysis(
+  //       payloadNewBranch
+  //     );
+  //     if (
+  //       responseSearchConsole.status === 200 ||
+  //       responseRankingKeyword.status === 200 ||
+  //       responseBrandedWordanalysis.status === 200
+  //     ) {
+  //       setSearchConsole(responseSearchConsole?.data);
+  //       setRankingKeyword(responseRankingKeyword?.data);
+  //       setBrandedWordAnalysis(responseBrandedWordanalysis?.data);
+  //       // console.log(responseSearchConsole.data, "responseSearchConsole");
+  //       // console.log(responseRankingKeyword.data, "responseRankingKeyword");
+  //       // console.log(
+  //       //   responseBrandedWordanalysis.data,
+  //       //   "responseBrandedWordanalysis"
+  //       // );
+  //       setIsModalOpen(false);
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error fetchWebList:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+  
+  const handleCloseModal = async (BrandTags: any) => {
+  try {
+    setIsLoading(true);
+
+    const payload = {
+      site_url: selectedSite?.siteUrl,
+      search_type: selectedSearchType,
+      country: selectedCountry === "All" ? null : selectedCountry,
+      device_type: selectedDeviceType === "All" ? null : selectedDeviceType,
+      start_date: formatDateToYYYYMMDD(range[0]?.startDate),
+      end_date: formatDateToYYYYMMDD(range[0]?.endDate),
+    };
+
+    const payloadNewBranch = {
+      ...payload,
+      branded_words: BrandTags,
+    };
+
+ 
+    const results = await Promise.allSettled([
+      AddSearchConsole(payload),
+      AddRankingKeyword(payload),
+      AddBrandedWordanalysis(payloadNewBranch),
+    ]);
+
+  
+    results.forEach((res, index) => {
+      if (res.status === "fulfilled") {
+        switch (index) {
+          case 0:
+            setSearchConsole(res.value.data);
+            break;
+          case 1:
+            setRankingKeyword(res.value.data);
+            break;
+          case 2:
+            setBrandedWordAnalysis(res.value.data);
+            break;
+        }
+      } else {
+        console.error(
+          `API call ${index + 1} failed:`,
+          res.reason?.message || res.reason
+        );
       }
-    } catch (error: any) {
-      console.error("Error fetchWebList:", error);
-    } finally {
-      setIsLoading(false);
+    });
+
+
+    if (results.some((res) => res.status === "fulfilled")) {
+      setIsModalOpen(false);
     }
-  };
+
+  } catch (error: any) {
+    console.error("Error in handleCloseModal:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const cardMatrix: CardMatrix | undefined = SearchConsole?.card_matrix;
 
@@ -203,34 +265,34 @@ const Reports = () => {
 
   const displayItems: DisplayItem[] = cardMatrix
     ? Object.entries(cardMatrix)
-        .filter(([key]) => !excludeTitles.includes(key)) // exclude these keys
-        .map(([key, value]) => {
-          const percent =
-            value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
-          const isDown = percent < 0;
-          return {
-            title: key,
-            value: value.Current,
-            percent: `${percent}%`,
-            isDown,
-          };
-        })
+      .filter(([key]) => !excludeTitles.includes(key)) // exclude these keys
+      .map(([key, value]) => {
+        const percent =
+          value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
+        const isDown = percent < 0;
+        return {
+          title: key,
+          value: value.Current,
+          percent: `${percent}%`,
+          isDown,
+        };
+      })
     : [];
 
   const excludedItems = cardMatrix
     ? Object.entries(cardMatrix)
-        .filter(([key]) => excludeTitles.includes(key))
-        .map(([key, value]) => {
-          const percent =
-            value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
-          const isDown = percent < 0;
-          return {
-            title: key.replace(/_/g, " "), // nicer display
-            value: value.Current,
-            percent: `${percent}%`,
-            isDown,
-          };
-        })
+      .filter(([key]) => excludeTitles.includes(key))
+      .map(([key, value]) => {
+        const percent =
+          value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
+        const isDown = percent < 0;
+        return {
+          title: key.replace(/_/g, " "), // nicer display
+          value: value.Current,
+          percent: `${percent}%`,
+          isDown,
+        };
+      })
     : [];
 
   // Safe access with default empty array to avoid errors
@@ -258,7 +320,7 @@ const Reports = () => {
                   className="heading_icon me-1"
                   alt="heading icon"
                 />
-                Organic reports <span className="text_blue">/ {activeTab === "overview" ? "Overview" : activeTab === "brand" ? "Brand vs Generic" :"Rankings"}</span>
+                Organic reports <span className="text_blue">/ {activeTab === "overview" ? "Overview" : activeTab === "brand" ? "Brand vs Generic" : "Rankings"}</span>
               </h2>
 
               {webList?.length > 0 && !isModalOpen && (
@@ -309,9 +371,8 @@ const Reports = () => {
                         <li className="nav-item" role="presentation">
                           <button
                             // className="nav-link active"
-                            className={`nav-link ${
-                              activeTab === "overview" ? "active" : ""
-                            }`}
+                            className={`nav-link ${activeTab === "overview" ? "active" : ""
+                              }`}
                             onClick={() => setActiveTab("overview")}
                             id="pills-overview-tab"
                             data-bs-toggle="pill"
@@ -330,9 +391,8 @@ const Reports = () => {
                         <li className="nav-item" role="presentation">
                           <button
                             // className="nav-link"
-                            className={`nav-link ${
-                              activeTab === "brand" ? "active" : ""
-                            }`}
+                            className={`nav-link ${activeTab === "brand" ? "active" : ""
+                              }`}
                             onClick={() => setActiveTab("brand")}
                             id="pills-brand-tab"
                             data-bs-toggle="pill"
@@ -351,9 +411,8 @@ const Reports = () => {
                         <li className="nav-item" role="presentation">
                           <button
                             // className="nav-link"
-                            className={`nav-link ${
-                              activeTab === "rankings" ? "active" : ""
-                            }`}
+                            className={`nav-link ${activeTab === "rankings" ? "active" : ""
+                              }`}
                             onClick={() => setActiveTab("rankings")}
                             id="pills-rankings-tab"
                             data-bs-toggle="pill"
@@ -399,6 +458,7 @@ const Reports = () => {
                                 showCalendar={showCalendar}
                                 setShowCalendar={setShowCalendar}
                                 today={today}
+                                brandTags={BrandTags}
                                 onSaveBrandTags={setBrandTagsAndFetch}
                                 activeTab={activeTab}
                                 minDate={sixMonthsAgo}
@@ -420,18 +480,16 @@ const Reports = () => {
                                         {item.value}
                                       </h4>
                                       <p
-                                        className={`font_14 ${
-                                          item.isDown
+                                        className={`font_14 ${item.isDown
                                             ? "text-danger"
                                             : "text-success"
-                                        } mb-1`}
+                                          } mb-1`}
                                       >
                                         <i
-                                          className={`bi ${
-                                            item.isDown
+                                          className={`bi ${item.isDown
                                               ? "bi-arrow-down-short"
                                               : "bi-arrow-up-short"
-                                          }`}
+                                            }`}
                                         ></i>{" "}
                                         {item.percent}
                                       </p>
@@ -454,18 +512,16 @@ const Reports = () => {
                                             {item.value}
                                           </h4>
                                           <p
-                                            className={`font_14 ${
-                                              item.isDown
+                                            className={`font_14 ${item.isDown
                                                 ? "text-danger"
                                                 : "text-success"
-                                            } mb-1`}
+                                              } mb-1`}
                                           >
                                             <i
-                                              className={`bi ${
-                                                item.isDown
+                                              className={`bi ${item.isDown
                                                   ? "bi-arrow-down-short"
                                                   : "bi-arrow-up-short"
-                                              }`}
+                                                }`}
                                             ></i>{" "}
                                             {item.percent}
                                           </p>
@@ -719,6 +775,7 @@ const Reports = () => {
                                 showCalendar={showCalendar}
                                 setShowCalendar={setShowCalendar}
                                 today={today}
+                                brandTags={BrandTags}
                                 onSaveBrandTags={setBrandTagsAndFetch}
                                 activeTab={activeTab}
                                 minDate={sixMonthsAgo}
@@ -902,7 +959,7 @@ const Reports = () => {
                                 <GenericKeywordsTable
                                   keywordList={
                                     BrandedWordAnalysis?.branded_keyword_list?.[
-                                      selectedMetric
+                                    selectedMetric
                                     ] ?? []
                                   }
                                   message="Branded Keywords"
@@ -911,7 +968,7 @@ const Reports = () => {
                                 <GenericKeywordsTable
                                   keywordList={
                                     BrandedWordAnalysis?.generic_keyword_list?.[
-                                      selectedMetric
+                                    selectedMetric
                                     ] ?? []
                                   }
                                   message="Generic Keywords"
@@ -945,6 +1002,7 @@ const Reports = () => {
                                 showCalendar={showCalendar}
                                 setShowCalendar={setShowCalendar}
                                 today={today}
+                                brandTags={BrandTags}
                                 onSaveBrandTags={setBrandTagsAndFetch}
                                 activeTab={activeTab}
                                 minDate={sixMonthsAgo}
@@ -971,18 +1029,16 @@ const Reports = () => {
                                               {item.current_count}
                                             </h4>
                                             <p
-                                              className={`font_14 mb-0 ${
-                                                isPositive
+                                              className={`font_14 mb-0 ${isPositive
                                                   ? "text-success"
                                                   : "text-danger"
-                                              }`}
+                                                }`}
                                             >
                                               <i
-                                                className={`bi ${
-                                                  isPositive
+                                                className={`bi ${isPositive
                                                     ? "bi-arrow-up-short"
                                                     : "bi-arrow-down-short"
-                                                }`}
+                                                  }`}
                                               ></i>{" "}
                                               {Math.abs(item.delta_abs)}
                                             </p>

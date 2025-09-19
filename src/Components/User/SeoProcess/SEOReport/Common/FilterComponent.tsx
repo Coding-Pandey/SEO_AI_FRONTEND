@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DateRange } from "react-date-range";
 
 interface FilterProps {
@@ -14,6 +14,7 @@ interface FilterProps {
   showCalendar: boolean;
   setShowCalendar: React.Dispatch<React.SetStateAction<boolean>>;
   today: Date;
+   brandTags: string[];
   onSaveBrandTags: (tags: string[]) => void;
   activeTab: string;
   minDate: Date;
@@ -32,14 +33,19 @@ const FilterComponent: React.FC<FilterProps> = ({
   showCalendar,
   setShowCalendar,
   today,
+  brandTags,
   onSaveBrandTags,
   activeTab,
   minDate,
 }) => {
   const [tempRange, setTempRange] = useState<any>(range);
   const [showInputBox, setShowInputBox] = useState<boolean>(false);
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(brandTags);
   const [inputValue, setInputValue] = useState("");
+
+   useEffect(() => {
+    setTags(brandTags);
+  }, [brandTags]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Enter" || e.key === ",") && inputValue.trim() !== "") {
