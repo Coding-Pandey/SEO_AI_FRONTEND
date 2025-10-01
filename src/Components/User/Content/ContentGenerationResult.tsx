@@ -14,13 +14,13 @@ import { toast } from "react-toastify";
 import TitleOrFileUpdateModal from "../../Page/TitleOrFileUpdateModal";
 import Loading from "../../Page/Loading/Loading";
 import {
-  EditGenerateContent,
+  AddGenerateContent,
   GetFormDetails,
   MoreGenerateSuggestion,
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
 import { GetUploadedSourcefiles } from "../SocialMedia/Common/SocialMediaServices";
-import { language_options, location_options } from "../../Page/store";
+import { getBase64, language_options, location_options } from "../../Page/store";
 
 const ContentGenerationResult = () => {
   const location = useLocation();
@@ -76,6 +76,7 @@ const ContentGenerationResult = () => {
       const storedData = localStorage.getItem("keywordToolResult");
 
       const formDataDetail = localStorage.getItem("FormDataDetails");
+ 
 
       if (formDataDetail) {
         setNewMessage("editContent");
@@ -265,17 +266,20 @@ const ContentGenerationResult = () => {
 
   const handleAddSection = async () => {
     try {
-      const Instructions = FormPreDetails?.AddInstructions;
-      const preUploadFile = FormPreDetails?.temp_file_path;
+      const base64file=FormPreDetails?.base64_fileData;
       const formData = new FormData();
       // formData.append("file_name", FileName);
-      // formData.append("content_type", String(contentType));
       // formData.append("objectives", JSON.stringify(PostObjectives));
       // formData.append("audience", JSON.stringify(TargetAudience));
       // formData.append("links", JSON.stringify(links));
+      formData.append("content_type", String(contentType));
+      formData.append("language_id", JSON.stringify(FormPreDetails.languageFull));
+      formData.append("location_ids", JSON.stringify(country));
       formData.append("generated_blog", JSON.stringify(generateKeywordDetails));
-      formData.append("text_data", Instructions);
-      formData.append("file_path", preUploadFile);
+      formData.append("text_data", AddInstructions);
+      formData.append("file_base", base64file);
+      // formData.append("summarized_text_json", "null");
+      // formData.append("keywords", "null");
       setloadingData(true);
       const response = await MoreGenerateSuggestion(formData);
       if (response.status === 200 || response.status === 201) {
@@ -476,10 +480,12 @@ const ContentGenerationResult = () => {
       formData.append("language_id", JSON.stringify(selectedLanguage));
       formData.append("location_ids", JSON.stringify(selectedCountries));
       let newFileUpload;
+       let fileBase64;
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
         formData.append("file", file);
         newFileUpload = file.name;
+         fileBase64 = await getBase64(file);
       }
       // if (FileUrl.length > 0) {
       //   const tempFile = FileUrl[0];
@@ -496,15 +502,18 @@ const ContentGenerationResult = () => {
         uploadedFiles: newFileUpload,
         links,
         language: selectedLanguage?.ID,
+        languageFull: selectedLanguage,
         country: selectedCountries.map((c) => c.id),
       };
-      const response = await EditGenerateContent(formData);
+  
+        const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
         const dataResult = response.data;
-        console.log(dataResult, "dataResult");
+        // console.log(dataResult, "dataResult");
         const tempfile = {
           ...newFormData,
           temp_file_path: dataResult?.temp_file_path,
+          base64_fileData:fileBase64
         };
         const updatedNewData = {
           ...dataResult,

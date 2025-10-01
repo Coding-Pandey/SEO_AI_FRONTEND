@@ -20,7 +20,7 @@ import {
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
 import { GetUploadedSourcefiles } from "../SocialMedia/Common/SocialMediaServices";
-import { language_options, location_options } from "../../Page/store";
+import { getBase64, language_options, location_options } from "../../Page/store";
 
 interface contentData {
   uuid: string;
@@ -216,6 +216,11 @@ const ContentGeneration = () => {
     handleAddLink();
   };
 
+
+
+
+
+
   const handleGenerateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setNewMessage("newContent")
     e.preventDefault();
@@ -267,10 +272,12 @@ const ContentGeneration = () => {
       formData.append("language_id", JSON.stringify(selectedLanguage));
       formData.append("location_ids", JSON.stringify(selectedCountries));
       let newFileUpload;
+      let fileBase64;
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
         formData.append("file", file);
         newFileUpload = file.name;
+        fileBase64 = await getBase64(file);
       }
       formData.append("links", JSON.stringify(links));
       const newFormData = {
@@ -282,6 +289,7 @@ const ContentGeneration = () => {
         uploadedFiles: newFileUpload,
         links,
         language: selectedLanguage?.ID,
+        languageFull: selectedLanguage,
         country: selectedCountries.map((c) => c.id),
       };
       const response = await AddGenerateContent(formData);
@@ -291,6 +299,7 @@ const ContentGeneration = () => {
         const tempfile = {
           ...newFormData,
           temp_file_path: dataResult.temp_file_path,
+          base64_fileData:fileBase64
         };
         localStorage.setItem("keywordToolResult", JSON.stringify(dataResult));
         localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));

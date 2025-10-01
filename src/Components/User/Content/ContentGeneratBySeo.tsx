@@ -20,7 +20,7 @@ import {
 } from "./ContentServices";
 import { GetUploadedSourcefiles } from "../SocialMedia/Common/SocialMediaServices";
 import ContentFormForSeo from "./ContentFormForSeo";
-import { language_options, location_options } from "../../Page/store";
+import { getBase64, language_options, location_options } from "../../Page/store";
 
 const ContentGeneratBySeo = () => {
   const location = useLocation();
@@ -238,17 +238,21 @@ const ContentGeneratBySeo = () => {
 
   const handleAddSection = async () => {
     try {
-      const Instructions = FormPreDetails?.AddInstructions;
-      const preUploadFile = FormPreDetails?.temp_file_path;
+     
+      const base64file=FormPreDetails?.base64_fileData;
       const formData = new FormData();
       // formData.append("file_name", FileName);
-      // formData.append("content_type", String(contentType));
       // formData.append("objectives", JSON.stringify(PostObjectives));
       // formData.append("audience", JSON.stringify(TargetAudience));
       // formData.append("links", JSON.stringify(links));
+      formData.append("content_type", String(contentType));
+      formData.append("language_id", JSON.stringify(FormPreDetails.languageFull));
+      formData.append("location_ids", JSON.stringify(country));
       formData.append("generated_blog", JSON.stringify(generateKeywordDetails));
-      formData.append("text_data", Instructions);
-      formData.append("file_path", preUploadFile);
+      formData.append("text_data", AddInstructions);
+      formData.append("file_base", base64file);
+       // formData.append("summarized_text_json", "null");
+      formData.append("keywords", JSON.stringify(keywords));
       setloadingData(true);
       const response = await MoreGenerateSuggestion(formData);
       if (response.status === 200 || response.status === 201) {
@@ -457,19 +461,21 @@ const ContentGeneratBySeo = () => {
       formData.append("text_data", AddInstructions);
       formData.append("language_id", JSON.stringify(selectedLanguage));
       formData.append("location_ids", JSON.stringify(selectedCountries));
+      formData.append("keywords", JSON.stringify(keywords));
       let newFileUpload;
+      let fileBase64;
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
         formData.append("file", file);
         newFileUpload = file.name;
+         fileBase64 = await getBase64(file);
       }
       // if (FileUrl.length > 0){
       //   const tempFile = FileUrl[0];
       //   formData.append("temp_file_path", tempFile);
       // }
-      formData.append("temp_file_path", generateKeywordDetails?.temp_file_path);
+      // formData.append("temp_file_path", generateKeywordDetails?.temp_file_path);
       formData.append("links", JSON.stringify(links));
-      formData.append("keywords", JSON.stringify(keywords));
       const newFormData = {
         FileName,
         contentType,
@@ -480,6 +486,7 @@ const ContentGeneratBySeo = () => {
         links,
         keywords,
         language: selectedLanguage?.ID,
+        languageFull: selectedLanguage,
         country: selectedCountries.map((c) => c.id),
       };
       const response = await AddGenerateContent(formData);
@@ -488,6 +495,7 @@ const ContentGeneratBySeo = () => {
         const tempfile = {
           ...newFormData,
           temp_file_path: dataResult?.temp_file_path,
+          base64_fileData:fileBase64
         };
         const updatedNewData = {
           ...dataResult,

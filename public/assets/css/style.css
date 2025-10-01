@@ -2827,6 +2827,38 @@ font-weight: 500;
     width: auto;
   }
 
+
+  .next_run_info {
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #28a745;
+    border-right: 3px solid #28a745;
+}
+
+.next_run_label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-right: 8px;
+}
+
+.next_run_time {
+  color: #495057;
+}
+
+.no_schedule_info {
+  background: #fff3cd;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #ffc107;
+  border-right: 3px solid #ffc107;
+}
+
+.warning_text {
+  color: #856404;
+  font-weight: 500;
+}
+
 /* Responsive css */
 @media only screen and (max-width:1599px) {
     .brand_select  .brand_content_box {

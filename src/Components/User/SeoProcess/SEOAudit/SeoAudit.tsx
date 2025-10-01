@@ -5,6 +5,7 @@ import {
   GetAuditListDetails,
   GetCrawDataById,
   GetCrawDataByTaskId,
+  GetscheduleJobDetails,
 } from "../SeoServices";
 import Loading from "../../../Page/Loading/Loading";
 import AuditAllSiteModal, { Site } from "./SeoAuditModals/AuditAllSiteModal";
@@ -128,6 +129,7 @@ const SeoAudit = () => {
   const [ActionConfirmModal, setActionConfirmModal] = useState(false);
   const [ShowAddDomainModal, setShowAddDomainModal] = useState(false);
   const [domainInput, setDomainInput] = useState<string>("");
+  const [jobDetails, setJobDetails] = useState<any>(null);
   const [indexability, setIndexability] = useState<IndexabilityState>({
     data: null,
     filters: [],
@@ -201,9 +203,16 @@ const SeoAudit = () => {
       setIsLoading(true);
       const response = await GetAuditListDetails();
       if (response?.status === 200 || response?.status === 201) {
+        console.log(response?.data, 'response?.data?')
+
         const selected = response?.data?.[0]?.selected_site;
+        const uuid = response?.data?.[0]?.uuid;
         setAllData(response?.data);
         setAlreadySelectedCrawl(selected);
+        if (uuid) {
+          const jobDetailsResponse = await GetscheduleJobDetails(uuid);
+          setJobDetails(jobDetailsResponse?.data)
+        }
       }
     } catch (error: any) {
       console.error("Error fetchWebList:", error);
@@ -451,6 +460,24 @@ const SeoAudit = () => {
                 />
                 SEO Audit <span className="text_blue">/ {selectedTab}</span>
               </h2>
+              {jobDetails && jobDetails?.next_run_time ? (
+                <div className="next_run_info">
+                  <span className="next_run_label">Next Run:</span>
+                  <span className="next_run_time">
+                    {new Date(jobDetails?.next_run_time).toLocaleDateString()} at{" "}
+                    {new Date(jobDetails?.next_run_time).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+              ) : (
+                <div className="no_schedule_info">
+                  <span className="warning_text">
+                    Scheduled audit report is not found, try to re-schedule
+                  </span>
+                </div>
+              )}
 
               {!isModalOpen && (
                 <button
@@ -516,9 +543,8 @@ const SeoAudit = () => {
                             key={item.id}
                           >
                             <button
-                              className={`nav-link ${
-                                index === 0 ? "active" : ""
-                              }`}
+                              className={`nav-link ${index === 0 ? "active" : ""
+                                }`}
                               id={`audit-${item.id}-tab`}
                               data-bs-toggle="pill"
                               data-bs-target={`#audit-${item.id}`}

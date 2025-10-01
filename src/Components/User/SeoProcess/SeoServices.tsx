@@ -234,6 +234,17 @@ export const GetAuditListDetails = async () => {
   }
 };
 
+export const GetscheduleJobDetails = async (job_id: string) => {
+  try {
+    const response = await axiosInstance.get(`/api/scheduler/job/${job_id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 export const AddDomainCrawlURL = async (formData: { domain: string }) => {
   try {
     const response = await axiosInstance.post(`/api/sheets/crawl`, formData);

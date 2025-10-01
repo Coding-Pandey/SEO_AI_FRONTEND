@@ -50,9 +50,18 @@ export const deleteContentPreviousList = async (formData: { uuid: string }) => {
   }
 };
 
+//   export const MoreGenerateSuggestion = async (formData:any) => {
+//   try { 
+//     const response = await axiosInstance.post(`/api/blog_suggestion_more`,formData);
+//     return response;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
   export const MoreGenerateSuggestion = async (formData:any) => {
   try { 
-    const response = await axiosInstance.post(`/api/blog_suggestion_more`,formData);
+    const response = await axiosInstance.post(`/api/suggestion_more`,formData);
     return response;
   } catch (error) {
     throw error;
