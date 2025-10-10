@@ -308,7 +308,7 @@ const ContentGenerationResult = () => {
       formData.append("generated_blog", JSON.stringify(generateKeywordDetails));
       formData.append("text_data", AddInstructions);
       formData.append("file_uuid", file_uuidNew);
-      formData.append("objective_id", contentObjectivesId);
+      formData.append("objective_id", JSON.stringify(contentObjectivesId));
 
       // formData.append("summarized_text_json", "null");
       // formData.append("keywords", "null");

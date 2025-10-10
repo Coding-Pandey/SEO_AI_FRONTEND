@@ -281,7 +281,7 @@ const ContentGeneratBySeo = () => {
       formData.append("file_uuid", file_uuidNew);
       // formData.append("summarized_text_json", "null");
       formData.append("keywords", JSON.stringify(keywords));
-      formData.append("objective_id", contentObjectivesId);
+      formData.append("objective_id", JSON.stringify(contentObjectivesId));
       setloadingData(true);
       const response = await MoreGenerateSuggestion(formData);
       if (response.status === 200 || response.status === 201) {
