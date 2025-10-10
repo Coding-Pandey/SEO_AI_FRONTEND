@@ -184,3 +184,21 @@ export const UpdateFileNameSocialMedia = async (
     throw error;
   }
 };
+
+export const getContentObjectives = async () => {
+  try {
+    const response = await axiosInstance.get("/api/content_objectives");
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getSMContentObjectives = async () => {
+  try {
+    const response = await axiosInstance.get("/api/sm_objectives");
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

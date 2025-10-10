@@ -19,12 +19,19 @@ import {
   MoreGenerateSuggestion,
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
-import { GetUploadedSourcefiles } from "../SocialMedia/Common/SocialMediaServices";
-import { getBase64, language_options, location_options } from "../../Page/store";
+import {
+  getContentObjectives,
+  GetUploadedSourcefiles,
+} from "../SocialMedia/Common/SocialMediaServices";
+import { language_options, location_options } from "../../Page/store";
+import { ContentObjective } from "./ContentGeneration";
 
 const ContentGenerationResult = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [contentObjectives, setContentObjectives] = useState<
+    ContentObjective[]
+  >([]);
   const [generateKeywordDetails, setGenerateKeywordDetails] = useState<any>({});
   const [FormPreDetails, setFormPreDetails] = useState<any>(null);
   const [sections, setSections] = useState<any>([]);
@@ -50,6 +57,8 @@ const ContentGenerationResult = () => {
   const [country, setCountry] = useState<any>([]);
   const [language, setLanguage] = useState<string | null>(null);
   const [NewMessage, setNewMessage] = useState<string>("editContent");
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [contentObjectivesId, setContentObjectivesId] = useState<number[]>([]);
 
   useEffect(() => {
     fetchGenerateData();
@@ -60,9 +69,11 @@ const ContentGenerationResult = () => {
       setloadingData(true);
       const responseSourcefiles = await GetUploadedSourcefiles();
       const responseForm = await GetFormDetails();
+      const responseContentObjectives = await getContentObjectives();
       if (responseForm.status === 200 || responseForm.status === 201) {
         setFormDynamictData(responseForm.data);
         setUploadedSourcefiles(responseSourcefiles.data);
+        setContentObjectives(responseContentObjectives.data.objectives);
       }
     } catch (error: any) {
       console.error("Error fetchPPCClusterData:", error);
@@ -76,7 +87,6 @@ const ContentGenerationResult = () => {
       const storedData = localStorage.getItem("keywordToolResult");
 
       const formDataDetail = localStorage.getItem("FormDataDetails");
- 
 
       if (formDataDetail) {
         setNewMessage("editContent");
@@ -117,9 +127,10 @@ const ContentGenerationResult = () => {
     }
   }, [location.state]);
 
-  const handleEdit = (section: any) => {
+  const handleEdit = (section: any, index: number) => {
     setEditSection(section);
     setEditModalOpen(true);
+    setEditIndex(index);
   };
 
   const handleDelete = (sectionId: any) => {
@@ -144,10 +155,10 @@ const ContentGenerationResult = () => {
       setSections((prevSections: any[]) => [...prevSections, editSection]);
       localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
       setGenerateKeywordDetails(updatedData);
-    } else {
-      const updatedSections = sections.map((section: any) =>
-        section.section_id === editSection?.section_id ? editSection : section
-      );
+    } else if (editIndex !== null) {
+      const updatedSections = [...sections];
+      updatedSections[editIndex] = editSection;
+
       setSections(updatedSections);
       updateLocalStorage(updatedSections);
       toast.success("Suggestion updated successfully");
@@ -264,20 +275,41 @@ const ContentGenerationResult = () => {
     setEditModalOpen(true);
   };
 
+  const handleObjectiveIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    const objectiveId = Number(value);
+
+    setContentObjectivesId((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, objectiveId];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== objectiveId);
+      }
+      return updatedObjectives;
+    });
+  };
+
   const handleAddSection = async () => {
     try {
-      const base64file=FormPreDetails?.base64_fileData;
+      const file_uuidNew = FormPreDetails?.file_uuid;
+      const contentObjectivesId = FormPreDetails?.contentObjectivesId;
       const formData = new FormData();
       // formData.append("file_name", FileName);
       // formData.append("objectives", JSON.stringify(PostObjectives));
       // formData.append("audience", JSON.stringify(TargetAudience));
       // formData.append("links", JSON.stringify(links));
       formData.append("content_type", String(contentType));
-      formData.append("language_id", JSON.stringify(FormPreDetails.languageFull));
+      formData.append(
+        "language_id",
+        JSON.stringify(FormPreDetails.languageFull)
+      );
       formData.append("location_ids", JSON.stringify(country));
       formData.append("generated_blog", JSON.stringify(generateKeywordDetails));
       formData.append("text_data", AddInstructions);
-      formData.append("file_base", base64file);
+      formData.append("file_uuid", file_uuidNew);
+      formData.append("objective_id", contentObjectivesId);
+
       // formData.append("summarized_text_json", "null");
       // formData.append("keywords", "null");
       setloadingData(true);
@@ -322,7 +354,10 @@ const ContentGenerationResult = () => {
   const AddGenerate = async () => {
     try {
       setloadingData(true);
-      const dataResult = generateKeywordDetails;
+      const dataResult = {
+        ...generateKeywordDetails,
+        content_type: String(contentType),
+      };
       localStorage.setItem("ClusterData", JSON.stringify(dataResult));
       navigate("/content/ContentSuggestionResult", { state: dataResult });
     } catch (error) {
@@ -479,18 +514,19 @@ const ContentGenerationResult = () => {
       formData.append("text_data", AddInstructions);
       formData.append("language_id", JSON.stringify(selectedLanguage));
       formData.append("location_ids", JSON.stringify(selectedCountries));
+      formData.append("objective_id", JSON.stringify(contentObjectivesId));
       let newFileUpload;
-       let fileBase64;
+
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
         formData.append("file", file);
         newFileUpload = file.name;
-         fileBase64 = await getBase64(file);
       }
       // if (FileUrl.length > 0) {
       //   const tempFile = FileUrl[0];
       //   formData.append("temp_file_path", tempFile);
       // }
+
       formData.append("temp_file_path", generateKeywordDetails?.temp_file_path);
       formData.append("links", JSON.stringify(links));
       const newFormData = {
@@ -504,16 +540,17 @@ const ContentGenerationResult = () => {
         language: selectedLanguage?.ID,
         languageFull: selectedLanguage,
         country: selectedCountries.map((c) => c.id),
+        contentObjectivesId,
       };
-  
-        const response = await AddGenerateContent(formData);
+
+      const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
         const dataResult = response.data;
         // console.log(dataResult, "dataResult");
         const tempfile = {
           ...newFormData,
           temp_file_path: dataResult?.temp_file_path,
-          base64_fileData:fileBase64
+          file_uuid: dataResult?.uuid,
         };
         const updatedNewData = {
           ...dataResult,
@@ -617,6 +654,9 @@ const ContentGenerationResult = () => {
                     country={country}
                     setCountry={setCountry}
                     NewMessage={NewMessage}
+                    contentObjectives={contentObjectives}
+                    handleObjectiveIdChange={handleObjectiveIdChange}
+                    contentObjectivesId={contentObjectivesId}
                   />
                 </div>
               </div>
@@ -763,7 +803,7 @@ const ContentGenerationResult = () => {
                               </div>
                             </div>
                           )}
-                          {sections?.map((section: any) => (
+                          {sections?.map((section: any, index: number) => (
                             <div
                               className={`content_item_box ${
                                 section.color === "new" ? "active" : ""
@@ -778,7 +818,7 @@ const ContentGenerationResult = () => {
                                   <button
                                     className="btn font_16 p-0"
                                     aria-label="edit_icon"
-                                    onClick={() => handleEdit(section)}
+                                    onClick={() => handleEdit(section, index)}
                                   >
                                     <i className="bi bi-pencil-fill"></i>
                                   </button>

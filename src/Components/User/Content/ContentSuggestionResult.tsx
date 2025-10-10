@@ -23,6 +23,7 @@ const ContentSuggestionResult = () => {
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("ClusterData");
+      console.log(storedData,"storedData")
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         localStorage.setItem("ClusterData", JSON.stringify(parsedData));

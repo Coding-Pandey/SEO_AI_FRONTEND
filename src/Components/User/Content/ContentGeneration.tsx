@@ -19,17 +19,29 @@ import {
   GetFormDetails,
 } from "./ContentServices";
 import ContentForm from "./ContentForm";
-import { GetUploadedSourcefiles } from "../SocialMedia/Common/SocialMediaServices";
-import { getBase64, language_options, location_options } from "../../Page/store";
+import {
+  getContentObjectives,
+  GetUploadedSourcefiles,
+} from "../SocialMedia/Common/SocialMediaServices";
+import { language_options, location_options } from "../../Page/store";
 
 interface contentData {
   uuid: string;
   file_name: string;
   last_reset: string;
 }
+
+export interface ContentObjective {
+  id: number;
+  objective: string;
+}
+
 const ContentGeneration = () => {
   const navigate = useNavigate();
   const [ContentData, setContentData] = useState<contentData[]>([]);
+  const [contentObjectives, setContentObjectives] = useState<
+    ContentObjective[]
+  >([]);
   const [FormDynamictData, setFormDynamictData] = useState<any>({});
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [contentType, setContentType] = useState<number | "">("");
@@ -42,10 +54,11 @@ const ContentGeneration = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [linkInput, setLinkInput] = useState<string>("");
   const [links, setLinks] = useState<string[]>([]);
+  const [contentObjectivesId, setContentObjectivesId] = useState<number[]>([]);
   const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
   const [country, setCountry] = useState<any>([]);
   const [language, setLanguage] = useState<string | null>(null);
-  const [NewMessage,setNewMessage]=useState<string>("newContent")
+  const [NewMessage, setNewMessage] = useState<string>("newContent");
 
   useEffect(() => {
     fetchGenerateData();
@@ -57,7 +70,7 @@ const ContentGeneration = () => {
       const response = await GetContentPreviousList();
       const responseForm = await GetFormDetails();
       const responseSourcefiles = await GetUploadedSourcefiles();
-      // console.log(responseForm.data, "responseForm");
+      const responseContentObjectives = await getContentObjectives();
       if (response.status === 200 || response.status === 201) {
         const sortedData = response.data.sort(
           (a: contentData, b: contentData) =>
@@ -66,6 +79,7 @@ const ContentGeneration = () => {
         setContentData(sortedData);
         setUploadedSourcefiles(responseSourcefiles.data);
         setFormDynamictData(responseForm.data);
+        setContentObjectives(responseContentObjectives.data.objectives);
       }
     } catch (error: any) {
       console.error("Error fetchPPCClusterData:", error);
@@ -118,6 +132,21 @@ const ContentGeneration = () => {
         updatedObjectives = [...prev, value];
       } else {
         updatedObjectives = prev.filter((item) => item !== value);
+      }
+      return updatedObjectives;
+    });
+  };
+
+  const handleObjectiveIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    const objectiveId = Number(value);
+
+    setContentObjectivesId((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, objectiveId];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== objectiveId);
       }
       return updatedObjectives;
     });
@@ -216,13 +245,9 @@ const ContentGeneration = () => {
     handleAddLink();
   };
 
-
-
-
-
-
   const handleGenerateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setNewMessage("newContent")
+    console.log("2");
+    setNewMessage("newContent");
     e.preventDefault();
 
     try {
@@ -253,14 +278,14 @@ const ContentGeneration = () => {
         return;
       }
 
-       const selectedCountries = location_options.filter((loc) =>
-            country.some((c: any) => c.value === loc.id)
-          );
-      
-          const selectedLanguage = language_options.find(
-            (lang) => lang.ID === Number(language)
-          );
- 
+      const selectedCountries = location_options.filter((loc) =>
+        country.some((c: any) => c.value === loc.id)
+      );
+
+      const selectedLanguage = language_options.find(
+        (lang) => lang.ID === Number(language)
+      );
+
       setFileUrl([]);
       setLoadingData(true);
       const formData = new FormData();
@@ -271,13 +296,13 @@ const ContentGeneration = () => {
       formData.append("text_data", AddInstructions);
       formData.append("language_id", JSON.stringify(selectedLanguage));
       formData.append("location_ids", JSON.stringify(selectedCountries));
+      formData.append("objective_id", JSON.stringify(contentObjectivesId));
       let newFileUpload;
-      let fileBase64;
+
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
         formData.append("file", file);
         newFileUpload = file.name;
-        fileBase64 = await getBase64(file);
       }
       formData.append("links", JSON.stringify(links));
       const newFormData = {
@@ -291,6 +316,7 @@ const ContentGeneration = () => {
         language: selectedLanguage?.ID,
         languageFull: selectedLanguage,
         country: selectedCountries.map((c) => c.id),
+        contentObjectivesId,
       };
       const response = await AddGenerateContent(formData);
       if (response.status === 200 || response.status === 201) {
@@ -299,7 +325,7 @@ const ContentGeneration = () => {
         const tempfile = {
           ...newFormData,
           temp_file_path: dataResult.temp_file_path,
-          base64_fileData:fileBase64
+          file_uuid: dataResult?.uuid,
         };
         localStorage.setItem("keywordToolResult", JSON.stringify(dataResult));
         localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
@@ -373,6 +399,9 @@ const ContentGeneration = () => {
                     country={country}
                     setCountry={setCountry}
                     NewMessage={NewMessage}
+                    contentObjectives={contentObjectives}
+                    handleObjectiveIdChange={handleObjectiveIdChange}
+                    contentObjectivesId={contentObjectivesId}
                   />
                 </div>
               </div>

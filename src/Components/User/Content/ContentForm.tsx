@@ -1,6 +1,7 @@
 import React from "react";
 import { language_options, location_options } from "../../Page/store";
 import Select from "react-select";
+import { ContentObjective } from "./ContentGeneration";
 interface ContentFormProps {
   contentType: string;
   FileName: string;
@@ -26,11 +27,14 @@ interface ContentFormProps {
   handleRemoveLink: (index: number) => void;
   handleGenerateSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   UploadedSourcefiles: any;
-  language:any,
-  setLanguage:any,
-  country:any,
-  setCountry:any,
-  NewMessage:any
+  language: any;
+  setLanguage: any;
+  country: any;
+  setCountry: any;
+  NewMessage: any;
+  contentObjectives: ContentObjective[];
+  handleObjectiveIdChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  contentObjectivesId: number[];
 }
 
 const ContentForm: React.FC<ContentFormProps> = ({
@@ -62,7 +66,10 @@ const ContentForm: React.FC<ContentFormProps> = ({
   setLanguage,
   country,
   setCountry,
-  NewMessage
+  NewMessage,
+  contentObjectives,
+  handleObjectiveIdChange,
+  contentObjectivesId,
 }) => {
   const locationOptions = location_options.map((location) => ({
     value: location.id,
@@ -142,32 +149,30 @@ const ContentForm: React.FC<ContentFormProps> = ({
                     Define Post Objective
                   </h3>
                   <div className="row mb-2">
-                    {UploadedSourcefiles?.define_objective?.length > 0 ? (
-                      UploadedSourcefiles?.define_objective.map(
-                        (item: any, i: any) => (
-                          <div
-                            className="col-12 col-lg-6 col-xxl-6"
-                            key={item.uuid_id}
-                          >
-                            <div className="objective_box">
-                              <input
-                                type="checkbox"
-                                id={`persona_${i}`}
-                                name={`objective${i}`}
-                                checked={PostObjectives.includes(item.uuid_id)}
-                                value={item.uuid_id}
-                                onChange={handleObjectiveChange}
-                              />
-                              <label
-                                htmlFor={`persona_${i}`}
-                                className="font_16 ms-1"
-                              >
-                                {item.category} - {item.file_name}
-                              </label>
-                            </div>
+                    {contentObjectives?.length > 0 ? (
+                      contentObjectives.map((item, i) => (
+                        <div
+                          className="col-12 col-lg-6 col-xxl-6"
+                          key={item.id}
+                        >
+                          <div className="objective_box">
+                            <input
+                              type="checkbox"
+                              id={`persona_${i}`}
+                              name={`objective${i}`}
+                              checked={contentObjectivesId.includes(item.id)}
+                              value={item.id}
+                              onChange={handleObjectiveIdChange}
+                            />
+                            <label
+                              htmlFor={`persona_${i}`}
+                              className="font_16 ms-1"
+                            >
+                              {item.objective}
+                            </label>
                           </div>
-                        )
-                      )
+                        </div>
+                      ))
                     ) : (
                       <div className="col-12">
                         <p className="text-muted">
@@ -182,30 +187,64 @@ const ContentForm: React.FC<ContentFormProps> = ({
                 <div className="form_input">
                   <h3 className="font_20 font_500 mb-3">Target Audience</h3>
                   <div className="row mb-2">
-                    {UploadedSourcefiles?.Target_audience?.length > 0 ? (
-                      UploadedSourcefiles?.Target_audience.map(
-                        (item: any, i: any) => (
-                          <div className="col-12" key={item.uuid_id}>
-                            <input
-                              type="checkbox"
-                              name="audience"
-                              id={`persona1_${i}`}
-                              value={item.uuid_id}
-                              checked={TargetAudience[0] === item.uuid_id}
-                              onChange={handleTargetAudience}
-                            />
-                            <label
-                              htmlFor={`persona1_${i}`}
-                              className="font_16 ms-1"
+                    {/* Shows Target audience checkbox */}
+                    {UploadedSourcefiles?.Target_audience?.length > 0 &&
+                    UploadedSourcefiles?.define_objective?.length > 0 ? (
+                      <>
+                        {UploadedSourcefiles.Target_audience.map(
+                          (item: any, i: any) => (
+                            <div className="col-12" key={item.uuid_id}>
+                              <input
+                                type="checkbox"
+                                name="audience"
+                                id={`persona1_${i}`}
+                                value={item.uuid_id}
+                                checked={TargetAudience[0] === item.uuid_id}
+                                onChange={handleTargetAudience}
+                              />
+                              <label
+                                htmlFor={`persona1_${i}`}
+                                className="font_16 ms-1"
+                              >
+                                {item.category} - {item.file_name}
+                              </label>
+                            </div>
+                          )
+                        )}
+
+                        {UploadedSourcefiles.define_objective.map(
+                          (item: any, i: any) => (
+                            <div
+                              className="col-12 col-lg-6 col-xxl-6"
+                              key={item.uuid_id}
                             >
-                              {item.category} - {item.file_name}
-                            </label>
-                          </div>
-                        )
-                      )
+                              <div className="objective_box">
+                                <input
+                                  type="checkbox"
+                                  id={`persona_${i}`}
+                                  name={`objective${i}`}
+                                  checked={PostObjectives.includes(
+                                    item.uuid_id
+                                  )}
+                                  value={item.uuid_id}
+                                  onChange={handleObjectiveChange}
+                                />
+                                <label
+                                  htmlFor={`persona_${i}`}
+                                  className="font_16 ms-1"
+                                >
+                                  {item.category} - {item.file_name}
+                                </label>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </>
                     ) : (
                       <div className="col-12">
-                        <p className="text-muted">No Audience uploaded.</p>
+                        <p className="text-muted">
+                          No Target Audience uploaded.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -293,7 +332,12 @@ const ContentForm: React.FC<ContentFormProps> = ({
               <label htmlFor="add_link" className="font_20 font_500 mb-2">
                 Add Country
               </label>
-              <div className="country_box" style={NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}}>
+              <div
+                className="country_box"
+                style={
+                  NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}
+                }
+              >
                 <Select
                   options={locationOptions}
                   value={country}
@@ -309,22 +353,24 @@ const ContentForm: React.FC<ContentFormProps> = ({
               <label htmlFor="add_link" className="font_20 font_500 mb-2">
                 Add Language
               </label>
-                <select
-                  className="form-control"
-                  id="targetLanguage"
-                  aria-label="target_language"
-                  value={language || ''}
-                  onChange={(e) => setLanguage(e.target.value)}
-                  style={NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}}
-                  disabled={NewMessage !== "newContent"}
-                >
-                  <option value="">Select Language</option>
-                  {language_options.map((language) => (
-                    <option key={language.ID} value={language.ID}>
-                      {language.Name}
-                    </option>
-                  ))}
-                </select>
+              <select
+                className="form-control"
+                id="targetLanguage"
+                aria-label="target_language"
+                value={language || ""}
+                onChange={(e) => setLanguage(e.target.value)}
+                style={
+                  NewMessage !== "newContent" ? { cursor: "not-allowed" } : {}
+                }
+                disabled={NewMessage !== "newContent"}
+              >
+                <option value="">Select Language</option>
+                {language_options.map((language) => (
+                  <option key={language.ID} value={language.ID}>
+                    {language.Name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="col-12">
@@ -367,7 +413,6 @@ const ContentForm: React.FC<ContentFormProps> = ({
                 ))}
               </ul>
             </div>
-
 
             <div className="col-12">
               <button className="btn primary_btn" type="submit">

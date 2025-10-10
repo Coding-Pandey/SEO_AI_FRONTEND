@@ -51,7 +51,7 @@ const DashBoard = () => {
         <SideBar />
         <div className="inner_content">
           <div className="keyword_tool_content">
-            <h5>Good morning, Admira (main dashboard, not ready)</h5>
+            <h5>Good morning (main dashboard, not ready)</h5>
           </div>
         </div>
       </main>

@@ -252,8 +252,12 @@ const SeoAudit = () => {
         setIsNewLoading(true);
       }
       const response = await GetCrawDataById(site?.uuid!);
-
+      if (site?.uuid!) {
+        const jobDetailsResponse = await GetscheduleJobDetails(site?.uuid!);
+        setJobDetails(jobDetailsResponse?.data)
+      }
       if (response.status === 200) {
+
         const data = response.data;
         // console.log(data, "data");
         const indexFilters = Object.keys(data.indexability?.tables || {});

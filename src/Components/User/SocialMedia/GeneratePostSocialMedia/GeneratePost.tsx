@@ -10,7 +10,9 @@ import {
   deleteSocialMediaData,
   GetSocialMediaData,
   GetUploadedSourcefiles,
+  getSMContentObjectives,
 } from "../Common/SocialMediaServices";
+import { ContentObjective } from "../../Content/ContentGeneration";
 
 interface GeneratePostCluster {
   uuid: string;
@@ -21,13 +23,20 @@ interface GeneratePostCluster {
 const GeneratePost = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
+  const [contentObjectives, setContentObjectives] = useState<
+    ContentObjective[]
+  >([]);
+  const [contentObjectivesId, setContentObjectivesId] = useState<number[]>([]);
+  const [PostObjectives, setPostObjectives] = useState<string[]>([]);
   const [description, setDescription] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [objectives, setObjectives] = useState<string[]>([]);
   const [audience, setAudience] = useState<string[]>([]);
   const [additional, setAdditional] = useState<string[]>([]);
-  const [generatedPostData, setGeneratedPostData] = useState<GeneratePostCluster[]>([]);
+  const [generatedPostData, setGeneratedPostData] = useState<
+    GeneratePostCluster[]
+  >([]);
   const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
   const navigate = useNavigate();
 
@@ -35,20 +44,20 @@ const GeneratePost = () => {
     fetchPPCClusterData();
   }, []);
 
-  console.log(generatedPostData,"generatedPostData")
-
   const fetchPPCClusterData = async () => {
     try {
       setLoading(true);
       const response = await GetSocialMediaData();
       const responseSourcefiles = await GetUploadedSourcefiles();
+      const responseContentObjectives = await getSMContentObjectives();
       if (response.status === 200 || response.status === 201) {
-         const sortedData = response.data.sort(
-        (a: GeneratePostCluster, b: GeneratePostCluster) =>
-          new Date(b.last_reset).getTime() - new Date(a.last_reset).getTime()
-      );
+        const sortedData = response.data.sort(
+          (a: GeneratePostCluster, b: GeneratePostCluster) =>
+            new Date(b.last_reset).getTime() - new Date(a.last_reset).getTime()
+        );
         setGeneratedPostData(sortedData);
         setUploadedSourcefiles(responseSourcefiles.data);
+        setContentObjectives(responseContentObjectives.data.objectives);
       }
     } catch (error: any) {
       setLoading(false);
@@ -86,6 +95,35 @@ const GeneratePost = () => {
     } else {
       setter([...selectedList, value]);
     }
+  };
+
+  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+
+    setPostObjectives((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, value];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== value);
+      }
+      return updatedObjectives;
+    });
+  };
+
+  const handleObjectiveIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    const objectiveId = Number(value);
+
+    setContentObjectivesId((prev) => {
+      let updatedObjectives;
+      if (checked) {
+        updatedObjectives = [...prev, objectiveId];
+      } else {
+        updatedObjectives = prev.filter((item) => item !== objectiveId);
+      }
+      return updatedObjectives;
+    });
   };
 
   const handleUpload = async () => {
@@ -189,7 +227,7 @@ const GeneratePost = () => {
     navigate(`/social/GeneratedPostResult/${id}`);
   };
 
-    const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     setAudience(() => {
       return checked ? [value] : [];
@@ -341,36 +379,32 @@ const GeneratePost = () => {
                           Define Post Objective
                         </h3>
                         <div className="row mb-2">
-                          {UploadedSourcefiles?.define_objective?.length > 0 ? (
-                            UploadedSourcefiles?.define_objective.map(
-                              (item: any, i: any) => (
-                                <div
-                                  className="col-12 col-lg-6 col-xxl-6"
-                                  key={item.uuid_id}
-                                >
-                                   <div className="objective_box">
+                          {contentObjectives?.length > 0 ? (
+                            contentObjectives.map((item, i) => (
+                              <div
+                                className="col-12 col-lg-6 col-xxl-6"
+                                key={item.id}
+                              >
+                                <div className="objective_box">
                                   <input
                                     type="checkbox"
                                     id={`persona_${i}`}
-                                    value={item.uuid_id}
-                                    onChange={() =>
-                                      handleCheckbox(
-                                        item.uuid_id,
-                                        objectives,
-                                        setObjectives
-                                      )
-                                    }
+                                    name={`objective${i}`}
+                                    checked={contentObjectivesId.includes(
+                                      item.id
+                                    )}
+                                    value={item.id}
+                                    onChange={handleObjectiveIdChange}
                                   />
                                   <label
                                     htmlFor={`persona_${i}`}
                                     className="font_16 ms-1"
                                   >
-                                    {item.category} - {item.file_name}
+                                    {item.objective}
                                   </label>
                                 </div>
-                                 </div>
-                              )
-                            )
+                              </div>
+                            ))
                           ) : (
                             <div className="col-12">
                               <p className="text-muted">
@@ -385,32 +419,60 @@ const GeneratePost = () => {
                       <div className="form_input">
                         <h3 className="font_20 font_500 mb-3">Audience</h3>
                         <div className="row mb-2">
-                          {UploadedSourcefiles?.Target_audience?.length > 0 ? (
-                            UploadedSourcefiles?.Target_audience.map(
-                              (item: any, i: any) => (
-                                <div
-                                  className="col-12"
-                                  key={item.uuid_id}
-                                >
-                                  <div className="objective_box">
-                                  <input
-                                    type="checkbox"
-                                    name="audience"
-                                    id={`persona1_${i}`}
-                                    value={item.uuid_id}
-                                    checked={audience[0] === item.uuid_id}
-                                    onChange={handleTargetAudience}
-                                  />
-                                  <label
-                                    htmlFor={`persona1_${i}`}
-                                    className="font_16 ms-1"
+                          {UploadedSourcefiles?.Target_audience?.length > 0 &&
+                          UploadedSourcefiles?.define_objective?.length > 0 ? (
+                            <>
+                              {UploadedSourcefiles?.Target_audience.map(
+                                (item: any, i: any) => (
+                                  <div className="col-12" key={item.uuid_id}>
+                                    <div className="objective_box">
+                                      <input
+                                        type="checkbox"
+                                        name="audience"
+                                        id={`persona1_${i}`}
+                                        value={item.uuid_id}
+                                        checked={audience[0] === item.uuid_id}
+                                        onChange={handleTargetAudience}
+                                      />
+                                      <label
+                                        htmlFor={`persona1_${i}`}
+                                        className="font_16 ms-1"
+                                      >
+                                        {item.category} - {item.file_name}
+                                      </label>
+                                    </div>
+                                  </div>
+                                )
+                              )}
+
+                              {UploadedSourcefiles.define_objective.map(
+                                (item: any, i: any) => (
+                                  <div
+                                    className="col-12 col-lg-6 col-xxl-6"
+                                    key={item.uuid_id}
                                   >
-                                    {item.category} - {item.file_name}
-                                  </label>
-                                </div>
-                                </div>
-                              )
-                            )
+                                    <div className="objective_box">
+                                      <input
+                                        type="checkbox"
+                                        id={`persona_${i}`}
+                                        name={`objective${i}`}
+                                        checked={PostObjectives.includes(
+                                          item.uuid_id
+                                        )}
+                                        value={item.uuid_id}
+                                        onChange={handleObjectiveChange}
+                                      />
+                                      <label
+                                        htmlFor={`persona_${i}`}
+                                        className="font_16 ms-1"
+                                      >
+                                        {item.category} - {item.file_name}
+                                      </label>
+                                    </div>
+                                  </div>
+                                )
+                              )}
+                            </>
                           ) : (
                             <div className="col-12">
                               <p className="text-muted">
@@ -420,7 +482,7 @@ const GeneratePost = () => {
                           )}
                         </div>
                       </div>
-                      
+
                       {/* Additional */}
                       <div className="form_input">
                         <h3 className="font_20 font_500 mb-3">Additional</h3>
