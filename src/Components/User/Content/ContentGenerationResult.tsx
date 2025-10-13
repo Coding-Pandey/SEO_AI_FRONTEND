@@ -128,18 +128,18 @@ const ContentGenerationResult = () => {
   }, [location.state]);
 
   const handleEdit = (section: any, index: number) => {
+    console.log("index", index);
     setEditSection(section);
     setEditModalOpen(true);
     setEditIndex(index);
   };
 
-  const handleDelete = (sectionId: any) => {
-    const updatedSections = sections.filter(
-      (section: any) => section.section_id !== sectionId
-    );
+  const handleDelete = (index: number) => {
+    console.log("handleDelete");
+    const updatedSections = sections.filter((_: any, i: number) => i !== index);
     setSections(updatedSections);
     updateLocalStorage(updatedSections);
-    toast.success("Suggestion Deleted successfully");
+    toast.success("Suggestion deleted successfully");
   };
 
   const handleSaveEdit = () => {
@@ -808,7 +808,7 @@ const ContentGenerationResult = () => {
                               className={`content_item_box ${
                                 section.color === "new" ? "active" : ""
                               }`}
-                              key={section.section_id}
+                              key={index}
                             >
                               <div className="content_item_header">
                                 <h5 className="font_20 mb-0">
@@ -818,16 +818,17 @@ const ContentGenerationResult = () => {
                                   <button
                                     className="btn font_16 p-0"
                                     aria-label="edit_icon"
-                                    onClick={() => handleEdit(section, index)}
+                                    onClick={() => {
+                                      console.log("check");
+                                      handleEdit(section, index);
+                                    }}
                                   >
                                     <i className="bi bi-pencil-fill"></i>
                                   </button>
                                   <button
                                     className="btn p-0 text_orange font_20"
                                     aria-label="remove_icon"
-                                    onClick={() =>
-                                      handleDelete(section.section_id)
-                                    }
+                                    onClick={() => handleDelete(index)}
                                   >
                                     <i className="bi bi-x"></i>
                                   </button>

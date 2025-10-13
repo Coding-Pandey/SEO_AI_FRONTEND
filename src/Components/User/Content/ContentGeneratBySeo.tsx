@@ -61,6 +61,7 @@ const ContentGeneratBySeo = () => {
   const [language, setLanguage] = useState<string | null>(null);
   const [NewMessage, setNewMessage] = useState<string>("editContent");
   const [contentObjectivesId, setContentObjectivesId] = useState<number[]>([]);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchGenerateData();
@@ -106,18 +107,17 @@ const ContentGeneratBySeo = () => {
     }
   }, [location.state]);
 
-  const handleEdit = (section: any) => {
+  const handleEdit = (section: any, index: number) => {
     setEditSection(section);
     setEditModalOpen(true);
+    setEditIndex(index);
   };
 
-  const handleDelete = (sectionId: any) => {
-    const updatedSections = sections.filter(
-      (section: any) => section.section_id !== sectionId
-    );
+  const handleDelete = (index: number) => {
+    const updatedSections = sections.filter((_: any, i: number) => i !== index);
     setSections(updatedSections);
     updateLocalStorage(updatedSections);
-    toast.success("Suggestion Deleted successfully");
+    toast.success("Suggestion deleted successfully");
   };
 
   const handleSaveEdit = () => {
@@ -133,10 +133,10 @@ const ContentGeneratBySeo = () => {
       setSections((prevSections: any[]) => [...prevSections, editSection]);
       localStorage.setItem("keywordToolResult", JSON.stringify(updatedData));
       setGenerateKeywordDetails(updatedData);
-    } else {
-      const updatedSections = sections.map((section: any) =>
-        section.section_id === editSection?.section_id ? editSection : section
-      );
+    } else if (editIndex !== null) {
+      const updatedSections = [...sections];
+      updatedSections[editIndex] = editSection;
+
       setSections(updatedSections);
       updateLocalStorage(updatedSections);
       toast.success("Suggestion updated successfully");
@@ -776,12 +776,12 @@ const ContentGeneratBySeo = () => {
                               </div>
                             </div>
                           )}
-                          {sections?.map((section: any) => (
+                          {sections?.map((section: any, index: number) => (
                             <div
                               className={`content_item_box ${
                                 section.color === "new" ? "active" : ""
                               }`}
-                              key={section.section_id}
+                              key={index}
                             >
                               <div className="content_item_header">
                                 <h5 className="font_20 mb-0">
@@ -791,16 +791,14 @@ const ContentGeneratBySeo = () => {
                                   <button
                                     className="btn font_16 p-0"
                                     aria-label="edit_icon"
-                                    onClick={() => handleEdit(section)}
+                                    onClick={() => handleEdit(section, index)}
                                   >
                                     <i className="bi bi-pencil-fill"></i>
                                   </button>
                                   <button
                                     className="btn p-0 text_orange font_20"
                                     aria-label="remove_icon"
-                                    onClick={() =>
-                                      handleDelete(section.section_id)
-                                    }
+                                    onClick={() => handleDelete(index)}
                                   >
                                     <i className="bi bi-x"></i>
                                   </button>

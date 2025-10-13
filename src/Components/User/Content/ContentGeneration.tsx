@@ -354,7 +354,7 @@ const ContentGeneration = () => {
                   className="img-fluid heading_icon"
                   style={{ marginRight: "10px" }}
                 />
-                Content Generator{" "}
+                Content Generato{" "}
               </h2>
             </div>
 
