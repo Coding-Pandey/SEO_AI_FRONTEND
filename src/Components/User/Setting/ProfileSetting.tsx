@@ -735,13 +735,17 @@ const ProfileSetting = () => {
                                       </li>
                                     ))}
                                   </ul>
-                                  <button
-                                    type="button"
-                                    className="btn primary_btn_outline"
-                                    onClick={() => handleOpenModel("Offering")}
-                                  >
-                                    Add
-                                  </button>
+                                  {Offering.length < 1 && (
+                                    <button
+                                      type="button"
+                                      className="btn primary_btn_outline"
+                                      onClick={() =>
+                                        handleOpenModel("Offering")
+                                      }
+                                    >
+                                      Add
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                               <div className="col-12 col-lg-6">
