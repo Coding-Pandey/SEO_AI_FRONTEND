@@ -44,7 +44,7 @@ const ContentGenerationResult = () => {
   const [FormDynamictData, setFormDynamictData] = useState<any>({});
   const [contentType, setContentType] = useState<number | "">("");
   const [FileName, setFileName] = useState<string>("");
-  const [PostObjectives, setPostObjectives] = useState<string[]>([]);
+  // const [PostObjectives, setPostObjectives] = useState<string[]>([]);
   const [TargetAudience, setTargetAudience] = useState<string[]>([]);
   const [AddInstructions, setAddInstructions] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -94,7 +94,7 @@ const ContentGenerationResult = () => {
         setFormPreDetails(parsedFormData);
         setFileName(parsedFormData?.FileName || "");
         setContentType(parsedFormData?.contentType || "");
-        setPostObjectives(parsedFormData?.PostObjectives || []);
+        // setPostObjectives(parsedFormData?.PostObjectives || []);
         setTargetAudience(parsedFormData?.TargetAudience || []);
         setAddInstructions(parsedFormData?.AddInstructions || "");
         setLinks(parsedFormData?.links || []);
@@ -371,19 +371,19 @@ const ContentGenerationResult = () => {
     setContentType(Number(e.target.value));
   };
 
-  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
+  // const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { value, checked } = e.target;
 
-    setPostObjectives((prev) => {
-      let updatedObjectives;
-      if (checked) {
-        updatedObjectives = [...prev, value];
-      } else {
-        updatedObjectives = prev.filter((item) => item !== value);
-      }
-      return updatedObjectives;
-    });
-  };
+  //   setPostObjectives((prev) => {
+  //     let updatedObjectives;
+  //     if (checked) {
+  //       updatedObjectives = [...prev, value];
+  //     } else {
+  //       updatedObjectives = prev.filter((item) => item !== value);
+  //     }
+  //     return updatedObjectives;
+  //   });
+  // };
 
   const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -482,10 +482,10 @@ const ContentGenerationResult = () => {
         return;
       }
 
-      if (PostObjectives.length > 10) {
-        toast.error("Please select a maximum of 10 post keywords");
-        return;
-      }
+      // if (PostObjectives.length > 10) {
+      //   toast.error("Please select a maximum of 10 post keywords");
+      //   return;
+      // }
 
       if (
         !AddInstructions.trim() &&
@@ -509,7 +509,7 @@ const ContentGenerationResult = () => {
       const formData = new FormData();
       formData.append("file_name", FileName);
       formData.append("content_type", String(contentType));
-      formData.append("objectives", JSON.stringify(PostObjectives));
+      // formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
       formData.append("text_data", AddInstructions);
       formData.append("language_id", JSON.stringify(selectedLanguage));
@@ -532,7 +532,7 @@ const ContentGenerationResult = () => {
       const newFormData = {
         FileName,
         contentType,
-        PostObjectives,
+        // PostObjectives,
         TargetAudience,
         AddInstructions,
         uploadedFiles: newFileUpload,
@@ -627,7 +627,7 @@ const ContentGenerationResult = () => {
                   <ContentForm
                     contentType={String(contentType)}
                     FileName={FileName}
-                    PostObjectives={PostObjectives}
+                    // PostObjectives={PostObjectives}
                     TargetAudience={TargetAudience}
                     AddInstructions={AddInstructions}
                     uploadedFiles={uploadedFiles}
@@ -636,7 +636,7 @@ const ContentGenerationResult = () => {
                     links={links}
                     FormDynamictData={FormDynamictData}
                     handleSelectChange={handleSelectChange}
-                    handleObjectiveChange={handleObjectiveChange}
+                    // handleObjectiveChange={handleObjectiveChange}
                     handleTargetAudience={handleTargetAudience}
                     setFileName={setFileName}
                     setAddInstructions={setAddInstructions}

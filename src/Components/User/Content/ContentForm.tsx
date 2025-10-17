@@ -5,7 +5,7 @@ import { ContentObjective } from "./ContentGeneration";
 interface ContentFormProps {
   contentType: string;
   FileName: string;
-  PostObjectives: string[];
+  // PostObjectives: string[];
   TargetAudience: string[];
   AddInstructions: string;
   uploadedFiles: File[];
@@ -14,7 +14,7 @@ interface ContentFormProps {
   links: string[];
   FormDynamictData: any;
   handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleObjectiveChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  // handleObjectiveChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleTargetAudience: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setFileName: (val: string) => void;
   setAddInstructions: (val: string) => void;
@@ -40,7 +40,7 @@ interface ContentFormProps {
 const ContentForm: React.FC<ContentFormProps> = ({
   contentType,
   FileName,
-  PostObjectives,
+  // PostObjectives,
   TargetAudience,
   AddInstructions,
   uploadedFiles,
@@ -49,7 +49,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
   links,
   FormDynamictData,
   handleSelectChange,
-  handleObjectiveChange,
+  // handleObjectiveChange,
   handleTargetAudience,
   setFileName,
   setAddInstructions,
@@ -98,11 +98,11 @@ const ContentForm: React.FC<ContentFormProps> = ({
         </div>
       ) : (
         <>
-          {PostObjectives?.length > 10 && (
+          {/* {PostObjectives?.length > 10 && (
             <p className="keyword_error font_16">
               Error: Limit Reached: Please enter no more than 10 keywords
             </p>
-          )}
+          )} */}
 
           <div className="row content_type">
             <div className="col-12">
@@ -141,12 +141,13 @@ const ContentForm: React.FC<ContentFormProps> = ({
             <div className="col-12">
               <div className="multicheckbox">
                 <div
-                  className={`form_input ${
-                    PostObjectives?.length > 10 ? "error-border" : ""
-                  }`}
+                  // className={`form_input
+                  //   ${contentObjectives?.length > 10 ? "error-border" : ""}
+                  //   `}
+                  className={`form_input`}
                 >
                   <h3 className="font_20 font_500 mb-3">
-                    Define Post Objective
+                    Define Content Objective
                   </h3>
                   <div className="row mb-2">
                     {contentObjectives?.length > 0 ? (
@@ -176,7 +177,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
                     ) : (
                       <div className="col-12">
                         <p className="text-muted">
-                          No Post Objective uploaded.
+                          No Content Objective Found.
                         </p>
                       </div>
                     )}
@@ -188,8 +189,9 @@ const ContentForm: React.FC<ContentFormProps> = ({
                   <h3 className="font_20 font_500 mb-3">Target Audience</h3>
                   <div className="row mb-2">
                     {/* Shows Target audience checkbox */}
-                    {UploadedSourcefiles?.Target_audience?.length > 0 &&
-                    UploadedSourcefiles?.define_objective?.length > 0 ? (
+                    {UploadedSourcefiles?.Target_audience?.length > 0 ? (
+                      // Code Commented
+                      // && UploadedSourcefiles?.define_objective?.length > 0
                       <>
                         {UploadedSourcefiles.Target_audience.map(
                           (item: any, i: any) => (
@@ -211,8 +213,8 @@ const ContentForm: React.FC<ContentFormProps> = ({
                             </div>
                           )
                         )}
-
-                        {UploadedSourcefiles.define_objective.map(
+                        {/* Code Commented */}
+                        {/* {UploadedSourcefiles.define_objective.map(
                           (item: any, i: any) => (
                             <div
                               className="col-12 col-lg-6 col-xxl-6"
@@ -238,7 +240,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
                               </div>
                             </div>
                           )
-                        )}
+                        )} */}
                       </>
                     ) : (
                       <div className="col-12">

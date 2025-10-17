@@ -4,7 +4,7 @@ import Select from "react-select";
 import { ContentObjective } from "./ContentGeneration";
 interface ContentFormProps {
   contentType: string;
-  PostObjectives: string[];
+  // PostObjectives: string[];
   TargetAudience: string[];
   AddInstructions: string;
   uploadedFiles: File[];
@@ -13,7 +13,7 @@ interface ContentFormProps {
   links: string[];
   FormDynamictData: any;
   handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleObjectiveChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  // handleObjectiveChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleTargetAudience: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setAddInstructions: (val: string) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
@@ -41,7 +41,7 @@ interface ContentFormProps {
 
 const ContentFormForSeo: React.FC<ContentFormProps> = ({
   contentType,
-  PostObjectives,
+  // PostObjectives,
   TargetAudience,
   AddInstructions,
   uploadedFiles,
@@ -50,7 +50,7 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
   links,
   FormDynamictData,
   handleSelectChange,
-  handleObjectiveChange,
+  // handleObjectiveChange,
   handleTargetAudience,
   setAddInstructions,
   fileInputRef,
@@ -103,11 +103,11 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
   return (
     <form onSubmit={handleGenerateSubmit}>
       <>
-        {PostObjectives?.length > 10 && (
+        {/* {PostObjectives?.length > 10 && (
           <p className="keyword_error font_16">
             Error: Limit Reached: Please enter no more than 10 keywords
           </p>
-        )}
+        )} */}
 
         <div className="row content_type">
           <div className="col-12">
@@ -130,9 +130,10 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
           <div className="col-12">
             <div className="multicheckbox">
               <div
-                className={`form_input ${
-                  PostObjectives?.length > 10 ? "error-border" : ""
-                }`}
+                // className={`form_input ${
+                //   PostObjectives?.length > 10 ? "error-border" : ""
+                // }`}
+                className={`form_input `}
               >
                 <h3 className="font_20 font_500 mb-3">Define Post Objective</h3>
                 <div className="row mb-2">
@@ -170,8 +171,8 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
                 <h3 className="font_20 font_500 mb-3">Target Audience</h3>
                 <div className="row mb-2">
                   {/* Shows Target audience checkbox */}
-                  {UploadedSourcefiles?.Target_audience?.length > 0 &&
-                  UploadedSourcefiles?.define_objective?.length > 0 ? (
+                  {UploadedSourcefiles?.Target_audience?.length > 0 ? (
+                    // && UploadedSourcefiles?.define_objective?.length > 0
                     <>
                       {UploadedSourcefiles.Target_audience.map(
                         (item: any, i: any) => (
@@ -194,7 +195,7 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
                         )
                       )}
 
-                      {UploadedSourcefiles.define_objective.map(
+                      {/* {UploadedSourcefiles.define_objective.map(
                         (item: any, i: any) => (
                           <div
                             className="col-12 col-lg-6 col-xxl-6"
@@ -218,7 +219,7 @@ const ContentFormForSeo: React.FC<ContentFormProps> = ({
                             </div>
                           </div>
                         )
-                      )}
+                      )} */}
                     </>
                   ) : (
                     <div className="col-12">

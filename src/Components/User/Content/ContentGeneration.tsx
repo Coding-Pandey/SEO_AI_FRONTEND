@@ -46,7 +46,7 @@ const ContentGeneration = () => {
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [contentType, setContentType] = useState<number | "">("");
   const [FileName, setFileName] = useState<string>("");
-  const [PostObjectives, setPostObjectives] = useState<string[]>([]);
+  // const [PostObjectives, setPostObjectives] = useState<string[]>([]);
   const [TargetAudience, setTargetAudience] = useState<string[]>([]);
   const [AddInstructions, setAddInstructions] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -123,19 +123,19 @@ const ContentGeneration = () => {
     setContentType(Number(e.target.value));
   };
 
-  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
+  // const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { value, checked } = e.target;
 
-    setPostObjectives((prev) => {
-      let updatedObjectives;
-      if (checked) {
-        updatedObjectives = [...prev, value];
-      } else {
-        updatedObjectives = prev.filter((item) => item !== value);
-      }
-      return updatedObjectives;
-    });
-  };
+  //   setPostObjectives((prev) => {
+  //     let updatedObjectives;
+  //     if (checked) {
+  //       updatedObjectives = [...prev, value];
+  //     } else {
+  //       updatedObjectives = prev.filter((item) => item !== value);
+  //     }
+  //     return updatedObjectives;
+  //   });
+  // };
 
   const handleObjectiveIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -256,10 +256,10 @@ const ContentGeneration = () => {
         return;
       }
 
-      if (PostObjectives.length > 10) {
-        toast.error("Please select a maximum of 10 post keywords");
-        return;
-      }
+      // if (PostObjectives.length > 10) {
+      //   toast.error("Please select a maximum of 10 post keywords");
+      //   return;
+      // }
 
       if (!AddInstructions.trim() && uploadedFiles.length === 0) {
         toast.error(
@@ -291,7 +291,7 @@ const ContentGeneration = () => {
       const formData = new FormData();
       formData.append("file_name", FileName);
       formData.append("content_type", String(contentType));
-      formData.append("objectives", JSON.stringify(PostObjectives));
+      // formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
       formData.append("text_data", AddInstructions);
       formData.append("language_id", JSON.stringify(selectedLanguage));
@@ -308,7 +308,7 @@ const ContentGeneration = () => {
       const newFormData = {
         FileName,
         contentType,
-        PostObjectives,
+        // PostObjectives,
         TargetAudience,
         AddInstructions,
         uploadedFiles: newFileUpload,
@@ -372,7 +372,7 @@ const ContentGeneration = () => {
                   <ContentForm
                     contentType={String(contentType)}
                     FileName={FileName}
-                    PostObjectives={PostObjectives}
+                    // PostObjectives={PostObjectives}
                     TargetAudience={TargetAudience}
                     AddInstructions={AddInstructions}
                     uploadedFiles={uploadedFiles}
@@ -381,7 +381,7 @@ const ContentGeneration = () => {
                     links={links}
                     FormDynamictData={FormDynamictData}
                     handleSelectChange={handleSelectChange}
-                    handleObjectiveChange={handleObjectiveChange}
+                    // handleObjectiveChange={handleObjectiveChange}
                     handleTargetAudience={handleTargetAudience}
                     setFileName={setFileName}
                     setAddInstructions={setAddInstructions}

@@ -27,7 +27,7 @@ const GeneratePost = () => {
     ContentObjective[]
   >([]);
   const [contentObjectivesId, setContentObjectivesId] = useState<number[]>([]);
-  const [PostObjectives, setPostObjectives] = useState<string[]>([]);
+  // const [PostObjectives, setPostObjectives] = useState<string[]>([]);
   const [description, setDescription] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [platforms, setPlatforms] = useState<string[]>([]);
@@ -97,19 +97,19 @@ const GeneratePost = () => {
     }
   };
 
-  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
+  // const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { value, checked } = e.target;
 
-    setPostObjectives((prev) => {
-      let updatedObjectives;
-      if (checked) {
-        updatedObjectives = [...prev, value];
-      } else {
-        updatedObjectives = prev.filter((item) => item !== value);
-      }
-      return updatedObjectives;
-    });
-  };
+  //   setPostObjectives((prev) => {
+  //     let updatedObjectives;
+  //     if (checked) {
+  //       updatedObjectives = [...prev, value];
+  //     } else {
+  //       updatedObjectives = prev.filter((item) => item !== value);
+  //     }
+  //     return updatedObjectives;
+  //   });
+  // };
 
   const handleObjectiveIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -419,8 +419,8 @@ const GeneratePost = () => {
                       <div className="form_input">
                         <h3 className="font_20 font_500 mb-3">Audience</h3>
                         <div className="row mb-2">
-                          {UploadedSourcefiles?.Target_audience?.length > 0 &&
-                          UploadedSourcefiles?.define_objective?.length > 0 ? (
+                          {UploadedSourcefiles?.Target_audience?.length > 0 ? (
+                            // && UploadedSourcefiles?.define_objective?.length > 0
                             <>
                               {UploadedSourcefiles?.Target_audience.map(
                                 (item: any, i: any) => (
@@ -445,7 +445,7 @@ const GeneratePost = () => {
                                 )
                               )}
 
-                              {UploadedSourcefiles.define_objective.map(
+                              {/* {UploadedSourcefiles.define_objective.map(
                                 (item: any, i: any) => (
                                   <div
                                     className="col-12 col-lg-6 col-xxl-6"
@@ -471,7 +471,7 @@ const GeneratePost = () => {
                                     </div>
                                   </div>
                                 )
-                              )}
+                              )} */}
                             </>
                           ) : (
                             <div className="col-12">

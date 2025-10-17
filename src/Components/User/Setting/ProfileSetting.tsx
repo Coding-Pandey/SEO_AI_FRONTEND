@@ -440,19 +440,21 @@ const ProfileSetting = () => {
                                     <span className="text-danger">*</span>
                                   </h4>
                                   <ul className="upload_content_item links_upload_list">
-                                    <div
-                                      className="add_media"
-                                      onClick={() =>
-                                        handleOpenModel(
-                                          "Ideal Customer Profile"
-                                        )
-                                      }
-                                    >
-                                      <div className="media_text">
-                                        <i className="bi bi-plus-circle"></i>
-                                        <span>Add</span>
+                                    {IdealCustomerProfile.length < 1 && (
+                                      <div
+                                        className="add_media"
+                                        onClick={() =>
+                                          handleOpenModel(
+                                            "Ideal Customer Profile"
+                                          )
+                                        }
+                                      >
+                                        <div className="media_text">
+                                          <i className="bi bi-plus-circle"></i>
+                                          <span>Add</span>
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
                                     {IdealCustomerProfile?.map(
                                       (file: FileItem) => (
                                         <li key={file.uuid_id}>
@@ -502,21 +504,23 @@ const ProfileSetting = () => {
                                     <span className="text-danger">*</span>
                                   </h4>
                                   <ul className="upload_content_item links_upload_list">
-                                    <div
-                                      className="add_media"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#idealCard"
-                                    >
+                                    {ToneOfVoice.length < 1 && (
                                       <div
-                                        className="media_text"
-                                        onClick={() =>
-                                          handleOpenModel("Tone of voice")
-                                        }
+                                        className="add_media"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#idealCard"
                                       >
-                                        <i className="bi bi-plus-circle"></i>
-                                        <span>Add</span>
+                                        <div
+                                          className="media_text"
+                                          onClick={() =>
+                                            handleOpenModel("Tone of voice")
+                                          }
+                                        >
+                                          <i className="bi bi-plus-circle"></i>
+                                          <span>Add</span>
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
                                     {ToneOfVoice?.map((file: FileItem) => (
                                       <li key={file.uuid_id}>
                                         <div className="left_part font_14">
@@ -622,21 +626,23 @@ const ProfileSetting = () => {
                                     <span className="text-danger">*</span>
                                   </h4>
                                   <ul className="upload_content_item links_upload_list">
-                                    <div
-                                      className="add_media"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#idealCard"
-                                    >
+                                    {BrandIdentity.length < 1 && (
                                       <div
-                                        className="media_text"
-                                        onClick={() =>
-                                          handleOpenModel("Brand Identity")
-                                        }
+                                        className="add_media"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#idealCard"
                                       >
-                                        <i className="bi bi-plus-circle"></i>
-                                        <span>Add</span>
+                                        <div
+                                          className="media_text"
+                                          onClick={() =>
+                                            handleOpenModel("Brand Identity")
+                                          }
+                                        >
+                                          <i className="bi bi-plus-circle"></i>
+                                          <span>Add</span>
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
                                     {BrandIdentity?.map((file: FileItem) => (
                                       <li key={file.uuid_id}>
                                         <div className="left_part font_14">
@@ -745,21 +751,25 @@ const ProfileSetting = () => {
                                     <span className="text-danger">*</span>
                                   </h4>
                                   <ul className="upload_content_item links_upload_list">
-                                    <div
-                                      className="add_media"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#idealCard"
-                                    >
+                                    {CommonPainPoints.length < 1 && (
                                       <div
-                                        className="media_text"
-                                        onClick={() =>
-                                          handleOpenModel("Common Pain Points")
-                                        }
+                                        className="add_media"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#idealCard"
                                       >
-                                        <i className="bi bi-plus-circle"></i>
-                                        <span>Add</span>
+                                        <div
+                                          className="media_text"
+                                          onClick={() =>
+                                            handleOpenModel(
+                                              "Common Pain Points"
+                                            )
+                                          }
+                                        >
+                                          <i className="bi bi-plus-circle"></i>
+                                          <span>Add</span>
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
                                     {CommonPainPoints?.map((file: FileItem) => (
                                       <li key={file.uuid_id}>
                                         <div className="left_part font_14">
@@ -805,21 +815,23 @@ const ProfileSetting = () => {
                                     <span className="text-danger">*</span>
                                   </h4>
                                   <ul className="upload_content_item links_upload_list">
-                                    <div
-                                      className="add_media"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#idealCard"
-                                    >
+                                    {ValueProposition.length > 1 && (
                                       <div
-                                        className="media_text"
-                                        onClick={() =>
-                                          handleOpenModel("Value Proposition")
-                                        }
+                                        className="add_media"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#idealCard"
                                       >
-                                        <i className="bi bi-plus-circle"></i>
-                                        <span>Add</span>
+                                        <div
+                                          className="media_text"
+                                          onClick={() =>
+                                            handleOpenModel("Value Proposition")
+                                          }
+                                        >
+                                          <i className="bi bi-plus-circle"></i>
+                                          <span>Add</span>
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
                                     {ValueProposition?.map((file: FileItem) => (
                                       <li key={file.uuid_id}>
                                         <div className="left_part font_14">

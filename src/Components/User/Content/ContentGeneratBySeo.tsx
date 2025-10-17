@@ -44,7 +44,7 @@ const ContentGeneratBySeo = () => {
   const [FormDynamictData, setFormDynamictData] = useState<any>({});
   const [contentType, setContentType] = useState<number | "">("");
   const [FileName, setFileName] = useState<string>("");
-  const [PostObjectives, setPostObjectives] = useState<string[]>([]);
+  // const [PostObjectives, setPostObjectives] = useState<string[]>([]);
   const [TargetAudience, setTargetAudience] = useState<string[]>([]);
   const [AddInstructions, setAddInstructions] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -342,19 +342,19 @@ const ContentGeneratBySeo = () => {
     setContentType(Number(e.target.value));
   };
 
-  const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
+  // const handleObjectiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { value, checked } = e.target;
 
-    setPostObjectives((prev) => {
-      let updatedObjectives;
-      if (checked) {
-        updatedObjectives = [...prev, value];
-      } else {
-        updatedObjectives = prev.filter((item) => item !== value);
-      }
-      return updatedObjectives;
-    });
-  };
+  //   setPostObjectives((prev) => {
+  //     let updatedObjectives;
+  //     if (checked) {
+  //       updatedObjectives = [...prev, value];
+  //     } else {
+  //       updatedObjectives = prev.filter((item) => item !== value);
+  //     }
+  //     return updatedObjectives;
+  //   });
+  // };
 
   const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -457,10 +457,10 @@ const ContentGeneratBySeo = () => {
         return;
       }
 
-      if (PostObjectives.length > 10) {
-        toast.error("Please select a maximum of 10 post Objectives");
-        return;
-      }
+      // if (PostObjectives.length > 10) {
+      //   toast.error("Please select a maximum of 10 post Objectives");
+      //   return;
+      // }
 
       if (keywords.length <= 0) {
         toast.error("Please enter at least one keyword.");
@@ -489,7 +489,7 @@ const ContentGeneratBySeo = () => {
       const formData = new FormData();
       formData.append("file_name", FileName);
       formData.append("content_type", String(contentType));
-      formData.append("objectives", JSON.stringify(PostObjectives));
+      // formData.append("objectives", JSON.stringify(PostObjectives));
       formData.append("audience", JSON.stringify(TargetAudience));
       formData.append("text_data", AddInstructions);
       formData.append("language_id", JSON.stringify(selectedLanguage));
@@ -512,7 +512,7 @@ const ContentGeneratBySeo = () => {
       const newFormData = {
         FileName,
         contentType,
-        PostObjectives,
+        // PostObjectives,
         TargetAudience,
         AddInstructions,
         uploadedFiles: newFileUpload,
@@ -597,7 +597,7 @@ const ContentGeneratBySeo = () => {
                   </div>
                   <ContentFormForSeo
                     contentType={String(contentType)}
-                    PostObjectives={PostObjectives}
+                    // PostObjectives={PostObjectives}
                     TargetAudience={TargetAudience}
                     AddInstructions={AddInstructions}
                     uploadedFiles={uploadedFiles}
@@ -606,7 +606,7 @@ const ContentGeneratBySeo = () => {
                     links={links}
                     FormDynamictData={FormDynamictData}
                     handleSelectChange={handleSelectChange}
-                    handleObjectiveChange={handleObjectiveChange}
+                    // handleObjectiveChange={handleObjectiveChange}
                     handleTargetAudience={handleTargetAudience}
                     setAddInstructions={setAddInstructions}
                     fileInputRef={fileInputRef}
