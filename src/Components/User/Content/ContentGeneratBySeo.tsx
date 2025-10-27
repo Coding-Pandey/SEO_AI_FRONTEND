@@ -25,6 +25,7 @@ import {
 import ContentFormForSeo from "./ContentFormForSeo";
 import { language_options, location_options } from "../../Page/store";
 import { ContentObjective } from "./ContentGeneration";
+import DynamicConfirmModal from "../SocialMedia/Common/DynamicConfirmModal";
 
 const ContentGeneratBySeo = () => {
   const location = useLocation();
@@ -62,6 +63,8 @@ const ContentGeneratBySeo = () => {
   const [NewMessage, setNewMessage] = useState<string>("editContent");
   const [contentObjectivesId, setContentObjectivesId] = useState<number[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showDynamicModal, setShowDynamicModal] = useState<boolean>(false);
 
   useEffect(() => {
     fetchGenerateData();
@@ -84,6 +87,25 @@ const ContentGeneratBySeo = () => {
       setloadingData(false);
     }
   };
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("keywordToolResult");
+    if (!storedData) return;
+
+    try {
+      const data = JSON.parse(storedData);
+      if (data && typeof data === "object" && Object.keys(data).length > 0) {
+        setEditFormOpen(false);
+        setGenerateKeywordDetails(data);
+        setSections(data?.data?.Sections || []);
+      }
+    } catch (error) {
+      console.error(
+        "Error parsing keywordToolResult from localStorage:",
+        error
+      );
+    }
+  }, []);
 
   useEffect(() => {
     if (location.state) {
@@ -331,8 +353,13 @@ const ContentGeneratBySeo = () => {
       };
       localStorage.setItem("ClusterData", JSON.stringify(dataResult));
       navigate("/content/ContentSuggestionResult", { state: dataResult });
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error during AddGenerate", error);
+      setShowModal(true);
+      setErrorMessage(
+        error?.response?.data?.detail?.message ||
+          "There was an error in the content generation"
+      );
     } finally {
       setloadingData(false);
     }
@@ -551,6 +578,11 @@ const ContentGeneratBySeo = () => {
       }
     } catch (error: any) {
       console.error("Error handle Generate Submit:", error);
+      setShowDynamicModal(true);
+      setErrorMessage(
+        error?.response?.data?.detail?.message ||
+          "There was an error in the content generation"
+      );
     } finally {
       setloadingData(false);
     }
@@ -560,6 +592,21 @@ const ContentGeneratBySeo = () => {
     <>
       {loadingData && <Loading />}
       <Header />
+      <DynamicConfirmModal
+        isOpen={showDynamicModal}
+        title="Missing Files"
+        message={errorMessage}
+        navigationPath="/ProfileSetting"
+        onClose={() => {
+          setShowDynamicModal(false);
+          setErrorMessage("");
+        }}
+        navigateTo={() => {
+          navigate("/ProfileSetting", {
+            state: { activateSourceFilesTab: true },
+          });
+        }}
+      />
       <main className="main_wrapper">
         <SideBar />
         <div className="inner_content ">
@@ -588,9 +635,13 @@ const ContentGeneratBySeo = () => {
                     <button
                       className="btn text_orange font_20 close_btn"
                       aria-label="remove_icon"
-                      onClick={() =>
-                        navigate(`/seo/SuggestionsResultById/${id}`)
-                      }
+                      onClick={() => {
+                        if (Object.keys(generateKeywordDetails).length > 0) {
+                          setEditFormOpen(false);
+                        } else {
+                          navigate(`/seo/SuggestionsResultById/${id}`);
+                        }
+                      }}
                     >
                       <i className="bi bi-x"></i>
                     </button>

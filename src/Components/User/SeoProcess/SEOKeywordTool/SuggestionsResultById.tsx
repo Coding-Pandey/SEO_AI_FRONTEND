@@ -31,7 +31,7 @@ interface SuggestionKeywordDetailsType {
   id: string;
   fileName: string;
   data: PageData[];
-    language_id: {
+  language_id: {
     ID: number;
     Name: string;
   };
@@ -54,7 +54,6 @@ const SuggestionsResultById = () => {
   const [content, setContent] = useState<string>("");
   const [UUID, setUUID] = useState<string>("");
   const [ShowFileModal, setShowFileModal] = useState<boolean>(false);
- 
 
   useEffect(() => {
     if (id) {
@@ -202,10 +201,11 @@ const SuggestionsResultById = () => {
     const dataGenerate = {
       items,
       id,
-      language:SuggestionKeywordDetails?.language_id,
-      country:SuggestionKeywordDetails?.location_ids,
+      language: SuggestionKeywordDetails?.language_id,
+      country: SuggestionKeywordDetails?.location_ids,
     };
     localStorage.removeItem("FormDataDetails");
+    localStorage.removeItem("keywordToolResult");
     navigate("/content/ContentGeneratBySeo", { state: dataGenerate });
   };
 

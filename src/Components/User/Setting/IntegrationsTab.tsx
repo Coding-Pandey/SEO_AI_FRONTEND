@@ -2,7 +2,7 @@ import { useState } from "react";
 import ConnectModal from "./ConnectModal ";
 import MultiIntegrationModal from "./Common/MultiIntegrationModal";
 
- const integrationsList = [
+const integrationsList = [
   {
     name: "Search console",
     img: "search-console.png",
@@ -69,10 +69,12 @@ export const linkedInOptions = [
 ];
 
 const IntegrationsTab = ({
+  activeTab,
   IntegratedData,
   setSelectedCategory,
   handleConnect,
 }: {
+  activeTab?: string | null;
   IntegratedData: any;
   setSelectedCategory: (category: string) => void;
   handleConnect: () => void;
@@ -89,7 +91,9 @@ const IntegrationsTab = ({
 
   return (
     <div
-      className="tab-pane fade"
+      className={`tab-pane fade ${
+        activeTab === "Integrations" ? "show active" : ""
+      }`}
       id="pills-integration"
       role="tabpanel"
       aria-labelledby="pills-integration-tab"

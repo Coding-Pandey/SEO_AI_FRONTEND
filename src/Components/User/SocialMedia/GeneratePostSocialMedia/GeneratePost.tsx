@@ -13,6 +13,7 @@ import {
   getSMContentObjectives,
 } from "../Common/SocialMediaServices";
 import { ContentObjective } from "../../Content/ContentGeneration";
+import DynamicConfirmModal from "../Common/DynamicConfirmModal";
 
 interface GeneratePostCluster {
   uuid: string;
@@ -21,6 +22,7 @@ interface GeneratePostCluster {
 }
 
 const GeneratePost = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
   const [contentObjectives, setContentObjectives] = useState<
@@ -38,7 +40,8 @@ const GeneratePost = () => {
     GeneratePostCluster[]
   >([]);
   const [UploadedSourcefiles, setUploadedSourcefiles] = useState<any>({});
-  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     fetchPPCClusterData();
@@ -195,6 +198,11 @@ const GeneratePost = () => {
       }
     } catch (error: any) {
       setLoading(false);
+      setShowModal(true);
+      setErrorMessage(
+        error?.response?.data?.detail?.message ||
+          "There was an error in the content generation"
+      );
       console.log("Error handleUpload:", error);
     }
   };
@@ -238,6 +246,21 @@ const GeneratePost = () => {
     <>
       {loading && <Loading />}
       <Header />
+      <DynamicConfirmModal
+        isOpen={showModal}
+        title="Missing Files"
+        message={errorMessage}
+        navigationPath="/ProfileSetting"
+        onClose={() => {
+          setShowModal(false);
+          setErrorMessage("");
+        }}
+        navigateTo={() => {
+          navigate("/ProfileSetting", {
+            state: { activateSourceFilesTab: true },
+          });
+        }}
+      />
       <main className="main_wrapper">
         <SideBar />
         <div className="inner_content ">

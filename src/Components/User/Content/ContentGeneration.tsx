@@ -24,6 +24,7 @@ import {
   GetUploadedSourcefiles,
 } from "../SocialMedia/Common/SocialMediaServices";
 import { language_options, location_options } from "../../Page/store";
+import DynamicConfirmModal from "../SocialMedia/Common/DynamicConfirmModal";
 
 interface contentData {
   uuid: string;
@@ -59,6 +60,8 @@ const ContentGeneration = () => {
   const [country, setCountry] = useState<any>([]);
   const [language, setLanguage] = useState<string | null>(null);
   const [NewMessage, setNewMessage] = useState<string>("newContent");
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     fetchGenerateData();
@@ -246,7 +249,6 @@ const ContentGeneration = () => {
   };
 
   const handleGenerateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("2");
     setNewMessage("newContent");
     e.preventDefault();
 
@@ -333,6 +335,11 @@ const ContentGeneration = () => {
       }
     } catch (error: any) {
       console.error("Error handle Generate Submit:", error);
+      setShowModal(true);
+      setErrorMessage(
+        error?.response?.data?.detail?.message ||
+          "There was an error in the content generation"
+      );
     } finally {
       setLoadingData(false);
     }
@@ -342,6 +349,21 @@ const ContentGeneration = () => {
     <>
       {loadingData && <Loading />}
       <Header />
+      <DynamicConfirmModal
+        isOpen={showModal}
+        title="Missing Files"
+        message={errorMessage}
+        navigationPath="/ProfileSetting"
+        onClose={() => {
+          setShowModal(false);
+          setErrorMessage("");
+        }}
+        navigateTo={() => {
+          navigate("/ProfileSetting", {
+            state: { activateSourceFilesTab: true },
+          });
+        }}
+      />
       <main className="main_wrapper">
         <SideBar />
         <div className="inner_content ">
@@ -354,7 +376,7 @@ const ContentGeneration = () => {
                   className="img-fluid heading_icon"
                   style={{ marginRight: "10px" }}
                 />
-                Content Generato{" "}
+                Content Generator{" "}
               </h2>
             </div>
 

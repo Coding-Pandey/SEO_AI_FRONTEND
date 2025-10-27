@@ -114,23 +114,21 @@ const SourceFileModal: React.FC<IcpModalProps> = ({
     }
   };
 
-const handleDelete = () => {
-  setSelectedFile(null);
-  setSelectedFileName("");
-  if (fileInputRef.current) {
-    fileInputRef.current.value = "";
-  }
+  const handleDelete = () => {
+    setSelectedFile(null);
+    setSelectedFileName("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
 
-  // Optionally, clear the edit data too (if you want to remove reference to the file completely)
-  // FileEditData = {}; ❌ Don't directly modify props
+    // Optionally, clear the edit data too (if you want to remove reference to the file completely)
+    // FileEditData = {}; ❌ Don't directly modify props
 
-  toast.success("File removed from the form", {
-    position: "top-right",
-    autoClose: 2000,
-  });
-};
-
-
+    toast.success("File removed from the form", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+  };
 
   return (
     <div

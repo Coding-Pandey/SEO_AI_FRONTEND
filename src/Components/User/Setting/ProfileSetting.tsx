@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
 import { GetUserDetails, UpdateUserProfile } from "../Services/Services";
@@ -28,6 +29,7 @@ interface FileItem {
 
 const ProfileSetting = () => {
   const { users } = useAuth();
+  const location = useLocation();
   const [userDetails, setUserDetails] = useState<any>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [IntegratedData, setIntegratedData] = useState<any>([]);
@@ -57,6 +59,12 @@ const ProfileSetting = () => {
   useEffect(() => {
     fetchUserDetails();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.activateSourceFilesTab) {
+      setActiveTab("Source files");
+    }
+  }, [location.state]);
 
   const fetchUserDetails = async () => {
     try {
@@ -243,14 +251,14 @@ const ProfileSetting = () => {
                     >
                       <li className="nav-item" role="presentation">
                         <button
-                          className="nav-link active"
+                          className={`nav-link ${
+                            activeTab === "Profile" ? "active" : ""
+                          }`}
                           id="pills-profile-tab"
-                          data-bs-toggle="pill"
-                          data-bs-target="#pills-profile"
                           type="button"
                           role="tab"
                           aria-controls="pills-profile"
-                          aria-selected="true"
+                          aria-selected={activeTab === "Profile"}
                           onClick={() => setActiveTab("Profile")}
                         >
                           Profile{" "}
@@ -259,16 +267,17 @@ const ProfileSetting = () => {
                           </span>
                         </button>
                       </li>
+
                       <li className="nav-item" role="presentation">
                         <button
-                          className="nav-link"
+                          className={`nav-link ${
+                            activeTab === "Integrations" ? "active" : ""
+                          }`}
                           id="pills-integration-tab"
-                          data-bs-toggle="pill"
-                          data-bs-target="#pills-integration"
                           type="button"
                           role="tab"
                           aria-controls="pills-integration"
-                          aria-selected="false"
+                          aria-selected={activeTab === "Integrations"}
                           onClick={() => setActiveTab("Integrations")}
                         >
                           Integrations{" "}
@@ -277,16 +286,17 @@ const ProfileSetting = () => {
                           </span>
                         </button>
                       </li>
+
                       <li className="nav-item" role="presentation">
                         <button
-                          className="nav-link"
+                          className={`nav-link ${
+                            activeTab === "Source files" ? "active" : ""
+                          }`}
                           id="pills-source-tab"
-                          data-bs-toggle="pill"
-                          data-bs-target="#pills-source"
                           type="button"
                           role="tab"
                           aria-controls="pills-source"
-                          aria-selected="false"
+                          aria-selected={activeTab === "Source files"}
                           onClick={() => setActiveTab("Source files")}
                         >
                           Source files{" "}
@@ -295,17 +305,18 @@ const ProfileSetting = () => {
                           </span>
                         </button>
                       </li>
+
                       {users?.user.role === "moderator" && (
                         <li className="nav-item" role="presentation">
                           <button
-                            className="nav-link"
+                            className={`nav-link ${
+                              activeTab === "Manage Users" ? "active" : ""
+                            }`}
                             id="pills-ManageUsers-tab"
-                            data-bs-toggle="pill"
-                            data-bs-target="#pills-ManageUsers"
                             type="button"
                             role="tab"
                             aria-controls="pills-ManageUsers"
-                            aria-selected="false"
+                            aria-selected={activeTab === "Manage Users"}
                             onClick={() => setActiveTab("Manage Users")}
                           >
                             Manage Users{" "}
@@ -325,7 +336,9 @@ const ProfileSetting = () => {
                     id="pills-tabContent"
                   >
                     <div
-                      className="tab-pane fade show active"
+                      className={`tab-pane fade ${
+                        activeTab === "Profile" ? "show active" : ""
+                      }`}
                       id="pills-profile"
                       role="tabpanel"
                       aria-labelledby="pills-profile-tab"
@@ -404,13 +417,16 @@ const ProfileSetting = () => {
                     </div>
 
                     <IntegrationsTab
+                      activeTab={activeTab}
                       IntegratedData={IntegratedData}
                       setSelectedCategory={setSelectedCategory}
                       handleConnect={handleConnect}
                     />
 
                     <div
-                      className="tab-pane fade"
+                      className={`tab-pane fade ${
+                        activeTab === "Source files" ? "show active" : ""
+                      }`}
                       id="pills-source"
                       role="tabpanel"
                       aria-labelledby="pills-source-tab"
