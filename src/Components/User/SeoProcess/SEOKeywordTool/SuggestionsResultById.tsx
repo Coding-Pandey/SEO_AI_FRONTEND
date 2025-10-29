@@ -7,6 +7,7 @@ import Loading from "../../../Page/Loading/Loading";
 import {
   deleteKeywordData,
   deletePageData,
+  downloadCSVFile,
   GetSeoClusterDataById,
   UpdateSEOFileName,
   UpdateSEOtitle,
@@ -209,6 +210,56 @@ const SuggestionsResultById = () => {
     navigate("/content/ContentGeneratBySeo", { state: dataGenerate });
   };
 
+  const handleCSVDownload = async () => {
+    if (!id) {
+      toast.error("Error downloading file, try again later!", {
+        position: "top-right",
+        autoClose: 1500,
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res: any = await downloadCSVFile({ uuid: id });
+      console.log("res", res);
+
+      if (res?.status === 200 || res?.status === 201) {
+        if (res.data?.download_url) {
+          const anchorTag = document.createElement("a");
+          anchorTag.href = res?.data?.download_url;
+          anchorTag.download = "";
+          document.body.appendChild(anchorTag);
+          anchorTag.click();
+          document.body.removeChild(anchorTag);
+
+          toast.success("File downloaded successfully!", {
+            position: "top-right",
+            autoClose: 1500,
+          });
+        } else {
+          toast.error("Download URL missing in response!", {
+            position: "top-right",
+            autoClose: 1500,
+          });
+        }
+      } else {
+        toast.error("Download failed. Please try again later.", {
+          position: "top-right",
+          autoClose: 1500,
+        });
+      }
+    } catch (error: any) {
+      console.error("Download error:", error);
+      toast.error("Error downloading file, try again later!", {
+        position: "top-right",
+        autoClose: 1500,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       {loading && <Loading />}
@@ -264,6 +315,11 @@ const SuggestionsResultById = () => {
                     />
                   )}
                 </h2>
+              </div>
+              <div>
+                <button className="btn primary_btn" onClick={handleCSVDownload}>
+                  Download CSV
+                </button>
               </div>
             </div>
 

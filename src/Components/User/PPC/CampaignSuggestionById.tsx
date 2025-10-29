@@ -10,6 +10,7 @@ import {
   deletePageDataPpc,
   GetPpcClusterDataById,
   UpdatePpcFileName,
+  downloadCSVFile,
 } from "./PpcServices";
 import FileNameUpdateModal from "../../Page/FileNameUpdateModal";
 
@@ -31,6 +32,56 @@ const CampaignSuggestionById = () => {
       fetchPpcClusterData(id);
     }
   }, [id]);
+
+  const handleCSVDownload = async () => {
+    if (!id) {
+      toast.error("Error downloading file, try again later!", {
+        position: "top-right",
+        autoClose: 1500,
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res: any = await downloadCSVFile({ uuid: id });
+      console.log("res", res);
+
+      if (res?.status === 200 || res?.status === 201) {
+        if (res.data?.download_url) {
+          const anchorTag = document.createElement("a");
+          anchorTag.href = res?.data?.download_url;
+          anchorTag.download = "";
+          document.body.appendChild(anchorTag);
+          anchorTag.click();
+          document.body.removeChild(anchorTag);
+
+          toast.success("File downloaded successfully!", {
+            position: "top-right",
+            autoClose: 1500,
+          });
+        } else {
+          toast.error("Download URL missing in response!", {
+            position: "top-right",
+            autoClose: 1500,
+          });
+        }
+      } else {
+        toast.error("Download failed. Please try again later.", {
+          position: "top-right",
+          autoClose: 1500,
+        });
+      }
+    } catch (error: any) {
+      console.error("Download error:", error);
+      toast.error("Error downloading file, try again later!", {
+        position: "top-right",
+        autoClose: 1500,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchPpcClusterData = async (clusterId: string) => {
     try {
@@ -158,7 +209,7 @@ const CampaignSuggestionById = () => {
       const formData = { file_name: content };
       const res = await UpdatePpcFileName(UUID, formData);
       if (res.status === 200 || res.status === 201) {
-        setSuggestionKeywordDetails((prev:any) =>
+        setSuggestionKeywordDetails((prev: any) =>
           prev ? { ...prev, fileName: content } : prev
         );
         setShowFileModal(false);
@@ -440,21 +491,18 @@ const CampaignSuggestionById = () => {
         </div>
         <div className="upload_download_btns">
           <button className="btn primary_btn">
-            <p>
-              Upload to Google Ads 
-            </p>
-              <i className="bi bi-upload"></i>
+            <p>Upload to Google Ads</p>
+            <i className="bi bi-upload"></i>
           </button>
           <button className="btn primary_btn">
-             <p>
-              Download
-             </p>
-             <i className="bi bi-download"></i>
+            <p>Download</p>
+            <i className="bi bi-download"></i>
           </button>
         </div>
       </div>
     </div>
   );
+
   return (
     <>
       {loading && <Loading />}
@@ -512,6 +560,11 @@ const CampaignSuggestionById = () => {
                   )}
                 </h2>
               </div>
+              <div>
+                <button className="btn primary_btn" onClick={handleCSVDownload}>
+                  Download CSV
+                </button>
+              </div>
             </div>
             <div className="suggest_page_wrapper suggest_ppc_campaign">
               <div className="row">
@@ -520,7 +573,7 @@ const CampaignSuggestionById = () => {
                     <SuggestCard key={index} group={group} />
                   )
                 )}
-            
+
                 {showModal && (
                   <div className="modal-overlays">
                     <div

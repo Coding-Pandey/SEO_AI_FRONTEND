@@ -151,6 +151,18 @@ export const SEOClusterUploadFile = async (
   }
 };
 
+export const downloadCSVFile = async (formData: { uuid: string }) => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/seo/export_to_csv",
+      formData
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const GetSeoClusterData = async () => {
   try {
     const response = await axiosInstance.get("/api/seo_Clusterfiles_list");
@@ -243,8 +255,6 @@ export const GetscheduleJobDetails = async (job_id: string) => {
   }
 };
 
-
-
 export const AddDomainCrawlURL = async (formData: { domain: string }) => {
   try {
     const response = await axiosInstance.post(`/api/sheets/crawl`, formData);
@@ -271,7 +281,6 @@ export const GetCrawDataById = async (uuid: string) => {
     throw error;
   }
 };
-
 
 export const GetCrawDataByTaskId = async (task_id: string) => {
   try {

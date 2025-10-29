@@ -1,6 +1,8 @@
 import axiosInstance from "../../../Interceptor/Interceptor";
-import { SEOClusterKeywordDataPayload, SEOGenerateKeywordDetails } from "../UserInterface/UserInterface";
-
+import {
+  SEOClusterKeywordDataPayload,
+  SEOGenerateKeywordDetails,
+} from "../UserInterface/UserInterface";
 
 //ppc
 
@@ -35,6 +37,18 @@ export const deletePpcClusterData = async (formData: { uuid: string }) => {
       {
         data: formData,
       }
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const downloadCSVFile = async (formData: { uuid: string }) => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/ppc/export_to_csv",
+      formData
     );
     return response;
   } catch (error) {
