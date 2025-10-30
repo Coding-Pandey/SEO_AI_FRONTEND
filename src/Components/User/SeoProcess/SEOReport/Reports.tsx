@@ -84,8 +84,7 @@ const Reports = () => {
   const [webListAllData, setWebListAllData] = useState<string | null>(null);
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [FilterData, setFilterData] = useState<any>({});
-  const [selectedDeviceType, setSelectedDeviceType] =
-    useState<string>("All");
+  const [selectedDeviceType, setSelectedDeviceType] = useState<string>("All");
   const [selectedSearchType, setSelectedSearchType] = useState<string>("web");
   const [selectedCountry, setSelectedCountry] = useState<string>("All");
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
@@ -98,7 +97,7 @@ const Reports = () => {
   const [selectedMetric, setSelectedMetric] = useState<
     "clicks" | "impressions" | "ctr" | "position"
   >("clicks");
-const initialLoadRef = useRef(false);
+  const initialLoadRef = useRef(false);
   const today = new Date();
   const sixMonthsAgo = subMonths(today, 6);
   const threeMonthsAgo = subMonths(today, 3);
@@ -124,12 +123,12 @@ const initialLoadRef = useRef(false);
         setWebListAllData(response?.data?.selected_site);
         setFilterData(responseFilterData.data);
 
-         const apiCountry = response?.data?.country;
-      if (apiCountry === null) {
-        setSelectedCountry("All");
-      } else {
-        setSelectedCountry(apiCountry);
-      }
+        const apiCountry = response?.data?.country;
+        if (apiCountry === null) {
+          setSelectedCountry("All");
+        } else {
+          setSelectedCountry(apiCountry);
+        }
       }
     } catch (error: any) {
       console.error("Error fetchWebList:", error);
@@ -154,69 +153,64 @@ const initialLoadRef = useRef(false);
 
   const setBrandTagsAndFetch = (tags: string[]) => {
     console.log(setBrandTags, "setBrandTags");
-    setBrandTags(tags)
+    setBrandTags(tags);
     handleCloseModal(tags);
   };
 
- 
   const handleCloseModal = async (BrandTags: any) => {
-  try {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    const payload = {
-      site_url: selectedSite?.siteUrl,
-      search_type: selectedSearchType,
-      country: selectedCountry === "All" ? null : selectedCountry,
-      device_type: selectedDeviceType === "All" ? null : selectedDeviceType,
-      start_date: formatDateToYYYYMMDD(range[0]?.startDate),
-      end_date: formatDateToYYYYMMDD(range[0]?.endDate),
-    };
+      const payload = {
+        site_url: selectedSite?.siteUrl,
+        search_type: selectedSearchType,
+        country: selectedCountry === "All" ? null : selectedCountry,
+        device_type: selectedDeviceType === "All" ? null : selectedDeviceType,
+        start_date: formatDateToYYYYMMDD(range[0]?.startDate),
+        end_date: formatDateToYYYYMMDD(range[0]?.endDate),
+      };
 
-    const payloadNewBranch = {
-      ...payload,
-      branded_words: BrandTags,
-    };
+      const payloadNewBranch = {
+        ...payload,
+        branded_words: BrandTags,
+      };
 
- 
-    const results = await Promise.allSettled([
-      AddSearchConsole(payload),
-      AddRankingKeyword(payload),
-      AddBrandedWordanalysis(payloadNewBranch),
-    ]);
+      const results = await Promise.allSettled([
+        AddSearchConsole(payload),
+        AddRankingKeyword(payload),
+        AddBrandedWordanalysis(payloadNewBranch),
+      ]);
 
-  
-    results.forEach((res, index) => {
-      if (res.status === "fulfilled") {
-        switch (index) {
-          case 0:
-            setSearchConsole(res.value.data);
-            break;
-          case 1:
-            setRankingKeyword(res.value.data);
-            break;
-          case 2:
-            setBrandedWordAnalysis(res.value.data);
-            break;
+      results.forEach((res, index) => {
+        if (res.status === "fulfilled") {
+          switch (index) {
+            case 0:
+              setSearchConsole(res.value.data);
+              break;
+            case 1:
+              setRankingKeyword(res.value.data);
+              break;
+            case 2:
+              setBrandedWordAnalysis(res.value.data);
+              break;
+          }
+        } else {
+          console.error(
+            `API call ${index + 1} failed:`,
+            res.reason?.message || res.reason
+          );
         }
-      } else {
-        console.error(
-          `API call ${index + 1} failed:`,
-          res.reason?.message || res.reason
-        );
+      });
+
+      if (results.some((res) => res.status === "fulfilled")) {
+        setIsModalOpen(false);
       }
-    });
-
-
-    if (results.some((res) => res.status === "fulfilled")) {
-      setIsModalOpen(false);
+    } catch (error: any) {
+      console.error("Error in handleCloseModal:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-  } catch (error: any) {
-    console.error("Error in handleCloseModal:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   const cardMatrix: CardMatrix | undefined = SearchConsole?.card_matrix;
 
@@ -224,34 +218,34 @@ const initialLoadRef = useRef(false);
 
   const displayItems: DisplayItem[] = cardMatrix
     ? Object.entries(cardMatrix)
-      .filter(([key]) => !excludeTitles.includes(key)) // exclude these keys
-      .map(([key, value]) => {
-        const percent =
-          value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
-        const isDown = percent < 0;
-        return {
-          title: key,
-          value: value.Current,
-          percent: `${percent}%`,
-          isDown,
-        };
-      })
+        .filter(([key]) => !excludeTitles.includes(key)) // exclude these keys
+        .map(([key, value]) => {
+          const percent =
+            value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
+          const isDown = percent < 0;
+          return {
+            title: key,
+            value: value.Current,
+            percent: `${percent}%`,
+            isDown,
+          };
+        })
     : [];
 
   const excludedItems = cardMatrix
     ? Object.entries(cardMatrix)
-      .filter(([key]) => excludeTitles.includes(key))
-      .map(([key, value]) => {
-        const percent =
-          value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
-        const isDown = percent < 0;
-        return {
-          title: key.replace(/_/g, " "), // nicer display
-          value: value.Current,
-          percent: `${percent}%`,
-          isDown,
-        };
-      })
+        .filter(([key]) => excludeTitles.includes(key))
+        .map(([key, value]) => {
+          const percent =
+            value["Change (%)"] ?? value["Relative_Change (%)"] ?? 0;
+          const isDown = percent < 0;
+          return {
+            title: key.replace(/_/g, " "), // nicer display
+            value: value.Current,
+            percent: `${percent}%`,
+            isDown,
+          };
+        })
     : [];
 
   // Safe access with default empty array to avoid errors
@@ -279,7 +273,15 @@ const initialLoadRef = useRef(false);
                   className="heading_icon me-1"
                   alt="heading icon"
                 />
-                Organic reports <span className="text_blue">/ {activeTab === "overview" ? "Overview" : activeTab === "brand" ? "Brand vs Generic" : "Rankings"}</span>
+                Organic reports{" "}
+                <span className="text_blue">
+                  /{" "}
+                  {activeTab === "overview"
+                    ? "Overview"
+                    : activeTab === "brand"
+                    ? "Brand vs Generic"
+                    : "Rankings"}
+                </span>
               </h2>
 
               {webList?.length > 0 && !isModalOpen && (
@@ -329,8 +331,9 @@ const initialLoadRef = useRef(false);
                         <li className="nav-item" role="presentation">
                           <button
                             // className="nav-link active"
-                            className={`nav-link ${activeTab === "overview" ? "active" : ""
-                              }`}
+                            className={`nav-link ${
+                              activeTab === "overview" ? "active" : ""
+                            }`}
                             onClick={() => setActiveTab("overview")}
                             id="pills-overview-tab"
                             data-bs-toggle="pill"
@@ -349,8 +352,9 @@ const initialLoadRef = useRef(false);
                         <li className="nav-item" role="presentation">
                           <button
                             // className="nav-link"
-                            className={`nav-link ${activeTab === "brand" ? "active" : ""
-                              }`}
+                            className={`nav-link ${
+                              activeTab === "brand" ? "active" : ""
+                            }`}
                             onClick={() => setActiveTab("brand")}
                             id="pills-brand-tab"
                             data-bs-toggle="pill"
@@ -369,8 +373,9 @@ const initialLoadRef = useRef(false);
                         <li className="nav-item" role="presentation">
                           <button
                             // className="nav-link"
-                            className={`nav-link ${activeTab === "rankings" ? "active" : ""
-                              }`}
+                            className={`nav-link ${
+                              activeTab === "rankings" ? "active" : ""
+                            }`}
                             onClick={() => setActiveTab("rankings")}
                             id="pills-rankings-tab"
                             data-bs-toggle="pill"
@@ -438,16 +443,18 @@ const initialLoadRef = useRef(false);
                                         {item.value}
                                       </h4>
                                       <p
-                                        className={`font_14 ${item.isDown
+                                        className={`font_14 ${
+                                          item.isDown
                                             ? "text-danger"
                                             : "text-success"
-                                          } mb-1`}
+                                        } mb-1`}
                                       >
                                         <i
-                                          className={`bi ${item.isDown
+                                          className={`bi ${
+                                            item.isDown
                                               ? "bi-arrow-down-short"
                                               : "bi-arrow-up-short"
-                                            }`}
+                                          }`}
                                         ></i>{" "}
                                         {item.percent}
                                       </p>
@@ -470,16 +477,18 @@ const initialLoadRef = useRef(false);
                                             {item.value}
                                           </h4>
                                           <p
-                                            className={`font_14 ${item.isDown
+                                            className={`font_14 ${
+                                              item.isDown
                                                 ? "text-danger"
                                                 : "text-success"
-                                              } mb-1`}
+                                            } mb-1`}
                                           >
                                             <i
-                                              className={`bi ${item.isDown
+                                              className={`bi ${
+                                                item.isDown
                                                   ? "bi-arrow-down-short"
                                                   : "bi-arrow-up-short"
-                                                }`}
+                                              }`}
                                             ></i>{" "}
                                             {item.percent}
                                           </p>
@@ -700,7 +709,6 @@ const initialLoadRef = useRef(false);
                                         metric={selectedMetric}
                                       />
                                     </div>
-                                  
                                   </div>
                                 </div>
                               </div>
@@ -773,8 +781,11 @@ const initialLoadRef = useRef(false);
 
                             <div className="col-12">
                               <div className="row">
-                                <div className="col-12 col-xxl-6">
-                                  <div className="card_box">
+                                <div className="col-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+                                  <div
+                                    className="card_box"
+                                    style={{ height: "100%" }}
+                                  >
                                     <h3 className="font_20 font_400 mb-2">
                                       Branded traffic
                                     </h3>
@@ -836,10 +847,74 @@ const initialLoadRef = useRef(false);
                                     </div>
                                   </div>
                                 </div>
+                                <div className="col-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+                                  <div
+                                    className="card_box"
+                                    style={{ height: "100%" }}
+                                  >
+                                    <h3 className="font_20 font_400 mb-2">
+                                      Generic traffic
+                                    </h3>
+                                    <div className="grid_outer">
+                                      {[
+                                        {
+                                          label: "Impressions",
+                                          key: "impressions",
+                                        },
+                                        { label: "Clicks", key: "clicks" },
+                                        {
+                                          label: "No. Keywords",
+                                          key: "no_of_keywords",
+                                        },
+                                        { label: "CTR", key: "ctr" },
+                                        {
+                                          label: "Avg. position",
+                                          key: "avg_position",
+                                        },
+                                      ].map(({ label, key }) => {
+                                        const data =
+                                          BrandedWordAnalysis
+                                            ?.non_branded_keywords?.[key];
+                                        const actual = data?.Actual ?? 0;
+                                        const fluctuation =
+                                          data?.fluctuation ?? "0";
+                                        const fluctuationNum =
+                                          parseFloat(fluctuation);
+                                        const isPositive = fluctuationNum > 0;
+                                        const fluctuationClass = isPositive
+                                          ? "text-success"
+                                          : "text-danger";
+                                        const icon = isPositive
+                                          ? "bi-arrow-up-short"
+                                          : "bi-arrow-down-short";
+
+                                        return (
+                                          <div className="grid_part" key={key}>
+                                            <h3 className="font_16 font_300 mb-1">
+                                              {label}
+                                            </h3>
+                                            <h4 className="font_20 font_600 mb-1">
+                                              {actual}
+                                            </h4>
+                                            <p
+                                              className={`font_14 ${fluctuationClass} mb-1`}
+                                            >
+                                              <i className={`bi ${icon}`}></i>{" "}
+                                              {fluctuationNum > 0
+                                                ? `${fluctuation}`
+                                                : fluctuation}
+                                              %
+                                            </p>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
-                            <div className="col-12 col-xxl-6">
+                            {/* <div className="col-12 col-xxl-6">
                               <div className="card_box">
                                 <h3 className="font_20 font_400 mb-2">
                                   Generic traffic
@@ -899,7 +974,7 @@ const initialLoadRef = useRef(false);
                                   })}
                                 </div>
                               </div>
-                            </div>
+                            </div> */}
 
                             <div className="col-12 text-end">
                               <ChartFilter
@@ -915,7 +990,7 @@ const initialLoadRef = useRef(false);
                                 <GenericKeywordsTable
                                   keywordList={
                                     BrandedWordAnalysis?.branded_keyword_list?.[
-                                    selectedMetric
+                                      selectedMetric
                                     ] ?? []
                                   }
                                   message="Branded Keywords"
@@ -924,7 +999,7 @@ const initialLoadRef = useRef(false);
                                 <GenericKeywordsTable
                                   keywordList={
                                     BrandedWordAnalysis?.generic_keyword_list?.[
-                                    selectedMetric
+                                      selectedMetric
                                     ] ?? []
                                   }
                                   message="Generic Keywords"
@@ -985,16 +1060,18 @@ const initialLoadRef = useRef(false);
                                               {item.current_count}
                                             </h4>
                                             <p
-                                              className={`font_14 mb-0 ${isPositive
+                                              className={`font_14 mb-0 ${
+                                                isPositive
                                                   ? "text-success"
                                                   : "text-danger"
-                                                }`}
+                                              }`}
                                             >
                                               <i
-                                                className={`bi ${isPositive
+                                                className={`bi ${
+                                                  isPositive
                                                     ? "bi-arrow-up-short"
                                                     : "bi-arrow-down-short"
-                                                  }`}
+                                                }`}
                                               ></i>{" "}
                                               {Math.abs(item.delta_abs)}
                                             </p>

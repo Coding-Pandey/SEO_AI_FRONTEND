@@ -117,7 +117,7 @@ const ContentGeneratBySeo = () => {
       );
       setKeywords(extractedKeywords);
       const LanguageAndCountryData = newData;
-      setLanguage(String(LanguageAndCountryData.language.ID));
+      setLanguage(String(LanguageAndCountryData?.language?.ID));
       setNewMessage("editContent");
       const mappedCountries = location_options
         .filter((loc) =>

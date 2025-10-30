@@ -203,7 +203,6 @@ const SeoAudit = () => {
       setIsLoading(true);
       const response = await GetAuditListDetails();
       if (response?.status === 200 || response?.status === 201) {
-        console.log(response?.data, 'response?.data?')
 
         const selected = response?.data?.[0]?.selected_site;
         const uuid = response?.data?.[0]?.uuid;
@@ -211,7 +210,7 @@ const SeoAudit = () => {
         setAlreadySelectedCrawl(selected);
         if (uuid) {
           const jobDetailsResponse = await GetscheduleJobDetails(uuid);
-          setJobDetails(jobDetailsResponse?.data)
+          setJobDetails(jobDetailsResponse?.data);
         }
       }
     } catch (error: any) {
@@ -254,10 +253,9 @@ const SeoAudit = () => {
       const response = await GetCrawDataById(site?.uuid!);
       if (site?.uuid!) {
         const jobDetailsResponse = await GetscheduleJobDetails(site?.uuid!);
-        setJobDetails(jobDetailsResponse?.data)
+        setJobDetails(jobDetailsResponse?.data);
       }
       if (response.status === 200) {
-
         const data = response.data;
         // console.log(data, "data");
         const indexFilters = Object.keys(data.indexability?.tables || {});
@@ -468,17 +466,22 @@ const SeoAudit = () => {
                 <div className="next_run_info">
                   <span className="next_run_label">Next Run:</span>
                   <span className="next_run_time">
-                    {new Date(jobDetails?.next_run_time).toLocaleDateString()} at{" "}
-                    {new Date(jobDetails?.next_run_time).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {new Date(jobDetails?.next_run_time).toLocaleDateString()}{" "}
+                    at{" "}
+                    {new Date(jobDetails?.next_run_time).toLocaleTimeString(
+                      [],
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
                   </span>
                 </div>
               ) : (
                 <div className="no_schedule_info">
                   <span className="warning_text">
-                    Scheduled audit report is not found, try to re-schedule
+                    {jobDetails.content ||
+                      "Scheduled audit report is not found, try to re-schedule"}
                   </span>
                 </div>
               )}
@@ -547,8 +550,9 @@ const SeoAudit = () => {
                             key={item.id}
                           >
                             <button
-                              className={`nav-link ${index === 0 ? "active" : ""
-                                }`}
+                              className={`nav-link ${
+                                index === 0 ? "active" : ""
+                              }`}
                               id={`audit-${item.id}-tab`}
                               data-bs-toggle="pill"
                               data-bs-target={`#audit-${item.id}`}
