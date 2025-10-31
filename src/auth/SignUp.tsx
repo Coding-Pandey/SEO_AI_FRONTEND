@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 const SignUp = () => {
   const navigate = useNavigate();
 
-  const [role, setRole] = useState<"user" | "moderator">("moderator");  
+  const [role, setRole] = useState<"user" | "moderator">("moderator");
   const [formData, setFormData] = useState<SignUpFormData>({
     username: "",
     email: "",
@@ -31,9 +31,9 @@ const SignUp = () => {
         userData.user?.role === "user" ||
         userData.user?.role === "moderator"
       ) {
-        navigate("/dashBoard");
+        navigate("/dashboard");
       } else if (userData.user?.role === "admin") {
-        navigate("/adminDashBoard");
+        navigate("/admin-dashboard");
       }
     }
   }, [navigate, userData]);

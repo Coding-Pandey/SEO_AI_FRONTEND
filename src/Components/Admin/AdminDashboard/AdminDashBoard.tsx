@@ -75,7 +75,7 @@ const AdminDashBoard = () => {
         localStorage.setItem("user_Data", JSON.stringify(combinedData));
         setUsers(combinedData);
         if (user.role === "moderator") {
-          navigate("/dashBoard", { replace: true });
+          navigate("/dashboard", { replace: true });
         }
       }
     } catch (error) {

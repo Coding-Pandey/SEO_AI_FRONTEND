@@ -78,7 +78,6 @@ const ProfileSetting = () => {
         setSelectedTimezone(response?.data?.timezone);
         const sourceFileList: FileItem[] =
           responseUploadFile?.data?.uploaded_files;
-        console.log(sourceFileList, "sourceFileList");
         const toneOfVoiceFiles: FileItem[] = Array.isArray(sourceFileList)
           ? sourceFileList.filter(
               (file: FileItem) => file.category === "Tone of voice"

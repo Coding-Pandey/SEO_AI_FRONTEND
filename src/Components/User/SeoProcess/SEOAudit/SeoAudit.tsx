@@ -203,7 +203,6 @@ const SeoAudit = () => {
       setIsLoading(true);
       const response = await GetAuditListDetails();
       if (response?.status === 200 || response?.status === 201) {
-
         const selected = response?.data?.[0]?.selected_site;
         const uuid = response?.data?.[0]?.uuid;
         setAllData(response?.data);
@@ -478,9 +477,9 @@ const SeoAudit = () => {
                   </span>
                 </div>
               ) : (
-                <div className="no_schedule_info">
-                  <span className="warning_text">
-                    {jobDetails.content ||
+                <div className="next_run_info">
+                  <span className="next_run_time">
+                    {jobDetails?.message ||
                       "Scheduled audit report is not found, try to re-schedule"}
                   </span>
                 </div>

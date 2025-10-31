@@ -359,7 +359,7 @@ const ContentGenerationResult = () => {
         content_type: String(contentType),
       };
       localStorage.setItem("ClusterData", JSON.stringify(dataResult));
-      navigate("/content/ContentSuggestionResult", { state: dataResult });
+      navigate("/content/content-suggestion-result", { state: dataResult });
     } catch (error) {
       console.log("Error during AddGenerate", error);
     } finally {

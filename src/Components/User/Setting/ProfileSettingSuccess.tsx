@@ -34,7 +34,7 @@ const ProfileSettingSuccess = () => {
                       type="button"
                       className="btn primary_btn ok_btn"
                       onClick={() =>
-                        navigate("/ProfileSetting", {
+                        navigate("/profile-setting", {
                           state: { openIntegrationModal: true, category },
                         })
                       }

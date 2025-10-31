@@ -207,7 +207,7 @@ const SuggestionsResultById = () => {
     };
     localStorage.removeItem("FormDataDetails");
     localStorage.removeItem("keywordToolResult");
-    navigate("/content/ContentGeneratBySeo", { state: dataGenerate });
+    navigate("/content/content-generate-by-seo", { state: dataGenerate });
   };
 
   const handleCSVDownload = async () => {

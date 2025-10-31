@@ -155,7 +155,7 @@ const KeywordTool = () => {
   };
 
   const handleNavigate = (id: string) => {
-    navigate(`/seo/SuggestionsResultById/${id}`);
+    navigate(`/seo/suggestions-result-by-id/${id}`);
   };
 
   return (

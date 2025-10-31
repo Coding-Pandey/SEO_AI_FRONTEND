@@ -63,7 +63,7 @@ const GeneratedPostResult = () => {
     post: any,
     platform: string
   ) => {
-     setPlatform(platform);
+    setPlatform(platform);
     if (platform === "facebook" && ShowListModal === false) {
       setSelectedFacebookList([]);
       setFacebookPostPayload({ uuid, id, post, platform });
@@ -371,7 +371,7 @@ const GeneratedPostResult = () => {
     try {
       const response = await deleteSocialMediaData({ uuid });
       if (response.status === 200) {
-        navigate("/social/GeneratePost");
+        navigate("/social/generate-post");
         toast.success("Set deleted successfully!");
       }
     } catch (error) {
@@ -656,7 +656,7 @@ const GeneratedPostResult = () => {
                   </button>
                   <button
                     className="btn primary_btn ms-2"
-                    onClick={() => navigate("/social/GeneratePost")}
+                    onClick={() => navigate("/social/generate-post")}
                   >
                     Generate new set
                   </button>

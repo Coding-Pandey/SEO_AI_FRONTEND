@@ -112,7 +112,7 @@ const CreateCampaign = () => {
         localStorage.setItem("languageAndCountry", JSON.stringify(NewData));
         localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
-        navigate("/ppc/CreateCampaignKeywordResult", { state: resultData });
+        navigate("/ppc/create-campaign-keyword-result", { state: resultData });
         setLoading(false);
       }
     } catch (error: any) {
@@ -155,7 +155,7 @@ const CreateCampaign = () => {
   };
 
   const handleNavigate = (id: string) => {
-    navigate(`/ppc/CampaignSuggestionById/${id}`);
+    navigate(`/ppc/campaign-suggestion-by-id/${id}`);
   };
 
   return (

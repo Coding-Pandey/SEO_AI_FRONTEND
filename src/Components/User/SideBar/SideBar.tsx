@@ -1,60 +1,59 @@
-import { Link, useLocation } from 'react-router-dom';
- 
+import { Link, useLocation } from "react-router-dom";
+
 const SideBar = () => {
   const { pathname } = useLocation();
 
   const menuItems = [
     {
-      title: 'Dashboard',
-      icon: 'bi-grid',
+      title: "Dashboard",
+      icon: "bi-grid",
       submenu: [
-        { title: 'Overview', to: '#' },
-        { title: 'List', to: '#' },
-        { title: 'Scheduled', to: '#' },
-        { title: 'Comment', to: '#' },
+        { title: "Overview", to: "#" },
+        { title: "List", to: "#" },
+        { title: "Scheduled", to: "#" },
+        { title: "Comment", to: "#" },
       ],
     },
     {
-      title: 'SEO',
-      icon: 'bi-bar-chart-line',
+      title: "SEO",
+      icon: "bi-bar-chart-line",
       submenu: [
-        { title: 'Overview', to: '#' },
-        { title: 'Keyword tool', to: '/seo/keywordTool' },
-        { title: 'Reports', to: '/seo/Reports' },
-        { title: 'SEO Audit', to: '/seo/SeoAudit' },
+        { title: "Overview", to: "#" },
+        { title: "Keyword tool", to: "/seo/keyword-tool" },
+        { title: "Reports", to: "/seo/reports" },
+        { title: "SEO Audit", to: "/seo/seo-audit" },
       ],
     },
     {
-      title: 'PPC',
-      icon: 'bi-coin',
+      title: "PPC",
+      icon: "bi-coin",
       submenu: [
-        { title: 'Overview', to: '#' },
-        { title: 'Create Campaign', to: '/ppc/CreateCampaign' },
-        { title: 'Scheduled', to: '#' },
-        { title: 'Comment', to: '#' },
+        { title: "Overview", to: "#" },
+        { title: "Create Campaign", to: "/ppc/create-campaign" },
+        { title: "Scheduled", to: "#" },
+        { title: "Comment", to: "#" },
       ],
     },
     {
-      title: 'Social Media',
-      icon: 'bi-person-plus',
+      title: "Social Media",
+      icon: "bi-person-plus",
       submenu: [
-        { title: 'Overview', to: '#' },
-        { title: 'Planner', to: '/social/Planner' },
-        { title: 'Generate Post', to: '/social/GeneratePost' },
-        { title: 'Report', to: '#' },
+        { title: "Overview", to: "#" },
+        { title: "Planner", to: "/social/planner" },
+        { title: "Generate Post", to: "/social/generate-post" },
+        { title: "Report", to: "#" },
       ],
     },
     {
-      title: 'Content',
-      icon: 'bi-pencil-square',
+      title: "Content",
+      icon: "bi-pencil-square",
       submenu: [
-        { title: 'Overview', to: '#' },
-        { title: 'Content Generation', to: '/content/ContentGeneration' },
-        { title: 'Scheduled', to: '#' },
-        { title: 'Comment', to: '#' },
+        { title: "Overview", to: "#" },
+        { title: "Content Generation", to: "/content/content-generation" },
+        { title: "Scheduled", to: "#" },
+        { title: "Comment", to: "#" },
       ],
     },
-    
   ];
 
   const isActive = (to: string) => pathname.startsWith(to);
@@ -62,7 +61,10 @@ const SideBar = () => {
   const renderDropdown = (item: any) => {
     const isAnySubActive = item.submenu.some((sub: any) => isActive(sub.to));
     return (
-      <li className={`nav-item dropdown ${isAnySubActive ? 'show' : ''}`} key={item.title}>
+      <li
+        className={`nav-item dropdown ${isAnySubActive ? "show" : ""}`}
+        key={item.title}
+      >
         <Link
           className="nav-link dropdown-toggle"
           to="#"
@@ -73,11 +75,11 @@ const SideBar = () => {
           <i className={`bi ${item.icon}`}></i> {item.title}
           <i className="bi bi-chevron-down dropdown_icon"></i>
         </Link>
-        <ul className={`dropdown-menu ${isAnySubActive ? 'show' : ''}`}>
+        <ul className={`dropdown-menu ${isAnySubActive ? "show" : ""}`}>
           {item.submenu.map((sub: any) => (
             <li className="dropdown-item" key={sub.title}>
               <Link
-                className={`submenu-link ${isActive(sub.to) ? 'active' : ''}`}
+                className={`submenu-link ${isActive(sub.to) ? "active" : ""}`}
                 to={sub.to}
               >
                 {sub.title}

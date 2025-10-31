@@ -28,9 +28,9 @@ const Login = () => {
         userData.user?.role === "user" ||
         userData.user?.role === "moderator"
       ) {
-        navigate("/dashBoard", { replace: true });
+        navigate("/dashboard", { replace: true });
       } else if (userData.user?.role === "admin") {
-        navigate("/adminDashBoard", { replace: true });
+        navigate("/admin-dashboard", { replace: true });
       }
     }
   }, [navigate, userData]);
@@ -48,17 +48,16 @@ const Login = () => {
       try {
         const response = await loginUser(formData);
         if (response.status === 201 || response.status === 200) {
-
           const { access_token, user, refresh_token } = response.data;
           const combinedData = { access_token, user, refresh_token };
           localStorage.setItem("user_Data", JSON.stringify(combinedData));
           setUsers(combinedData);
 
           if (user.role === "user" || user.role === "moderator") {
-            setTimeout(() => navigate("/dashBoard", { replace: true }), 100);
+            setTimeout(() => navigate("/dashboard", { replace: true }), 100);
           } else if (user.role === "admin") {
             setTimeout(
-              () => navigate("/adminDashBoard", { replace: true }),
+              () => navigate("/admin-dashboard", { replace: true }),
               100
             );
           }
@@ -88,9 +87,12 @@ const Login = () => {
         localStorage.setItem("user_Data", JSON.stringify(combinedData));
         setUsers(combinedData);
         if (user.role === "user" || user.role === "moderator") {
-          setTimeout(() => navigate("/dashBoard", { replace: true }), 100);
+          setTimeout(() => navigate("/dashboard", { replace: true }), 100);
         } else if (user.role === "admin") {
-          setTimeout(() => navigate("/adminDashBoard", { replace: true }), 100);
+          setTimeout(
+            () => navigate("/admin-dashboard", { replace: true }),
+            100
+          );
         }
       }
     } catch (error) {
@@ -146,7 +148,7 @@ const Login = () => {
     //     localStorage.setItem("user_Data", JSON.stringify(combinedData));
     //     setUsers(combinedData);
     //     setTimeout(() => {
-    //       navigate("/dashBoard");
+    //       navigate("/dashboard");
     //     }, 100);
     //   }
     // } catch (err) {
@@ -277,7 +279,7 @@ const Login = () => {
                       textDecoration: "underline",
                       color: "rgb(250, 122, 78)",
                     }}
-                    onClick={() => navigate("/signUp")}
+                    onClick={() => navigate("/signup")}
                   >
                     SIGN UP
                   </span>

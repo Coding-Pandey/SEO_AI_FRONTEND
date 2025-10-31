@@ -7,7 +7,7 @@ const AdminSideBar = () => {
     {
       title: "Admin Dashboard",
       icon: "bi-grid",
-      to: "/adminDashBoard",
+      to: "/admin-dashboard",
     },
     {
       title: "User Management",
@@ -47,8 +47,6 @@ const AdminSideBar = () => {
           </li>
         ))}
       </ul>
-
-    
     </div>
   );
 };

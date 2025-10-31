@@ -223,7 +223,7 @@ const CreateCampaignKeywordResult = () => {
       ) {
         const id = SEOClusterResponse.data.uuid;
         console.log(SEOClusterResponse.data, "ClusterData");
-        navigate(`/ppc/CampaignSuggestionById/${id}`);
+        navigate(`/ppc/campaign-suggestion-by-id/${id}`);
       }
     } catch (error: any) {
       console.log("Error handleSuggestPages:", error);
@@ -388,7 +388,7 @@ const CreateCampaignKeywordResult = () => {
                       </label>
                       <input
                         type="range"
-                     // className="form-range"
+                        // className="form-range"
                         id="keyword_volume"
                         min={0}
                         step={10}

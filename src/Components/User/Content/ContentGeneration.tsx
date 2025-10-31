@@ -119,7 +119,7 @@ const ContentGeneration = () => {
   };
 
   const handleNavigate = (id: string) => {
-    navigate(`/content/ContentPreviousList/${id}`);
+    navigate(`/content/content-previous-list/${id}`);
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -331,7 +331,7 @@ const ContentGeneration = () => {
         };
         localStorage.setItem("keywordToolResult", JSON.stringify(dataResult));
         localStorage.setItem("FormDataDetails", JSON.stringify(tempfile));
-        navigate("/content/ContentGenerationResult", { state: dataResult });
+        navigate("/content/content-generation-result", { state: dataResult });
       }
     } catch (error: any) {
       console.error("Error handle Generate Submit:", error);
@@ -353,13 +353,13 @@ const ContentGeneration = () => {
         isOpen={showModal}
         title="Missing Files"
         message={errorMessage}
-        navigationPath="/ProfileSetting"
+        navigationPath="/profile-setting"
         onClose={() => {
           setShowModal(false);
           setErrorMessage("");
         }}
         navigateTo={() => {
-          navigate("/ProfileSetting", {
+          navigate("/profile-setting", {
             state: { activateSourceFilesTab: true },
           });
         }}

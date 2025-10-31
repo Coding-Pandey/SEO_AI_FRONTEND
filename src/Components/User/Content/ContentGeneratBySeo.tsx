@@ -117,8 +117,6 @@ const ContentGeneratBySeo = () => {
       );
       setKeywords(extractedKeywords);
       const LanguageAndCountryData = newData;
-      setLanguage(String(LanguageAndCountryData?.language?.ID));
-      setNewMessage("editContent");
       const mappedCountries = location_options
         .filter((loc) =>
           LanguageAndCountryData.country.some((c: any) => c.id === loc.id)
@@ -126,6 +124,13 @@ const ContentGeneratBySeo = () => {
         .map((loc) => ({ value: loc.id, label: loc.country }));
 
       setCountry(mappedCountries);
+      if (LanguageAndCountryData?.language?.ID != null) {
+        setLanguage(String(LanguageAndCountryData.language.ID));
+        setNewMessage("editContent");
+      } else {
+        setLanguage("");
+        setNewMessage("newContent");
+      }
     }
   }, [location.state]);
 
@@ -352,7 +357,7 @@ const ContentGeneratBySeo = () => {
         content_type: String(contentType),
       };
       localStorage.setItem("ClusterData", JSON.stringify(dataResult));
-      navigate("/content/ContentSuggestionResult", { state: dataResult });
+      navigate("/content/content-suggestion-result", { state: dataResult });
     } catch (error: any) {
       console.log("Error during AddGenerate", error);
       setShowModal(true);
@@ -596,13 +601,13 @@ const ContentGeneratBySeo = () => {
         isOpen={showDynamicModal}
         title="Missing Files"
         message={errorMessage}
-        navigationPath="/ProfileSetting"
+        navigationPath="/profile-setting"
         onClose={() => {
           setShowDynamicModal(false);
           setErrorMessage("");
         }}
         navigateTo={() => {
-          navigate("/ProfileSetting", {
+          navigate("/profile-setting", {
             state: { activateSourceFilesTab: true },
           });
         }}
@@ -639,7 +644,7 @@ const ContentGeneratBySeo = () => {
                         if (Object.keys(generateKeywordDetails).length > 0) {
                           setEditFormOpen(false);
                         } else {
-                          navigate(`/seo/SuggestionsResultById/${id}`);
+                          navigate(`/seo/suggestions-result-by-id/${id}`);
                         }
                       }}
                     >

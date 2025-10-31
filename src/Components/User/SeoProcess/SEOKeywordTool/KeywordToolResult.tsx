@@ -221,7 +221,7 @@ const KeywordToolResult = () => {
         SEOClusterResponse.status === 200
       ) {
         const id = SEOClusterResponse.data.uuid;
-        navigate(`/seo/SuggestionsResultById/${id}`);
+        navigate(`/seo/suggestions-result-by-id/${id}`);
       }
     } catch (error: any) {
       console.log("error fetching handleSuggestPages", error);

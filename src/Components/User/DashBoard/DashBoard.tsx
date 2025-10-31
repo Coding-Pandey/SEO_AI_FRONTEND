@@ -1,4 +1,3 @@
-// import { useEffect, useState } from 'react';
 import { useEffect, useState } from "react";
 import Header from "../Header/Header";
 import SideBar from "../SideBar/SideBar";
@@ -10,6 +9,7 @@ const DashBoard = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedTimezone, setSelectedTimezone] = useState<any>();
+  const [userInfo, setUserInfo] = useState<any>();
 
   useEffect(() => {
     fetchUserDetails();
@@ -22,7 +22,9 @@ const DashBoard = () => {
       if (response.status === 200 || response.status === 201) {
         if (response.data.timezone === null) {
           setShowModal(true);
+          return;
         }
+        setUserInfo(response?.data?.username || "");
       }
     } catch (error: any) {
       console.error("Error fetchUserDetails:", error);
@@ -51,7 +53,7 @@ const DashBoard = () => {
         <SideBar />
         <div className="inner_content">
           <div className="keyword_tool_content">
-            <h5>Good morning (main dashboard, not ready)</h5>
+            <h5>Good morning, {userInfo} (main dashboard, not ready)</h5>
           </div>
         </div>
       </main>

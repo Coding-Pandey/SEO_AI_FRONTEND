@@ -23,7 +23,7 @@ const ContentSuggestionResult = () => {
   useEffect(() => {
     if (location.state) {
       const storedData = localStorage.getItem("ClusterData");
-      console.log(storedData,"storedData")
+      console.log(storedData, "storedData");
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         localStorage.setItem("ClusterData", JSON.stringify(parsedData));
@@ -90,7 +90,7 @@ const ContentSuggestionResult = () => {
         };
         localStorage.setItem("ClusterData", JSON.stringify(newData));
         setGenerateSuggestionDetails(newData);
-        navigate("/content/ContentGeneration");
+        navigate("/content/content-generation");
       }
     } catch (error) {
       console.log("Error during AddGenerate", error);

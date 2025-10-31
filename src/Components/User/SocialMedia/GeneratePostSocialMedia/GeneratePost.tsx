@@ -193,7 +193,7 @@ const GeneratePost = () => {
         setObjectives([]);
         setAudience([]);
         const id = response.data.uuid;
-        navigate(`/social/GeneratedPostResult/${id}`);
+        navigate(`/social/generated-post-result/${id}`);
         setLoading(false);
       }
     } catch (error: any) {
@@ -232,7 +232,7 @@ const GeneratePost = () => {
   };
 
   const handleNavigate = (id: string) => {
-    navigate(`/social/GeneratedPostResult/${id}`);
+    navigate(`/social/generated-post-result/${id}`);
   };
 
   const handleTargetAudience = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -250,13 +250,13 @@ const GeneratePost = () => {
         isOpen={showModal}
         title="Missing Files"
         message={errorMessage}
-        navigationPath="/ProfileSetting"
+        navigationPath="/profile-setting"
         onClose={() => {
           setShowModal(false);
           setErrorMessage("");
         }}
         navigateTo={() => {
-          navigate("/ProfileSetting", {
+          navigate("/profile-setting", {
             state: { activateSourceFilesTab: true },
           });
         }}

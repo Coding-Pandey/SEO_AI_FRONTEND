@@ -18,7 +18,6 @@ export const UpdateUserProfile = async (formData: any) => {
   }
 };
 
-
 export const SwitchToAdminAccount = async () => {
   try {
     const response = await axiosInstance.post("/api/admin/end-impersonation");

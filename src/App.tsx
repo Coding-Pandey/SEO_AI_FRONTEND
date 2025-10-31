@@ -97,8 +97,6 @@ const ProfileSettingSuccess = lazy(
   () => import("./Components/User/Setting/ProfileSettingSuccess")
 );
 
- 
-
 function App() {
   return (
     <>
@@ -107,83 +105,89 @@ function App() {
         <Routes>
           {/* Public Route */}
           <Route path="/" element={<Login />} />
-          <Route path="/email-verify/register" element={<EmailVerification />} />
-          <Route path="/signUp" element={<SignUp />} />
+          <Route
+            path="/email-verify/register"
+            element={<EmailVerification />}
+          />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/Logout" element={<Logout />} />
           {/* Protected Routes Admin*/}
           <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
-            <Route path="/adminDashBoard" element={<AdminDashBoard />} />
-            <Route path="/Admin-Profile" element={<AdminProfile />} />
+            <Route path="/admin-dashboard" element={<AdminDashBoard />} />
+            <Route path="/admin-profile" element={<AdminProfile />} />
             <Route
               path="/users-organization"
               element={<UsersAndOrganization />}
             />
             <Route path="/active-session" element={<ActiveSession />} />
             <Route path="/security_logs" element={<SecurityLogs />} />
-            <Route path="/organization-management" element={<Organizations />} />
+            <Route
+              path="/organization-management"
+              element={<Organizations />}
+            />
           </Route>
           {/* Protected Routes User */}
           <Route
             element={<ProtectedRoutes allowedRoles={["user", "moderator"]} />}
           >
-            <Route path="/dashBoard" element={<DashBoard />} />
-            <Route path="/seo/keywordTool" element={<KeywordTool />} />
+            <Route path="/dashboard" element={<DashBoard />} />
+            <Route path="/seo/keyword-tool" element={<KeywordTool />} />
             <Route
-              path="/seo/keywordToolResult"
+              path="/seo/keyword-tool-result"
               element={<KeywordToolResult />}
             />
             <Route
-              path="/seo/SuggestionsResultById/:id"
+              path="/seo/suggestions-result-by-id/:id"
               element={<SuggestionsResultById />}
             />
-            <Route path="/seo/Reports" element={<Reports />} />
-            <Route path="/seo/SeoAudit" element={<SeoAudit />} />
+            <Route path="/seo/reports" element={<Reports />} />
+            <Route path="/seo/seo-audit" element={<SeoAudit />} />
 
-            <Route path="/ppc/CreateCampaign" element={<CreateCampaign />} />
+            <Route path="/ppc/create-campaign" element={<CreateCampaign />} />
             <Route
-              path="/ppc/CreateCampaignKeywordResult"
+              path="/ppc/create-campaign-keyword-result"
               element={<CreateCampaignKeywordResult />}
             />
             <Route
-              path="/ppc/CampaignSuggestionById/:id"
+              path="/ppc/campaign-suggestion-by-id/:id"
               element={<CampaignSuggestionById />}
             />
 
-            <Route path="/social/GeneratePost" element={<GeneratePost />} />
+            <Route path="/social/generate-post" element={<GeneratePost />} />
             <Route
-              path="/social/GeneratedPostResult/:id"
+              path="/social/generated-post-result/:id"
               element={<GeneratedPostResult />}
             />
-            <Route path="/social/Planner" element={<Planner />} />
+            <Route path="/social/planner" element={<Planner />} />
 
             <Route
-              path="/content/ContentGeneration"
+              path="/content/content-generation"
               element={<ContentGeneration />}
             />
             <Route
-              path="/content/ContentGenerationResult"
+              path="/content/content-generation-result"
               element={<ContentGenerationResult />}
             />
             <Route
-              path="/content/ContentSuggestionResult"
+              path="/content/content-suggestion-result"
               element={<ContentSuggestionResult />}
             />
             <Route
-              path="/content/ContentGeneratBySeo"
+              path="/content/content-generate-by-seo"
               element={<ContentGeneratBySeo />}
             />
             <Route
-              path="/content/ContentPreviousList/:id"
+              path="/content/content-previous-list/:id"
               element={<ContentPreviousList />}
             />
 
-            <Route path="/ProfileSetting" element={<ProfileSetting />} />
+            <Route path="/profile-setting" element={<ProfileSetting />} />
             <Route
-              path="/ProfileSettingSuccess/:category"
+              path="/profile-setting-success/:category"
               element={<ProfileSettingSuccess />}
             />
           </Route>
-        
+
           {/* 404 Route */}
           <Route path="*" element={<PageNotFound />} />
         </Routes>

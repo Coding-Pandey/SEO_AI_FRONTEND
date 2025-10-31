@@ -15,7 +15,7 @@ const menuItems: MenuItem[] = [
   {
     title: "Admin Dashboard",
     icon: "bi-grid",
-    to: "/adminDashBoard",
+    to: "/admin-dashboard",
   },
   {
     title: "User Management",
@@ -66,7 +66,7 @@ const AdminHeader = () => {
     <header>
       <nav className="navbar navbar-expand-md">
         <div className="container-fluid">
-          <Link className="navbar-brand" to="/adminDashBoard">
+          <Link className="navbar-brand" to="/admin-dashboard">
             <img
               src="/assets/images/logo.svg"
               className="img-fluid main-logo"
@@ -111,9 +111,9 @@ const AdminHeader = () => {
             </li>
             <li>
               <Link
-                to="/Admin-Profile"
+                to="/admin-profile"
                 className={`nav-link ${
-                  isActive("Admin-Profile") ? "active" : ""
+                  isActive("admin-profile") ? "active" : ""
                 }`}
               >
                 <i className="bi bi-gear" aria-label="settings_icons"></i>
@@ -146,7 +146,7 @@ const AdminHeader = () => {
               </Link>
               <ul className="dropdown-menu">
                 <li>
-                  <Link className="dropdown-item" to="/Admin-Profile">
+                  <Link className="dropdown-item" to="/admin-profile">
                     My Account
                   </Link>
                 </li>
