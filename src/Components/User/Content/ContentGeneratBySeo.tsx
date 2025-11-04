@@ -351,7 +351,6 @@ const ContentGeneratBySeo = () => {
   const AddGenerate = async () => {
     try {
       setloadingData(true);
-
       const dataResult = {
         ...generateKeywordDetails,
         content_type: String(contentType),

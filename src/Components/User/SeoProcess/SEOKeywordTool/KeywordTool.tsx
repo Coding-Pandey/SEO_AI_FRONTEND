@@ -113,7 +113,7 @@ const KeywordTool = () => {
         localStorage.setItem("languageAndCountry", JSON.stringify(NewData));
         localStorage.setItem("fileNameData", JSON.stringify(fileNameData));
         localStorage.setItem("keywordToolResult", JSON.stringify(resultData));
-        navigate("/seo/KeywordToolResult", { state: resultData });
+        navigate("/seo/keyword-tool-result", { state: resultData });
         setLoading(false);
       }
     } catch (error: any) {
