@@ -80,7 +80,7 @@ const IntegrationsTab = ({
   activeTab?: string | null;
   IntegratedData: any;
   setSelectedCategory: (category: string) => void;
-  handleConnect: (providers?: string[]) => void;
+  handleConnect: (providers: string[]) => void;
 }) => {
   const [selectedIntegration, setSelectedIntegration] = useState<string | null>(
     null
@@ -207,6 +207,13 @@ const IntegrationsTab = ({
           {showConnectModal && (
             <ConnectModal
               onConnect={() => {
+                if (!providerNames || providerNames.length === 0) {
+                  toast.error("Please select at least one provider name", {
+                    autoClose: 2000,
+                    position: "top-right",
+                  });
+                  return;
+                }
                 handleConnect(providerNames);
                 setShowConnectModal(false);
               }}

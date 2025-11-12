@@ -135,7 +135,7 @@ const ProfileSetting = () => {
     }
   };
 
-  const handleConnect = async (providers?: string[]) => {
+  const handleConnect = async (providers: string[]) => {
     const provider_names: IntegrationsPayload = {
       scope_categories: providers || [],
     };
