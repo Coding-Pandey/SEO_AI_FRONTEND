@@ -1,15 +1,21 @@
 import axiosInstance from "../../../Interceptor/Interceptor";
+import { IntegrationsPayload } from "./ProfileSetting";
 
-export const GetConnectIntegrations = async (provider_name: string) => {
+export const GetConnectIntegrations = async (
+  provider_name: string,
+  providers?: IntegrationsPayload
+) => {
+  console.log("providers", providers);
   try {
-    const response = await axiosInstance.get(`/api/login/${provider_name}`);
+    const response = await axiosInstance.post(
+      `/api/login/${provider_name}`,
+      providers
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
-
-
 
 export const GetIntegrationData = async () => {
   try {
@@ -29,30 +35,46 @@ export const GetUploadedSourceFile = async () => {
   }
 };
 
-export const DeleteSource = async (uuid_id:string) => {
+export const DeleteSource = async (uuid_id: string) => {
   try {
-    const response = await axiosInstance.delete(`/api/delete_Source_file/${uuid_id}`);
+    const response = await axiosInstance.delete(
+      `/api/delete_Source_file/${uuid_id}`
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-
-export const AddSourceFileData = async (formData:any) => {
+export const AddSourceFileData = async (formData: any) => {
   try {
-    const response = await axiosInstance.post(`/api/upload_and_parse`,formData);
+    const response = await axiosInstance.post(
+      `/api/upload_and_parse`,
+      formData
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-
-
-export const UpdateSourceFileData = async (uuid_id :string,formData:any) => {
+export const UpdateSourceFileData = async (uuid_id: string, formData: any) => {
   try {
-    const response = await axiosInstance.patch(`/api/upload_and_parse/${uuid_id }`,formData);
+    const response = await axiosInstance.patch(
+      `/api/upload_and_parse/${uuid_id}`,
+      formData
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getProviderName = async (provider_name: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/available-scopes/${provider_name}`
+    );
     return response;
   } catch (error) {
     throw error;

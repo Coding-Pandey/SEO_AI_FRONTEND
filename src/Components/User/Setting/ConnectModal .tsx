@@ -1,11 +1,19 @@
+import Select from "react-select";
+
 const ConnectModal = ({
   onConnect,
   isConnected,
   onClose,
+  selectProviderName,
+  setProviderNames,
+  providerNames,
 }: {
   onConnect: () => void;
   isConnected: boolean;
   onClose: () => void;
+  selectProviderName: string[];
+  setProviderNames: any;
+  providerNames: string[];
 }) => {
   return (
     <div
@@ -21,6 +29,26 @@ const ConnectModal = ({
             <p className="font_16 mb-1">
               We require authorisation to connect to the data
             </p>
+            <div style={{ minWidth: "250px" }}>
+              <Select
+                options={selectProviderName.map((name) => ({
+                  label: name,
+                  value: name,
+                }))}
+                value={providerNames.map((name) => ({
+                  label: name,
+                  value: name,
+                }))}
+                onChange={(selected) =>
+                  setProviderNames(
+                    Array.isArray(selected) ? selected.map((s) => s.value) : []
+                  )
+                }
+                isMulti
+                placeholder="Select Provider Names"
+                classNamePrefix="react_select_new"
+              />
+            </div>
             <button
               type="button"
               className="btn primary_btn ok_btn"

@@ -27,6 +27,10 @@ interface FileItem {
   uploaded_file_name: string;
 }
 
+export interface IntegrationsPayload {
+  scope_categories: string[];
+}
+
 const ProfileSetting = () => {
   const { users } = useAuth();
   const location = useLocation();
@@ -131,11 +135,17 @@ const ProfileSetting = () => {
     }
   };
 
-  const handleConnect = async () => {
+  const handleConnect = async (providers?: string[]) => {
+    const provider_names: IntegrationsPayload = {
+      scope_categories: providers || [],
+    };
     try {
       if (!selectedCategory) return;
       setIsLoading(true);
-      const res = await GetConnectIntegrations(selectedCategory);
+      const res = await GetConnectIntegrations(
+        selectedCategory,
+        provider_names
+      );
       if (res.status === 201 || res.status === 200) {
         if (res.data.url) {
           window.location.href = res.data.url;
