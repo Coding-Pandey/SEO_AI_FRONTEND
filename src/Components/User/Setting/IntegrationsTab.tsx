@@ -114,7 +114,7 @@ const IntegrationsTab = ({
 
       setSelectProviderName(
         Object.entries(categories)
-          .filter(([key, value]) => value.length > 0)
+          .filter(([, value]) => value.length > 0)
           .map(([key]) => key)
       );
 
