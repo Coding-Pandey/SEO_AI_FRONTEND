@@ -80,7 +80,7 @@ const IntegrationsTab = ({
   activeTab?: string | null;
   IntegratedData: any;
   setSelectedCategory: (category: string) => void;
-  handleConnect: (providers: string[]) => void;
+  handleConnect: (providers: string[], setProviderNames: any) => void;
 }) => {
   const [selectedIntegration, setSelectedIntegration] = useState<string | null>(
     null
@@ -214,7 +214,7 @@ const IntegrationsTab = ({
                   });
                   return;
                 }
-                handleConnect(providerNames);
+                handleConnect(providerNames, setProviderNames);
                 setShowConnectModal(false);
               }}
               isConnected={
@@ -222,7 +222,10 @@ const IntegrationsTab = ({
                   ? getIsConnected(selectedIntegration)
                   : false
               }
-              onClose={() => setShowConnectModal(false)}
+              onClose={() => {
+                setProviderNames([]);
+                setShowConnectModal(false);
+              }}
               selectProviderName={selectProviderName}
               setProviderNames={setProviderNames}
               providerNames={providerNames}

@@ -135,7 +135,7 @@ const ProfileSetting = () => {
     }
   };
 
-  const handleConnect = async (providers: string[]) => {
+  const handleConnect = async (providers: string[], setProviderNames: any) => {
     const provider_names: IntegrationsPayload = {
       scope_categories: providers || [],
     };
@@ -148,6 +148,7 @@ const ProfileSetting = () => {
       );
       if (res.status === 201 || res.status === 200) {
         if (res.data.url) {
+          setProviderNames([]);
           window.location.href = res.data.url;
         }
       }
