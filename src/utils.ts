@@ -6,6 +6,7 @@ export const deleteS3Files = async (uuid: string) => {
     const response = await axiosInstance.get(
       `/api/delete_s3_file?file_uuid=${uuid}`
     );
+    console.log("dse");
     return response;
   } catch (error) {
     throw error;
