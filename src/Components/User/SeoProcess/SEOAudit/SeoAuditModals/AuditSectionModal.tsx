@@ -99,7 +99,7 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
     Uppercase: "Uppercase",
   };
 
-  // ✅ Sorting logic
+  // Sorting logic
   const sortedRows = [...tableRows].sort((a, b) => {
     if (!sortColumn) return 0;
 
@@ -253,14 +253,16 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                   <h3 className="font_18 font_300 mb-2">{card.title}</h3>
                   <h4 className="font_25 font_500 mb-1">{card.value}</h4>
                   <p
-                    className={`font_14 ${card.isDown ? "text-danger" : "text-success"
-                      }  mb-1`}
+                    className={`font_14 ${
+                      card.isDown ? "text-danger" : "text-success"
+                    }  mb-1`}
                   >
                     <i
-                      className={`bi ${card.isDown
+                      className={`bi ${
+                        card.isDown
                           ? "bi-arrow-down-short"
                           : "bi-arrow-up-short"
-                        }`}
+                      }`}
                     ></i>{" "}
                     {card.percent ?? card.value}
                   </p>
@@ -320,11 +322,12 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
               {filters.map((filter, idx) => (
                 <li key={idx}>
                   <button
-                    className={`indexable_btn primary_btn ${activeFilter.trim().toLowerCase() ===
-                        filter.trim().toLowerCase()
+                    className={`indexable_btn primary_btn ${
+                      activeFilter.trim().toLowerCase() ===
+                      filter.trim().toLowerCase()
                         ? "activeAudit"
                         : ""
-                      }`}
+                    }`}
                     onClick={(e) => {
                       e.preventDefault();
                       setActiveFilter(filter);
@@ -344,24 +347,31 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
               <table className="table table-striped">
                 <thead>
                   <tr>
-                    {tableHeaders.map((header, idx) => (
-                      <th
-                        key={idx}
-                        scope="col"
-                        onClick={() => handleSort(header)}
-                        className="cursor-pointer select-none"
-                        style={{ cursor: "pointer" }}
-                      >
-                        {header}{" "}
-                        <span>
-                          {sortColumn === header
-                            ? sortOrder === "asc"
-                              ? "▲"
-                              : "▼"
-                            : "⇅"}
-                        </span>
-                      </th>
-                    ))}
+                    {tableHeaders.map((header, idx) => {
+                      // Find the key in headerKeyMap whose value matches the header
+                      const key = Object.keys(headerKeyMap).find(
+                        (k) => headerKeyMap[k] === header
+                      );
+
+                      return (
+                        <th
+                          key={idx}
+                          scope="col"
+                          onClick={() => handleSort(key ?? "")}
+                          className="cursor-pointer select-none"
+                          style={{ cursor: "pointer" }}
+                        >
+                          {(key || header).replace(/_/g, " ")}{" "}
+                          <span>
+                            {sortColumn === key
+                              ? sortOrder === "asc"
+                                ? "▲"
+                                : "▼"
+                              : "⇅"}
+                          </span>
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody>
@@ -375,12 +385,14 @@ const AuditSectionModal: React.FC<AuditSectionModalProps> = ({
                           fontSize: "13px",
                         }}
                       >
-                        {renderRowCells(row)}
+                        {tableHeaders.map((header, cellIdx) => (
+                          <td key={cellIdx}>{row[header] ?? "-"}</td>
+                        ))}
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={10} className="text-center">
+                      <td colSpan={tableHeaders.length} className="text-center">
                         Data not found
                       </td>
                     </tr>

@@ -256,7 +256,6 @@ const SeoAudit = () => {
       }
       if (response.status === 200) {
         const data = response.data;
-        // console.log(data, "data");
         const indexFilters = Object.keys(data.indexability?.tables || {});
         const firstIndexFilter = indexFilters[0] || "";
 
@@ -407,7 +406,6 @@ const SeoAudit = () => {
       ) {
         if (response?.data.status === "SUCCESS") {
           const { uuid } = response.data;
-          console.log("UUID:", uuid);
           const matchedSite = {
             uuid: uuid,
             crawl_url: "crawl_url",
@@ -434,6 +432,10 @@ const SeoAudit = () => {
       handleBackgroundApi({ task_id: taskId });
     }
   }, []);
+
+  const dynamicHeaders = (headers: any) => {
+    return Object.keys(headers);
+  };
 
   return (
     <>
@@ -661,7 +663,9 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={indexability.cards}
                           filters={indexability.filters}
-                          tableHeaders={tableHeadersIndexability}
+                          tableHeaders={dynamicHeaders(
+                            indexability.tableData[0] || []
+                          )}
                           tableRows={indexability.tableData}
                           activeFilter={indexability.activeFilter}
                           setActiveFilter={(filter: string) => {
@@ -684,7 +688,9 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={statusCode.cards}
                           filters={statusCode.filters}
-                          tableHeaders={tableStatusCodeHeaders}
+                          tableHeaders={dynamicHeaders(
+                            statusCode.tableData[0] || []
+                          )}
                           tableRows={statusCode.tableData}
                           activeFilter={statusCode.activeFilter}
                           setActiveFilter={(filter: string) => {
@@ -707,7 +713,9 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={pageTitle.cards}
                           filters={pageTitle.filters}
-                          tableHeaders={tableHeadersPageTitle}
+                          tableHeaders={dynamicHeaders(
+                            pageTitle.tableData[0] || []
+                          )}
                           tableRows={pageTitle.tableData}
                           activeFilter={pageTitle.activeFilter}
                           setActiveFilter={(filter: string) => {
@@ -730,7 +738,9 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={metaDescription.cards}
                           filters={metaDescription.filters}
-                          tableHeaders={tableHeadersMeta}
+                          tableHeaders={dynamicHeaders(
+                            metaDescription.tableData[0] || []
+                          )}
                           tableRows={metaDescription.tableData}
                           activeFilter={metaDescription.activeFilter}
                           setActiveFilter={(filter: string) => {
@@ -753,7 +763,9 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={hTags.cards}
                           filters={hTags.filters}
-                          tableHeaders={tableHeadersHTags}
+                          tableHeaders={dynamicHeaders(
+                            hTags.tableData[0] || []
+                          )}
                           tableRows={hTags.tableData}
                           activeFilter={hTags.activeFilter}
                           setActiveFilter={(filter: string) => {
@@ -776,7 +788,9 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={internalLinks.cards}
                           filters={internalLinks.filters}
-                          tableHeaders={tableHeadersinternalLinks}
+                          tableHeaders={dynamicHeaders(
+                            internalLinks.tableData[0] || []
+                          )}
                           tableRows={internalLinks.tableData}
                           activeFilter={internalLinks.activeFilter}
                           setActiveFilter={(filter: string) => {
@@ -799,7 +813,9 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={content.cards}
                           filters={content.filters}
-                          tableHeaders={tableHeaderscontent}
+                          tableHeaders={dynamicHeaders(
+                            content.tableData[0] || []
+                          )}
                           tableRows={content.tableData}
                           activeFilter={content.activeFilter}
                           setActiveFilter={(filter: string) => {
@@ -822,7 +838,7 @@ const SeoAudit = () => {
                         <AuditSectionModal
                           cards={URLS.cards}
                           filters={URLS.filters}
-                          tableHeaders={tableHeadersUrl}
+                          tableHeaders={dynamicHeaders(URLS.tableData[0] || [])}
                           tableRows={URLS.tableData}
                           activeFilter={URLS.activeFilter}
                           setActiveFilter={(filter: string) => {
